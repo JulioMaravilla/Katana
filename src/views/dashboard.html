@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Katana Sushi</title>
+    <link rel="stylesheet" href="../../public/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <img src="/public/images/logo.png" alt="Katana Sushi Logo" class="sidebar-logo">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="menu-item active">
+                <a href="#perfil">
+                    <i class="fas fa-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#pedidos">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Mis Pedidos</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#favoritos">
+                    <i class="fas fa-heart"></i>
+                    <span>Favoritos</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#direcciones">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Mis Direcciones</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#menu">
+                    <i class="fas fa-utensils"></i>
+                    <span>Menú</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#promociones">
+                    <i class="fas fa-percent"></i>
+                    <span>Promociones</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 id="pageTitle">Mi Perfil</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-menu">
+                    <img src="/public/images/default-avatar.png" alt="Usuario" class="user-avatar">
+                    <span class="user-name" id="userName">Cargando...</span>
+                    <div class="notification-badge">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">2</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Perfil Section -->
+            <section id="perfilContent" class="dashboard-section active">
+                <div class="profile-info-dashboard">
+                    <div class="info-card">
+                        <div class="info-header">
+                            <i class="fas fa-user-circle"></i>
+                            <h2>Información Personal</h2>
+                        </div>
+                        <div class="info-body">
+                            <div class="info-group">
+                                <label>Nombres:</label>
+                                <p id="userNombres">Cargando...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Apellidos:</label>
+                                <p id="userApellidos">Cargando...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Correo:</label>
+                                <p id="userEmail">Cargando...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Teléfono:</label>
+                                <p id="userTelefono">Cargando...</p>
+                            </div>
+                            <div class="info-group">
+                                <label>Fecha de Nacimiento:</label>
+                                <p id="userFechaNacimiento">Cargando...</p>
+                            </div>
+                        </div>
+                        <div class="info-actions">
+                            <button class="action-btn edit-btn" onclick="habilitarEdicion()">
+                                <i class="fas fa-edit"></i> Editar Información
+                            </button>
+                            <button class="action-btn password-btn" onclick="mostrarCambioPassword()">
+                                <i class="fas fa-key"></i> Cambiar Contraseña
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-header">
+                            <i class="fas fa-star"></i>
+                            <h2>Resumen de Actividad</h2>
+                        </div>
+                        <div class="info-body">
+                            <div class="activity-stat">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">Pedidos Realizados</div>
+                            </div>
+                            <div class="activity-stat">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">Productos Favoritos</div>
+                            </div>
+                            <div class="activity-stat">
+                                <div class="stat-value">2</div>
+                                <div class="stat-label">Reseñas Escritas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modales -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Editar Perfil</h2>
+            <form id="editProfileForm" class="edit-form">
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="nombres" id="editNombres" placeholder="Nombres">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="apellidos" id="editApellidos" placeholder="Apellidos">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" name="telefono" id="editTelefono" placeholder="Teléfono">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                        <input type="date" name="fechaNacimiento" id="editFechaNacimiento">
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Cambiar Contraseña</h2>
+            <form id="changePasswordForm" class="edit-form">
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="currentPassword" placeholder="Contraseña Actual" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="newPassword" placeholder="Nueva Contraseña" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="confirmNewPassword" placeholder="Confirmar Nueva Contraseña" required>
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">Cambiar Contraseña</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../public/js/dashboard.js"></script>
+</body>
+</html> 

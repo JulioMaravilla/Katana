@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katana Sushi - Auténtico Sushi Japonés</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="nav-logo">
+            <img src="" alt="Logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="#inicio"><i class="fas fa-home"></i>Inicio</a></li>
+            <li><a href="#menu"><i class="fas fa-utensils"></i>Menú</a></li>
+            <li><a href="#promociones"><i class="fas fa-percent"></i>Promociones</a></li>
+            <li><a href="#nosotros"><i class="fas fa-users"></i>Nosotros</a></li>
+            <li><a href="#contacto"><i class="fas fa-envelope"></i>Contacto</a></li>
+            <li class="mobile-only"><a href="src/views/login.html" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a></li>
+        </ul>
+        <div class="nav-buttons">
+            <a href="src/views/login.html" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a>
+            <a href="#" class="cart-btn" id="cartBtn">
+                <i class="fas fa-shopping-cart"></i>
+                <span>0</span>
+            </a>
+            <div class="menu-toggle">
+                <i class="fas fa-bars menu-icon"></i>
+            </div>
+        </div>
+        <!-- Carrito expandible -->
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <h3><i class="fas fa-shopping-cart"></i> Mi Carrito</h3>
+                <button class="close-cart"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items">
+                <!-- Los items se agregarán dinámicamente -->
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-basket"></i>
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">$0.00</span>
+                </div>
+                <button class="checkout-btn">
+                    Proceder al pago
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Overlay para el carrito -->
+        <div class="cart-overlay"></div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>KATANA SUSHI</h1>
+            <p>El verdadero sabor de Japón</p>
+            <a href="#menu" class="cta-button">Ver Menú</a>
+        </div>
+    </header>
+
+    <section id="promociones" class="promos">
+        <h2>Promociones Especiales</h2>
+        <div class="promo-container">
+            <div class="promo-card">
+                <img src="/public/images/promo1.jpg" alt="2x1 en Rolls">
+                <h3>2x1 en Rolls</h3>
+                <p>Todos los martes</p>
+            </div>
+            <div class="promo-card">
+                <img src="/public/images/promo2.jpg" alt="Combo Familiar">
+                <h3>Combo Familiar</h3>
+                <p>40 piezas + bebidas</p>
+            </div>
+            <div class="promo-card">
+                <img src="/public/images/promo3.jpg" alt="Happy Hour">
+                <h3>Happy Hour</h3>
+                <p>30% off de 3PM a 6PM</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="menu" class="menu-section">
+        <h2>Nuestro Menú</h2>
+        <div class="menu-categories">
+            <button class="category-btn active">Rolls</button>
+            <button class="category-btn">Nigiri</button>
+            <button class="category-btn">Sashimi</button>
+            <button class="category-btn">Bebidas</button>
+        </div>
+        <div class="menu-items">
+            <!-- Los items del menú se cargarán dinámicamente -->
+        </div>
+    </section>
+
+    <section id="nosotros" class="about">
+        <div class="about-content">
+            <h2>Nuestra Historia</h2>
+            <p>En Katana Sushi, nos enorgullece ofrecer la más auténtica experiencia culinaria japonesa. 
+               Nuestros chefs expertos combinan técnicas tradicionales con toques modernos para crear 
+               obras maestras gastronómicas.</p>
+        </div>
+    </section>
+
+    <section id="contacto" class="contact">
+        <h2>Contáctanos</h2>
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Información</h3>
+                <p><i class="fas fa-phone"></i> 7382-1435</p>
+                <p><i class="fab fa-whatsapp"></i> WhatsApp: 7382-1435</p>
+                <p><i class="fab fa-instagram"></i> @Katana.Sushi.sv</p>
+                <p><i class="fab fa-facebook"></i> Katana Sushi</p>
+            </div>
+            <div class="contact-form">
+                <form>
+                    <input type="text" placeholder="Nombre" required>
+                    <input type="email" placeholder="Email" required>
+                    <textarea placeholder="Mensaje" required></textarea>
+                    <button type="submit">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Horario</h3>
+                <p>Lunes a Jueves: 11:00 AM - 9:00 PM</p>
+                <p>Viernes y Sábado: 11:00 AM - 10:00 PM</p>
+                <p>Domingo: 12:00 PM - 8:00 PM</p>
+            </div>
+            <div class="footer-section">
+                <h3>Síguenos</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Katana Sushi. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="public/js/main.js"></script>
+</body>
+</html> 
