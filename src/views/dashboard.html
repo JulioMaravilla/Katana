@@ -54,6 +54,18 @@
                     <span>Promociones</span>
                 </a>
             </li>
+            <li class="menu-item">
+                <a href="#carrito">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Carrito</span>
+                </a>
+            </li>
+            <li class="menu-item" style="display: none;">
+                <a href="#checkout">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Proceso de Pago</span>
+                </a>
+            </li>
         </ul>
         <div class="sidebar-footer">
             <button class="logout-btn" onclick="cerrarSesion()">
@@ -145,6 +157,485 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Menú Section -->
+            <section id="menuContent" class="dashboard-section">
+                <div class="dashboard-header">
+                    <div class="header-left">
+                        <h1><i class="fas fa-utensils"></i> Nuestro Menú</h1>
+                    </div>
+                </div>
+                <div class="menu-items">
+                    <!-- Sushi Mix Especial -->
+                    <div class="menu-item-card">
+                        <img src="/public/images/sushi-mix.jpg" alt="Sushi Mix Especial" class="menu-item-image">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-name">Sushi Mix Especial</h3>
+                                <span class="menu-item-price">$5.00</span>
+                            </div>
+                            <p class="menu-item-description">Deliciosa combinación de rolls variados con pescado fresco y aguacate.</p>
+                            <button class="add-to-cart-btn" onclick="addToCart({
+                                id: 1,
+                                name: 'Sushi Mix Especial',
+                                price: 5.00,
+                                image: '/public/images/sushi-mix.jpg',
+                                description: 'Deliciosa combinación de rolls variados'
+                            })">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Roll de Salmón Premium -->
+                    <div class="menu-item-card">
+                        <img src="/public/images/salmon-roll.jpg" alt="Roll de Salmón Premium" class="menu-item-image">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-name">Roll de Salmón Premium</h3>
+                                <span class="menu-item-price">$22.50</span>
+                            </div>
+                            <p class="menu-item-description">Roll especial de salmón fresco con aguacate y queso crema.</p>
+                            <button class="add-to-cart-btn" onclick="addToCart({
+                                id: 2,
+                                name: 'Roll de Salmón Premium',
+                                price: 22.50,
+                                image: '/public/images/salmon-roll.jpg',
+                                description: 'Roll especial de salmón fresco'
+                            })">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tempura Roll -->
+                    <div class="menu-item-card">
+                        <img src="/public/images/tempura-roll.jpg" alt="Tempura Roll" class="menu-item-image">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-name">Tempura Roll</h3>
+                                <span class="menu-item-price">$18.00</span>
+                            </div>
+                            <p class="menu-item-description">Roll tempurizado con camarón y verduras frescas.</p>
+                            <button class="add-to-cart-btn" onclick="addToCart({
+                                id: 3,
+                                name: 'Tempura Roll',
+                                price: 18.00,
+                                image: '/public/images/tempura-roll.jpg',
+                                description: 'Roll tempurizado con camarón'
+                            })">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- California Roll -->
+                    <div class="menu-item-card">
+                        <img src="/public/images/california-roll.jpg" alt="California Roll" class="menu-item-image">
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3 class="menu-item-name">California Roll</h3>
+                                <span class="menu-item-price">$15.00</span>
+                            </div>
+                            <p class="menu-item-description">Roll clásico con kanikama, pepino y aguacate.</p>
+                            <button class="add-to-cart-btn" onclick="addToCart({
+                                id: 4,
+                                name: 'California Roll',
+                                price: 15.00,
+                                image: '/public/images/california-roll.jpg',
+                                description: 'Roll clásico con kanikama'
+                            })">
+                                <i class="fas fa-cart-plus"></i>
+                                Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Carrito Section -->
+            <section id="carritoContent" class="dashboard-section">
+                <div class="dashboard-header">
+                    <div class="header-left">
+                        <h1><i class="fas fa-shopping-cart"></i> Carrito de Compras</h1>
+                    </div>
+                </div>
+                <div class="cart-container">
+                    <div class="cart-items">
+                        <!-- Los items del carrito se cargarán dinámicamente -->
+                    </div>
+                    <div class="cart-summary">
+                        <div class="cart-total">
+                            <span>Total:</span>
+                            <span class="total-amount">$0.00</span>
+                        </div>
+                        <button class="checkout-btn">
+                            <i class="fas fa-credit-card"></i>
+                            Proceder al Pago
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Proceso de Pago -->
+            <section id="checkoutContent" class="dashboard-section">
+                <div class="dashboard-header">
+                    <div class="header-left">
+                        <h1><i class="fas fa-credit-card"></i> Proceso de Pago</h1>
+                    </div>
+                </div>
+                <div class="checkout-container">
+                    <!-- Resumen del Pedido -->
+                    <div class="order-summary">
+                        <h2>Resumen del pedido</h2>
+                        <div class="order-items">
+                            <!-- Los items se cargarán dinámicamente -->
+                        </div>
+                        <div class="order-total">
+                            <div class="subtotal">
+                                <span>Subtotal</span>
+                                <span class="amount">$45.50</span>
+                            </div>
+                            <div class="shipping">
+                                <span>Envío</span>
+                                <span class="amount">Gratis</span>
+                            </div>
+                            <div class="total">
+                                <span>Total</span>
+                                <span class="amount">$45.50</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opciones de Entrega -->
+                    <div class="delivery-method">
+                        <h2>Forma de entrega</h2>
+                        <div class="delivery-options">
+                            <label class="delivery-option">
+                                <input type="radio" name="delivery" value="envio" checked>
+                                <div class="option-content">
+                                    <i class="fas fa-truck"></i>
+                                    <span>Envío a domicilio</span>
+                                </div>
+                            </label>
+                            <label class="delivery-option">
+                                <input type="radio" name="delivery" value="retiro">
+                                <div class="option-content">
+                                    <i class="fas fa-store"></i>
+                                    <span>Retiro en tienda</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Formularios de Entrega -->
+                    <div class="delivery-forms">
+                        <!-- Formulario de Envío -->
+                        <form class="shipping-form" id="shippingForm">
+                            <h2>Detalles de envío</h2>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="nombre" placeholder="Nombre" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="apellido" placeholder="Apellido" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" name="telefono" placeholder="Teléfono" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <select name="zona" class="custom-select" required>
+                                        <option value="">Selecciona la zona de entrega</option>
+                                        <option value="zona1">Zona 1 - Centro</option>
+                                        <option value="zona2">Zona 2 - Norte</option>
+                                        <option value="zona3">Zona 3 - Sur</option>
+                                        <option value="zona4">Zona 4 - Este</option>
+                                        <option value="zona5">Zona 5 - Oeste</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-map"></i>
+                                    <input type="text" name="direccion" placeholder="Dirección exacta" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-map-signs"></i>
+                                    <input type="text" name="referencia" placeholder="Punto de referencia">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-sticky-note"></i>
+                                    <textarea name="indicaciones" class="custom-textarea" placeholder="Indicaciones adicionales"></textarea>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Formulario de Retiro -->
+                        <form class="store-pickup-form" id="pickupForm" style="display: none;">
+                            <h2>Detalles de Retiro en Tienda</h2>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="pickup_nombre" placeholder="Nombre" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="pickup_apellido" placeholder="Apellido" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" name="pickup_telefono" placeholder="Teléfono" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-clock"></i>
+                                    <select name="pickup_horario" class="custom-select" required>
+                                        <option value="">Selecciona horario de retiro</option>
+                                        <option value="manana">Mañana (9:00 - 12:00)</option>
+                                        <option value="tarde">Tarde (12:00 - 17:00)</option>
+                                        <option value="noche">Noche (17:00 - 21:00)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="store-info">
+                                <h3><i class="fas fa-store"></i> Información de la Tienda</h3>
+                                <p><i class="fas fa-building"></i> Katana Sushi - Sucursal Principal</p>
+                                <p><i class="fas fa-map-marker-alt"></i> Av. Principal #123</p>
+                                <p><i class="fas fa-clock"></i> Horario: 9:00 - 21:00</p>
+                                <p><i class="fas fa-phone"></i> Teléfono: (123) 456-7890</p>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Botón de Pago -->
+                    <div class="payment-actions">
+                        <button class="proceed-payment-btn" onclick="handlePayment()">
+                            <i class="fas fa-credit-card"></i>
+                            Pagar con tarjeta
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Pedidos -->
+            <section id="pedidosContent" class="dashboard-section">
+                <div class="dashboard-header">
+                    <div class="header-left">
+                        <h1><i class="fas fa-shopping-bag"></i> Mis Pedidos</h1>
+                    </div>
+                </div>
+                
+                <div class="orders-container">
+                    <!-- Filtros de pedidos -->
+                    <div class="orders-filters">
+                        <div class="search-order">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar pedido por número..." id="searchOrder">
+                        </div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">
+                                Todos
+                            </button>
+                            <button class="filter-btn" data-filter="pending">
+                                Pendientes
+                            </button>
+                            <button class="filter-btn" data-filter="processing">
+                                En Proceso
+                            </button>
+                            <button class="filter-btn" data-filter="delivered">
+                                Entregados
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de pedidos -->
+                    <div class="orders-list">
+                        <!-- Pedido 1 -->
+                        <div class="order-card" data-status="processing">
+                            <div class="order-header">
+                                <div class="order-info">
+                                    <h3>Pedido #KS001</h3>
+                                    <span class="order-date">23 Mar 2024 - 15:30</span>
+                                </div>
+                                <div class="order-status processing">
+                                    <i class="fas fa-clock"></i>
+                                    En Preparación
+                                </div>
+                            </div>
+                            
+                            <div class="order-items">
+                                <div class="order-item">
+                                    <img src="/public/images/sushi-mix.jpg" alt="Sushi Mix Especial">
+                                    <div class="item-details">
+                                        <h4>Sushi Mix Especial</h4>
+                                        <p>Cantidad: 2</p>
+                                    </div>
+                                    <span class="item-price">$10.00</span>
+                                </div>
+                                <div class="order-item">
+                                    <img src="/public/images/california-roll.jpg" alt="California Roll">
+                                    <div class="item-details">
+                                        <h4>California Roll</h4>
+                                        <p>Cantidad: 1</p>
+                                    </div>
+                                    <span class="item-price">$15.00</span>
+                                </div>
+                            </div>
+
+                            <div class="order-tracking">
+                                <div class="tracking-steps">
+                                    <div class="tracking-step completed">
+                                        <div class="step-icon">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>Pedido Confirmado</h4>
+                                            <p>23 Mar - 15:30</p>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-step completed">
+                                        <div class="step-icon">
+                                            <i class="fas fa-utensils"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>En Preparación</h4>
+                                            <p>23 Mar - 15:35</p>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-step">
+                                        <div class="step-icon">
+                                            <i class="fas fa-motorcycle"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>En Camino</h4>
+                                            <p>Pendiente</p>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-step">
+                                        <div class="step-icon">
+                                            <i class="fas fa-home"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>Entregado</h4>
+                                            <p>Pendiente</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="order-footer">
+                                <div class="order-total">
+                                    <span>Total:</span>
+                                    <span class="total-amount">$25.00</span>
+                                </div>
+                                <button class="details-btn" onclick="toggleOrderDetails(this)">
+                                    <span>Ver Detalles</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pedido 2 -->
+                        <div class="order-card" data-status="delivered">
+                            <div class="order-header">
+                                <div class="order-info">
+                                    <h3>Pedido #KS002</h3>
+                                    <span class="order-date">22 Mar 2024 - 19:45</span>
+                                </div>
+                                <div class="order-status delivered">
+                                    <i class="fas fa-check-circle"></i>
+                                    Entregado
+                                </div>
+                            </div>
+                            
+                            <div class="order-items">
+                                <div class="order-item">
+                                    <img src="/public/images/tempura-roll.jpg" alt="Tempura Roll">
+                                    <div class="item-details">
+                                        <h4>Tempura Roll</h4>
+                                        <p>Cantidad: 1</p>
+                                    </div>
+                                    <span class="item-price">$18.00</span>
+                                </div>
+                            </div>
+
+                            <div class="order-tracking">
+                                <div class="tracking-steps">
+                                    <div class="tracking-step completed">
+                                        <div class="step-icon">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>Pedido Confirmado</h4>
+                                            <p>22 Mar - 19:45</p>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-step completed">
+                                        <div class="step-icon">
+                                            <i class="fas fa-utensils"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>En Preparación</h4>
+                                            <p>22 Mar - 19:50</p>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-step completed">
+                                        <div class="step-icon">
+                                            <i class="fas fa-motorcycle"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>En Camino</h4>
+                                            <p>22 Mar - 20:05</p>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-step completed">
+                                        <div class="step-icon">
+                                            <i class="fas fa-home"></i>
+                                        </div>
+                                        <div class="step-info">
+                                            <h4>Entregado</h4>
+                                            <p>22 Mar - 20:30</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="order-footer">
+                                <div class="order-total">
+                                    <span>Total:</span>
+                                    <span class="total-amount">$18.00</span>
+                                </div>
+                                <button class="details-btn" onclick="toggleOrderDetails(this)">
+                                    <span>Ver Detalles</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -208,6 +699,94 @@
                 </div>
                 <button type="submit" class="save-btn">Cambiar Contraseña</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal de Pago con Tarjeta -->
+    <div id="paymentModal" class="payment-modal">
+        <div class="payment-modal-content">
+            <div class="payment-header">
+                <img src="/public/images/logo.png" alt="Katana Sushi" class="payment-logo">
+                <h2>PAGO SEGURO</h2>
+                <button class="close-payment" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="payment-form">
+                <form id="cardPaymentForm" onsubmit="processPayment(event)">
+                    <div class="form-group">
+                        <label>Titular de la tarjeta <span class="required">*</span></label>
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="cardHolder" placeholder="Nombre como aparece en la tarjeta" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número de tarjeta <span class="required">*</span></label>
+                        <div class="input-icon">
+                            <i class="fas fa-credit-card"></i>
+                            <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" required 
+                                   pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" 
+                                   oninput="formatCardNumber(this)">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Fecha de vencimiento <span class="required">*</span></label>
+                            <div class="input-icon">
+                                <i class="fas fa-calendar"></i>
+                                <input type="text" name="expiryDate" placeholder="MM/AA" required 
+                                       pattern="(0[1-9]|1[0-2])\/([0-9]{2})" 
+                                       oninput="formatExpiryDate(this)">
+                            </div>
+                        </div>
+
+                        <div class="form-group half">
+                            <label>Código de seguridad <span class="required">*</span></label>
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="text" name="cvv" placeholder="CVV" required 
+                                       pattern="[0-9]{3,4}" maxlength="4">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correo Electrónico <span class="required">*</span></label>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" name="email" placeholder="tuemail@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="payment-summary">
+                        <div class="summary-row">
+                            <span>Total a pagar:</span>
+                            <span class="total-amount">$27.50</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="pay-now-btn">
+                        <span>Pagar ahora</span>
+                        <span class="amount">$27.50</span>
+                    </button>
+                </form>
+
+                <div class="payment-footer">
+                    <div class="secure-payment">
+                        <i class="fas fa-lock"></i>
+                        <span>Pago 100% seguro</span>
+                    </div>
+                    <div class="accepted-cards">
+                        <span>Aceptamos:</span>
+                        <img src="/public/images/visa.png" alt="Visa">
+                        <img src="/public/images/mastercard.png" alt="Mastercard">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

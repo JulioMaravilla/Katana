@@ -5,14 +5,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartOverlay = document.querySelector('.cart-overlay');
     const closeCartBtn = document.querySelector('.close-cart');
     const cartItemsContainer = document.querySelector('.cart-items');
-    let cart = [];
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     // Variables para el menú móvil
     const menuToggle = document.querySelector('.menu-toggle');
     const menuIcon = document.querySelector('.menu-icon');
     const navLinks = document.querySelector('.nav-links');
     const navItems = navLinks.querySelectorAll('li');
+    const body = document.body;
     let isMenuOpen = false;
+    let lastScrollTop = 0;
 
     // Datos de ejemplo para los productos
     const menuItems = {
@@ -73,14 +75,21 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.setProperty('--item-index', index);
     });
 
+    // Función para guardar el carrito en localStorage
+    function saveCart() {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
     // Funciones del carrito
-    function toggleCart() {
+    function toggleCart(e) {
+        e?.preventDefault();
         if (isMenuOpen) {
             closeMenu();
         }
         cartSidebar.classList.toggle('active');
         cartOverlay.classList.toggle('active');
         document.body.style.overflow = cartSidebar.classList.contains('active') ? 'hidden' : '';
+        updateCart(); // Actualizar el carrito al abrirlo
     }
 
     function closeCart() {
@@ -91,34 +100,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateCartCount() {
         const cartCount = document.querySelector('.cart-btn span');
-        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+        if (cartCount) {
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
     }
 
     function updateCartTotal() {
         const totalElement = document.querySelector('.total-amount');
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        totalElement.textContent = `$${total.toFixed(2)}`;
+        if (totalElement) {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalElement.textContent = `$${total.toFixed(2)}`;
+        }
     }
 
     function addToCart(item) {
-        const existingItem = cart.find(cartItem => cartItem.id === item.id);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({...item, quantity: 1});
+        try {
+            const parsedItem = typeof item === 'string' ? JSON.parse(item) : item;
+            const existingItem = cart.find(cartItem => cartItem.id === parsedItem.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({...parsedItem, quantity: 1});
+            }
+            
+            saveCart();
+            updateCart();
+            showNotification('Producto agregado al carrito', 'success');
+            
+            // Abrir el carrito
+            cartSidebar.classList.add('active');
+            cartOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } catch (error) {
+            console.error('Error al agregar al carrito:', error);
+            showNotification('Error al agregar el producto', 'error');
         }
-        
-        updateCart();
-        // Asegurarnos que el carrito se abra
-        cartSidebar.classList.add('active');
-        cartOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
     }
 
     function removeFromCart(itemId) {
         cart = cart.filter(item => item.id !== itemId);
+        saveCart();
         updateCart();
+        showNotification('Producto eliminado del carrito', 'success');
     }
 
     function updateItemQuantity(itemId, change) {
@@ -128,13 +154,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (item.quantity <= 0) {
                 removeFromCart(itemId);
             } else {
+                saveCart();
                 updateCart();
             }
         }
     }
 
     function updateCart() {
-        const cartItemsContainer = document.querySelector('.cart-items');
+        if (!cartItemsContainer) return;
         
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = `
@@ -152,14 +179,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="cart-item-description">${item.description || ''}</p>
                         <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
                         <div class="cart-item-quantity">
-                            <button class="quantity-btn decrease" onclick="updateItemQuantity(${item.id}, -1)">-</button>
+                            <button class="quantity-btn decrease" onclick="window.updateItemQuantity(${item.id}, -1)">-</button>
                             <span>${item.quantity}</span>
-                            <button class="quantity-btn increase" onclick="updateItemQuantity(${item.id}, 1)">+</button>
-                            <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button class="quantity-btn increase" onclick="window.updateItemQuantity(${item.id}, 1)">+</button>
                         </div>
                     </div>
+                    <button class="cart-item-remove" onclick="window.removeFromCart(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             `).join('');
         }
@@ -168,37 +195,104 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCartTotal();
     }
 
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(notification);
+        
+        // Mostrar la notificación
+        setTimeout(() => notification.classList.add('show'), 100);
+        
+        // Ocultar y eliminar la notificación
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
     // Funciones del menú móvil
-    function toggleMenu() {
-        if (cartSidebar.classList.contains('active')) {
-            closeCart();
-        }
-        isMenuOpen = !isMenuOpen;
-        menuToggle.classList.toggle('active');
+    function openMenu() {
+        if (isMenuOpen) return;
         
+        isMenuOpen = true;
+        menuToggle.classList.add('active');
+        body.classList.add('menu-open');
+        
+        // Mostrar el menú
         navLinks.style.display = 'flex';
-        // Forzar un reflow
-        navLinks.offsetHeight;
         
-        if (isMenuOpen) {
+        // Forzar un reflow
+        void navLinks.offsetHeight;
+        
+        // Activar las animaciones
+        requestAnimationFrame(() => {
             navLinks.classList.add('active');
             menuIcon.classList.remove('fa-bars');
             menuIcon.classList.add('fa-times');
-        } else {
-            closeMenu();
-        }
-        
-        document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+            
+            // Animar los elementos del menú
+            navItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                
+                // Forzar un reflow
+                void item.offsetWidth;
+                
+                item.style.transition = `all 0.3s ease ${index * 0.1}s`;
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            });
+        });
     }
 
     function closeMenu() {
+        if (!isMenuOpen) return;
+
         isMenuOpen = false;
         menuToggle.classList.remove('active');
         menuIcon.classList.remove('fa-times');
         menuIcon.classList.add('fa-bars');
-        
+        body.classList.remove('menu-open');
+
+        // Animar la salida de los elementos
+        navItems.forEach((item, index) => {
+            item.style.transition = 'all 0.3s ease';
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+        });
+
+        // Animar la salida del menú
         navLinks.classList.remove('active');
-        document.body.style.overflow = '';
+
+        // Esperar a que terminen las animaciones antes de ocultar
+        setTimeout(() => {
+            if (!isMenuOpen) {
+                navLinks.style.display = 'none';
+                // Limpiar estilos
+                navItems.forEach(item => {
+                    item.removeAttribute('style');
+                });
+            }
+        }, 300);
+    }
+
+    function toggleMenu(e) {
+        e?.preventDefault();
+        e?.stopPropagation();
+        
+        if (cartSidebar?.classList.contains('active')) {
+            closeCart();
+        }
+        
+        if (!isMenuOpen) {
+            openMenu();
+        } else {
+            closeMenu();
+        }
     }
 
     // Funciones del menú de productos
@@ -248,59 +342,34 @@ document.addEventListener('DOMContentLoaded', function() {
     displayMenuItems();
 
     // Event Listeners para el carrito
-    cartBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        toggleCart();
-    });
+    if (cartBtn) {
+        cartBtn.addEventListener('click', toggleCart);
+    }
 
-    closeCartBtn.addEventListener('click', closeCart);
-    cartOverlay.addEventListener('click', function(e) {
-        if (e.target === cartOverlay) {
-            closeCart();
-        }
-    });
+    if (closeCartBtn) {
+        closeCartBtn.addEventListener('click', closeCart);
+    }
+
+    if (cartOverlay) {
+        cartOverlay.addEventListener('click', (e) => {
+            if (e.target === cartOverlay) {
+                closeCart();
+            }
+        });
+    }
 
     // Event Listeners para el menú móvil
     menuToggle.addEventListener('click', toggleMenu);
 
-    // Manejar la transición del menú
-    navLinks.addEventListener('transitionend', function(e) {
-        if (e.propertyName === 'opacity' && !isMenuOpen) {
-            navLinks.style.display = 'none';
-        }
-    });
-
-    // Cerrar menú al hacer click en un enlace
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const href = link.getAttribute('href');
-            if (href.startsWith('#')) {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                closeMenu();
-                setTimeout(() => {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }, 300);
-            } else {
-                closeMenu();
-            }
+    // Cerrar menú al hacer click en enlaces
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            closeMenu();
         });
     });
 
-    // Cerrar menú y carrito con ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (cartSidebar.classList.contains('active')) {
-                closeCart();
-            }
-            if (isMenuOpen) {
-                closeMenu();
-            }
-        }
-    });
-
     // Cerrar menú al hacer click fuera
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', (e) => {
         if (isMenuOpen && 
             !e.target.closest('.nav-links') && 
             !e.target.closest('.menu-toggle')) {
@@ -308,15 +377,63 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Cambiar color de navbar al hacer scroll
-    window.addEventListener('scroll', () => {
-        const navbar = document.querySelector('.navbar');
-        if (window.scrollY > 50) {
-            navbar.style.backgroundColor = '#9A0024';
-        } else {
-            navbar.style.backgroundColor = '#BB002B';
+    // Cerrar menú con la tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMenuOpen) {
+            closeMenu();
         }
     });
+
+    // Control del scroll del navbar
+    let navbar = document.querySelector('.navbar');
+    let scrollTimeout;
+
+    function handleScroll() {
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+        }
+
+        scrollTimeout = setTimeout(() => {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // No ocultar el navbar si el menú está abierto
+            if (!isMenuOpen) {
+                if (currentScroll > lastScrollTop && currentScroll > 100) {
+                    navbar.classList.add('hidden');
+                } else {
+                    navbar.classList.remove('hidden');
+                }
+            }
+            
+            // Cambiar color del navbar
+            navbar.style.backgroundColor = currentScroll > 50 ? '#9A0024' : '#BB002B';
+
+            lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+        }, 100);
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Cerrar menú al redimensionar la ventana
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (window.innerWidth > 768 && isMenuOpen) {
+                closeMenu();
+            }
+        }, 100);
+    });
+
+    // Prevenir scroll en móvil cuando el menú está abierto
+    document.addEventListener('touchmove', (e) => {
+        if (isMenuOpen && !e.target.closest('.nav-links')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Inicializar el carrito
+    updateCart();
 
     // Exponer funciones necesarias globalmente
     window.addToCart = addToCart;
