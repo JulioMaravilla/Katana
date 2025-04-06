@@ -3796,4 +3796,250 @@ footer {
         align-self: flex-end;
         margin-top: 10px;
     }
-} 
+}
+
+.horario-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 20px auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.horario-card h2 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.horario-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.horario-icon {
+    background: #C41E3A;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.horario-icon i {
+    color: white;
+    font-size: 24px;
+}
+
+.horario-info {
+    flex: 1;
+}
+
+.horario-row {
+    background: #FFF1F3;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dias {
+    color: #333;
+    font-weight: 500;
+}
+
+.horas {
+    color: #C41E3A;
+    font-weight: 500;
+}
+
+.horas.especial {
+    color: #C41E3A;
+}
+
+@media (max-width: 768px) {
+    .horario-card {
+        margin: 20px 15px;
+    }
+    
+    .horario-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+    }
+}
+
+/* Experiencia Section */
+.experiencia {
+    padding: 5rem 5%;
+    background-color: #fff;
+    text-align: center;
+}
+
+.experiencia h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.experiencia h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background-color: #BB002B;
+}
+
+.experiencia .subtitle {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+}
+
+.experiencia-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.experiencia-item {
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.experiencia-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 20px rgba(187, 0, 43, 0.15);
+}
+
+.experiencia-icon {
+    width: 80px;
+    height: 80px;
+    background: #BB002B;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.experiencia-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.experiencia-item h3 {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.experiencia-item p {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .experiencia h2 {
+        font-size: 2rem;
+    }
+
+    .experiencia .subtitle {
+        font-size: 1.1rem;
+    }
+
+    .experiencia-container {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .experiencia-item {
+        padding: 1.5rem;
+    }
+
+    .experiencia-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .experiencia-icon i {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .experiencia {
+        padding: 3rem 5%;
+    }
+
+    .experiencia h2 {
+        font-size: 1.8rem;
+    }
+
+    .experiencia .subtitle {
+        font-size: 1rem;
+    }
+
+    .experiencia-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* WhatsApp Float Button */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 40px;
+    right: 40px;
+    background-color: #25d366;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    box-shadow: 2px 2px 3px #999;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    background-color: #128C7E;
+    transform: scale(1.1);
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.whatsapp-float i {
+    margin-top: 2px;
+}
+
+@media screen and (max-width: 768px) {
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 25px;
+    }
+}

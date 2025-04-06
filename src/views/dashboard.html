@@ -284,7 +284,7 @@
             <section id="checkoutContent" class="dashboard-section">
                 <div class="dashboard-header">
                     <div class="header-left">
-                        <h1><i class="fas fa-credit-card"></i> Proceso de Pago</h1>
+                        <h1><i class="fas fa-truck"></i> Proceso de Entrega</h1>
                     </div>
                 </div>
                 <div class="checkout-container">
@@ -321,119 +321,68 @@
                                     <span>Envío a domicilio</span>
                                 </div>
                             </label>
-                            <label class="delivery-option">
-                                <input type="radio" name="delivery" value="retiro">
-                                <div class="option-content">
-                                    <i class="fas fa-store"></i>
-                                    <span>Retiro en tienda</span>
-                                </div>
-                            </label>
                         </div>
                     </div>
 
-                    <!-- Formularios de Entrega -->
-                    <div class="delivery-forms">
-                        <!-- Formulario de Envío -->
-                        <form class="shipping-form" id="shippingForm">
-                            <h2>Detalles de envío</h2>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-user"></i>
-                                    <input type="text" name="nombre" placeholder="Nombre" required>
-                                </div>
+                    <!-- Formulario de Envío -->
+                    <form class="shipping-form active" id="shippingForm">
+                        <h2>Detalles de envío</h2>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="nombre" placeholder="Nombre" required>
                             </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-user"></i>
-                                    <input type="text" name="apellido" placeholder="Apellido" required>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" name="apellido" placeholder="Apellido" required>
                             </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-phone"></i>
-                                    <input type="tel" name="telefono" placeholder="Teléfono" required>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" name="telefono" placeholder="Teléfono" required>
                             </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <select name="zona" class="custom-select" required>
-                                        <option value="">Selecciona la zona de entrega</option>
-                                        <option value="zona1">Zona 1 - Centro</option>
-                                        <option value="zona2">Zona 2 - Norte</option>
-                                        <option value="zona3">Zona 3 - Sur</option>
-                                        <option value="zona4">Zona 4 - Este</option>
-                                        <option value="zona5">Zona 5 - Oeste</option>
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <select name="zona" class="custom-select" required>
+                                    <option value="">Selecciona la zona de entrega</option>
+                                    <option value="zona1">Zona 1 - Centro</option>
+                                    <option value="zona2">Zona 2 - Norte</option>
+                                    <option value="zona3">Zona 3 - Sur</option>
+                                    <option value="zona4">Zona 4 - Este</option>
+                                    <option value="zona5">Zona 5 - Oeste</option>
+                                </select>
                             </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-map"></i>
-                                    <input type="text" name="direccion" placeholder="Dirección exacta" required>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-map"></i>
+                                <input type="text" name="direccion" placeholder="Dirección exacta" required>
                             </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-map-signs"></i>
-                                    <input type="text" name="referencia" placeholder="Punto de referencia">
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-map-signs"></i>
+                                <input type="text" name="referencia" placeholder="Punto de referencia">
                             </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-sticky-note"></i>
-                                    <textarea name="indicaciones" class="custom-textarea" placeholder="Indicaciones adicionales"></textarea>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-comment-alt"></i>
+                                <textarea name="indicaciones" class="custom-textarea" placeholder="Indicaciones adicionales para la entrega"></textarea>
                             </div>
-                        </form>
+                        </div>
+                    </form>
 
-                        <!-- Formulario de Retiro -->
-                        <form class="store-pickup-form" id="pickupForm" style="display: none;">
-                            <h2>Detalles de Retiro en Tienda</h2>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-user"></i>
-                                    <input type="text" name="pickup_nombre" placeholder="Nombre" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-user"></i>
-                                    <input type="text" name="pickup_apellido" placeholder="Apellido" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-phone"></i>
-                                    <input type="tel" name="pickup_telefono" placeholder="Teléfono" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-icon">
-                                    <i class="fas fa-clock"></i>
-                                    <select name="pickup_horario" class="custom-select" required>
-                                        <option value="">Selecciona horario de retiro</option>
-                                        <option value="manana">Mañana (9:00 - 12:00)</option>
-                                        <option value="tarde">Tarde (12:00 - 17:00)</option>
-                                        <option value="noche">Noche (17:00 - 21:00)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="store-info">
-                                <h3><i class="fas fa-store"></i> Información de la Tienda</h3>
-                                <p><i class="fas fa-building"></i> Katana Sushi - Sucursal Principal</p>
-                                <p><i class="fas fa-map-marker-alt"></i> Av. Principal #123</p>
-                                <p><i class="fas fa-clock"></i> Horario: 9:00 - 21:00</p>
-                                <p><i class="fas fa-phone"></i> Teléfono: (123) 456-7890</p>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Botón de Pago -->
-                    <div class="payment-actions">
-                        <button class="proceed-payment-btn" onclick="handlePayment()">
-                            <i class="fas fa-credit-card"></i>
-                            Pagar con tarjeta
+                    <!-- Botón de Confirmar Pedido -->
+                    <div class="checkout-actions">
+                        <button type="button" class="confirm-order-btn" onclick="confirmOrder()">
+                            <i class="fas fa-check-circle"></i>
+                            Confirmar Pedido
                         </button>
                     </div>
                 </div>
@@ -699,94 +648,6 @@
                 </div>
                 <button type="submit" class="save-btn">Cambiar Contraseña</button>
             </form>
-        </div>
-    </div>
-
-    <!-- Modal de Pago con Tarjeta -->
-    <div id="paymentModal" class="payment-modal">
-        <div class="payment-modal-content">
-            <div class="payment-header">
-                <img src="/public/images/logo.png" alt="Katana Sushi" class="payment-logo">
-                <h2>PAGO SEGURO</h2>
-                <button class="close-payment" onclick="closePaymentModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="payment-form">
-                <form id="cardPaymentForm" onsubmit="processPayment(event)">
-                    <div class="form-group">
-                        <label>Titular de la tarjeta <span class="required">*</span></label>
-                        <div class="input-icon">
-                            <i class="fas fa-user"></i>
-                            <input type="text" name="cardHolder" placeholder="Nombre como aparece en la tarjeta" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Número de tarjeta <span class="required">*</span></label>
-                        <div class="input-icon">
-                            <i class="fas fa-credit-card"></i>
-                            <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" required 
-                                   pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" 
-                                   oninput="formatCardNumber(this)">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label>Fecha de vencimiento <span class="required">*</span></label>
-                            <div class="input-icon">
-                                <i class="fas fa-calendar"></i>
-                                <input type="text" name="expiryDate" placeholder="MM/AA" required 
-                                       pattern="(0[1-9]|1[0-2])\/([0-9]{2})" 
-                                       oninput="formatExpiryDate(this)">
-                            </div>
-                        </div>
-
-                        <div class="form-group half">
-                            <label>Código de seguridad <span class="required">*</span></label>
-                            <div class="input-icon">
-                                <i class="fas fa-lock"></i>
-                                <input type="text" name="cvv" placeholder="CVV" required 
-                                       pattern="[0-9]{3,4}" maxlength="4">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Correo Electrónico <span class="required">*</span></label>
-                        <div class="input-icon">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" name="email" placeholder="tuemail@example.com" required>
-                        </div>
-                    </div>
-
-                    <div class="payment-summary">
-                        <div class="summary-row">
-                            <span>Total a pagar:</span>
-                            <span class="total-amount">$27.50</span>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="pay-now-btn">
-                        <span>Pagar ahora</span>
-                        <span class="amount">$27.50</span>
-                    </button>
-                </form>
-
-                <div class="payment-footer">
-                    <div class="secure-payment">
-                        <i class="fas fa-lock"></i>
-                        <span>Pago 100% seguro</span>
-                    </div>
-                    <div class="accepted-cards">
-                        <span>Aceptamos:</span>
-                        <img src="/public/images/visa.png" alt="Visa">
-                        <img src="/public/images/mastercard.png" alt="Mastercard">
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 

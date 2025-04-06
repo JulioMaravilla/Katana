@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - Katana</title>
+    <!-- Google Fonts - Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="img/logo.png" alt="Katana Logo" class="admin-logo">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <ul class="admin-menu">
+                <li class="menu-item">
+                    <a href="#dashboard" class="menu-link active" data-section="dashboardContent">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#pedidos" class="menu-link" data-section="ordersContent">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Pedidos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#clientes" class="menu-link" data-section="customersContent">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#productos" class="menu-link" data-section="productsContent">
+                        <i class="fas fa-box"></i>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#reportes" class="menu-link" data-section="reportsContent">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <h1 class="header-title">Dashboard</h1>
+                <div class="admin-user">
+                    <img src="img/admin-avatar.jpg" alt="Admin" class="user-avatar">
+                    <div class="user-info">
+                        <span class="user-name">Admin Usuario</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboardContent" class="dashboard-section active">
+                <!-- Dashboard Stats -->
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon orders">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">1,234</div>
+                        <div class="stat-label">Total Pedidos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon users">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">856</div>
+                        <div class="stat-label">Clientes Registrados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon revenue">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">$45,678</div>
+                        <div class="stat-label">Ingresos Mensuales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon products">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">324</div>
+                        <div class="stat-label">Productos Activos</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="ordersContent" class="dashboard-section">
+                <div class="orders-section">
+                    <div class="section-header">
+                        <h2>Pedidos Recientes</h2>
+                        <button class="admin-btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                    <div class="orders-table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID Pedido</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#KS001</td>
+                                    <td>Juan Pérez</td>
+                                    <td>23/03/2024</td>
+                                    <td>$45.00</td>
+                                    <td><span class="status-badge pending">Pendiente</span></td>
+                                    <td>
+                                        <button class="action-btn view-btn" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit-btn" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#KS002</td>
+                                    <td>María García</td>
+                                    <td>23/03/2024</td>
+                                    <td>$32.50</td>
+                                    <td><span class="status-badge processing">En proceso</span></td>
+                                    <td>
+                                        <button class="action-btn view-btn" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn edit-btn" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customers Section -->
+            <section id="customersContent" class="dashboard-section">
+                <div class="customers-section">
+                    <div class="section-header">
+                        <h2>Clientes Registrados</h2>
+                        <div class="header-actions">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Buscar cliente...">
+                            </div>
+                            <button class="admin-btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Nuevo Cliente
+                            </button>
+                        </div>
+                    </div>
+                    <div class="customers-table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Fecha Registro</th>
+                                    <th>Pedidos</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#001</td>
+                                    <td>Juan Pérez</td>
+                                    <td>juan@email.com</td>
+                                    <td>7382-1435</td>
+                                    <td>20/03/2024</td>
+                                    <td>5</td>
+                                    <td>
+                                        <button class="action-btn view-btn" title="Ver perfil">
+                                            <i class="fas fa-user"></i>
+                                        </button>
+                                        <button class="action-btn edit-btn" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#002</td>
+                                    <td>María García</td>
+                                    <td>maria@email.com</td>
+                                    <td>7382-1436</td>
+                                    <td>21/03/2024</td>
+                                    <td>3</td>
+                                    <td>
+                                        <button class="action-btn view-btn" title="Ver perfil">
+                                            <i class="fas fa-user"></i>
+                                        </button>
+                                        <button class="action-btn edit-btn" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section id="productsContent" class="dashboard-section">
+                <div class="products-section">
+                    <div class="section-header">
+                        <h2>Gestión de Productos</h2>
+                        <button class="admin-btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Nuevo Producto
+                        </button>
+                    </div>
+                    <div class="admin-form">
+                        <h2 class="form-title">Agregar Nuevo Producto</h2>
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nombre del Producto</label>
+                                    <input type="text" class="form-control" placeholder="Ingrese el nombre del producto">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Precio</label>
+                                    <input type="number" class="form-control" placeholder="Ingrese el precio">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Categoría</label>
+                                    <select class="form-control">
+                                        <option value="">Seleccione una categoría</option>
+                                        <option value="basic">Basic</option>
+                                        <option value="pro">Pro</option>
+                                        <option value="premium">Premium</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Stock</label>
+                                    <input type="number" class="form-control" placeholder="Ingrese el stock disponible">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" rows="4" placeholder="Ingrese la descripción del producto"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Imagen del Producto</label>
+                                <input type="file" class="form-control" accept="image/*">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Guardar Producto
+                                </button>
+                                <button type="button" class="admin-btn btn-danger">
+                                    <i class="fas fa-times"></i>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Products Table -->
+                    <div class="products-table-section">
+                        <div class="section-header">
+                            <h2>Lista de Productos</h2>
+                            <div class="header-actions">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" placeholder="Buscar producto...">
+                                </div>
+                                <select class="admin-select">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="pro">Pro</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="products-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Precio</th>
+                                        <th>Categoría</th>
+                                        <th>Stock</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <img src="img/sushi.jpg" alt="sushi" class="product-thumbnail">
+                                        </td>
+                                        <td>Sushi Roll</td>
+                                        <td>$5.00</td>
+                                        <td>Rolls</td>
+                                        <td>50</td>
+                                        <td><span class="status-badge success">Activo</span></td>
+                                        <td>
+                                            <button class="action-btn view-btn" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit-btn" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete-btn" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="img/coca-cola.jpg" alt="coca-cola" class="product-thumbnail">
+                                        </td>
+                                        <td>Coca-Cola</td>
+                                        <td>$1.00</td>
+                                        <td>Bebidas</td>
+                                        <td>100</td>
+                                        <td><span class="status-badge success">Activo</span></td>
+                                        <td>
+                                            <button class="action-btn view-btn" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit-btn" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete-btn" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reportsContent" class="dashboard-section">
+                <div class="reports-section">
+                    <div class="section-header">
+                        <h2>Métricas y Estadísticas</h2>
+                        <div class="date-filters">
+                            <select class="admin-select">
+                                <option>Este mes</option>
+                                <option>Último mes</option>
+                                <option>Este año</option>
+                            </select>
+                            <select class="admin-select">
+                                <option>Enero 2024</option>
+                                <option>Febrero 2024</option>
+                                <option>Marzo 2024</option>
+                            </select>
+                            <select class="admin-select">
+                                <option>2024</option>
+                                <option>2023</option>
+                            </select>
+                            <button class="admin-btn btn-primary">
+                                <i class="fas fa-sync-alt"></i>
+                                Volver al inicio
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Cards -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Total vendidos</h3>
+                                <div class="metric-value">600 rollos</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Ingresos</h3>
+                                <div class="metric-value">$1,100</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Ventas hoy</h3>
+                                <div class="metric-value">50 rollos</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Gráfico de ventas (líneas o barras)</h3>
+                            <div class="chart-container">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Gráfico de ventas por categoría</h3>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.querySelector('.admin-sidebar');
+        const main = document.querySelector('.admin-main');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+        });
+
+        // Navegación entre secciones
+        const menuLinks = document.querySelectorAll('.menu-link');
+        const sections = document.querySelectorAll('.dashboard-section');
+        const headerTitle = document.querySelector('.header-title');
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Actualizar menú activo
+                menuLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                // Mostrar sección correspondiente
+                const targetSection = link.getAttribute('data-section');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(targetSection).classList.add('active');
+                
+                // Actualizar título del header
+                headerTitle.textContent = link.querySelector('span').textContent;
+
+                // Inicializar gráficos si estamos en la sección de reportes
+                if (targetSection === 'reportsContent') {
+                    initializeCharts();
+                }
+            });
+        });
+
+        // Inicialización de gráficos
+        function initializeCharts() {
+            // Datos para el gráfico de ventas
+            const salesData = {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                datasets: [{
+                    label: 'Ventas',
+                    data: [80, 90, 75, 70, 75, 45, 65, 85, 55, 60, 75, 70],
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            };
+
+            // Datos para el gráfico de categorías
+            const categoryData = {
+                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                datasets: [{
+                    data: [12, 19, 8, 15, 10, 8, 9, 11, 13, 7, 14, 6],
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40'
+                    ]
+                }]
+            };
+
+            // Configuración del gráfico de ventas
+            const salesChart = new Chart(document.getElementById('salesChart'), {
+                type: 'bar',
+                data: salesData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Configuración del gráfico de categorías
+            const categoryChart = new Chart(document.getElementById('categoryChart'), {
+                type: 'pie',
+                data: categoryData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
