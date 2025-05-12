@@ -7,11 +7,12 @@
     <link rel="stylesheet" href="public/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
 </head>
 <body>
     <nav class="navbar">
         <a href="#" class="nav-logo">
-            <img src="" alt="Logo">
+            <img src="public/images/logo.png" alt="Katana Sushi Logo" style="height: 50px;">
         </a>
         <ul class="nav-links">
             <li><a href="#inicio"><i class="fas fa-home"></i>Inicio</a></li>
@@ -19,26 +20,21 @@
             <li><a href="#promociones"><i class="fas fa-percent"></i>Promociones</a></li>
             <li><a href="#nosotros"><i class="fas fa-users"></i>Nosotros</a></li>
             <li><a href="#contacto"><i class="fas fa-envelope"></i>Contacto</a></li>
-            <li class="mobile-only"><a href="src/views/login.html" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a></li>
-        </ul>
+            </ul>
         <div class="nav-buttons">
-            <a href="src/views/login.html" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a>
             <a href="#" class="cart-btn" id="cartBtn">
-                <i class="fas fa-shopping-cart"></i>
-                <span>0</span>
+                <i class="fas fa-shopping-cart"></i>                <span>0</span>
             </a>
             <div class="menu-toggle">
                 <i class="fas fa-bars menu-icon"></i>
             </div>
         </div>
-        <!-- Carrito expandible -->
         <div class="cart-sidebar">
             <div class="cart-header">
                 <h3><i class="fas fa-shopping-cart"></i> Mi Carrito</h3>
                 <button class="close-cart"><i class="fas fa-times"></i></button>
             </div>
             <div class="cart-items">
-                <!-- Los items se agregarán dinámicamente -->
                 <div class="empty-cart">
                     <i class="fas fa-shopping-basket"></i>
                     <p>Tu carrito está vacío</p>
@@ -49,64 +45,76 @@
                     <span>Total:</span>
                     <span class="total-amount">$0.00</span>
                 </div>
-                <button class="checkout-btn">
-                    Proceder al pago
+                <button class="checkout-btn"> Continuar con el pedido
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </div>
-        <!-- Overlay para el carrito -->
         <div class="cart-overlay"></div>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <h1>KATANA SUSHI</h1>
-            <p>El verdadero sabor de Japón</p>
-            
-            <div class="horario-card">
-                <h2>Horario de Encargos</h2>
-                <div class="horario-item">
-                    <div class="horario-icon">
-                        <i class="fas fa-clock"></i>
+    <section class="main-carousel">
+        <div class="carousel-slide active" style="background-image: url('public/images/horaa.jpg');"></div>
+        <div class="carousel-slide" style="background-image: url('public/images/promo.png');"></div>
+        <div class="carousel-slide" style="background-image: url('public/images/Cuadro_MartesPromos.png');"></div>
+        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+        <div class="carousel-indicators">
+            <span class="indicator active"></span>
+            <span class="indicator"></span>
+            <span class="indicator"></span>
+        </div>
+    </section>
+
+    <section class="horario-section">
+        <div class="horario-card">
+            <h2>Horario de Encargos</h2>
+            <div class="horario-item">
+                <div class="horario-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="horario-info">
+                    <div class="horario-row">
+                        <span class="dias">Lunes a Jueves</span>
+                        <span class="horas">8:00 AM - 6:00 PM</span>
                     </div>
-                    <div class="horario-info">
-                        <div class="horario-row">
-                            <span class="dias">Lunes a Jueves</span>
-                            <span class="horas">8:00 AM - 6:00 PM</span>
-                        </div>
-                        <div class="horario-row">
-                            <span class="dias">Sábados</span>
-                            <span class="horas especial">Entregas desde 12:00 PM</span>
-                        </div>
+                    <div class="horario-row">
+                        <span class="dias">Sábados</span>
+                        <span class="horas especial">Entregas desde 12:00 PM</span>
                     </div>
                 </div>
             </div>
-
-            <a href="#menu" class="cta-button">Ver Menú</a>
         </div>
-    </header>
+    </section>
+
+    <a href="#menu" class="cta-button oculto" style="display:block;text-align:center;margin:2rem auto;max-width:200px;">Ver Menú</a>
 
     <section id="promociones" class="promos">
         <h2>Promociones Especiales</h2>
         <div class="promo-container">
-            <div class="promo-card">
-                <img src="public/images/shushi.jpg" alt="2x1 en Rolls">
+             <div class="promo-card promo-cupon-registrado">
+                 <h3>Cupón exclusivo para usuarios registrados</h3>
+                 <p>Obtén 25% de descuento en tu sushi.<br>Válido hasta el 30 de abril 2025.</p>
+                 <button class="cta-button" style="margin-top:1rem;" id="btnUsarCuponRegistrado">Usar cupón</button>
+             </div>
+             <div class="promo-card">
+                <img src="public/images/shushi.jpg" alt="2x1 en Rolls" onerror="this.onerror=null; this.src='public/images/placeholder.png';">
                 <h3>2x1 en Rolls</h3>
                 <p>Todos los martes</p>
             </div>
             <div class="promo-card">
-                <img src="public/images/descarga.jpg" alt="Combo Familiar">
+                <img src="public/images/descarga.jpg" alt="Combo Familiar" onerror="this.onerror=null; this.src='public/images/placeholder.png';">
                 <h3>Combo Familiar</h3>
                 <p>40 piezas + bebidas</p>
             </div>
             <div class="promo-card">
-                <img src="public/images/shushi.jpg" alt="Happy Hour">
+                <img src="public/images/shushi.jpg" alt="Happy Hour" onerror="this.onerror=null; this.src='public/images/placeholder.png';">
                 <h3>Happy Hour</h3>
                 <p>30% off de 3PM a 6PM</p>
             </div>
         </div>
     </section>
+
     <section id="menu" class="menu-section">
         <h2>Nuestro Menú</h2>
         <div class="menu-categories">
@@ -114,17 +122,19 @@
             <button class="category-btn">Nigiri</button>
             <button class="category-btn">Sashimi</button>
             <button class="category-btn">Bebidas</button>
+            <button class="category-btn">Entradas</button>
+            <button class="category-btn">Postres</button>
         </div>
         <div class="menu-items">
-            <!-- Los items del menú se cargarán dinámicamente -->
+            <p style="text-align:center;">Cargando menú...</p>
         </div>
     </section>
 
     <section id="nosotros" class="about">
         <div class="about-content">
             <h2>Nuestra Historia</h2>
-            <p>En Katana Sushi, nos enorgullece ofrecer la más auténtica experiencia culinaria japonesa. 
-               Nuestros chefs expertos combinan técnicas tradicionales con toques modernos para crear 
+            <p>En Katana Sushi, nos enorgullece ofrecer la más auténtica experiencia culinaria japonesa.
+               Nuestros chefs expertos combinan técnicas tradicionales con toques modernos para crear
                obras maestras gastronómicas.</p>
         </div>
     </section>
@@ -165,20 +175,28 @@
     </section>
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <!--h3>Horario</h3>
-                <p>Lunes a Jueves: 11:00 AM - 9:00 PM</p>
-                <p>Viernes y Sábado: 11:00 AM - 10:00 PM</p>
-                <p>Domingo: 12:00 PM - 8:00 PM</p-->
+        <div class="footer-content simple-footer">
+            <div class="footer-col">
+                <h4>NUESTRA EMPRESA</h4>
+                <ul>
+                    <li><a href="#nosotros">Sobre nosotros</a></li>
+                    <li><a href="#">Términos de uso</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                </ul>
             </div>
-            <div class="footer-section">
-                <h3>Síguenos</h3>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
-                </div>
+            <div class="footer-col">
+                <h4>MENÚ</h4>
+                <ul>
+                    <li><a href="#menu">Ver menú</a></li>
+                    <li><a href="#promociones">Promociones</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>CONTACTO</h4>
+                <ul>
+                    <li><a href="#contacto">Formulario</a></li>
+                    <li><a href="mailto:info@katanasushi.com">info@katanasushi.com</a></li>
+                </ul>
             </div>
         </div>
         <div class="footer-bottom">
@@ -186,11 +204,86 @@
         </div>
     </footer>
 
+    <div class="social-float">
+        <div class="social-float-button">
+            <i class="fas fa-headset"></i>
+        </div>
+        <div class="social-float-menu">
+            <a href="https://wa.me/50373821435" target="_blank" class="social-float-item">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=100083618180488" target="_blank" class="social-float-item">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://www.instagram.com/katana.sushi.sv?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="social-float-item">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </div>
+
+    <div id="authChoiceModal" class="choice-modal">
+        <div class="choice-modal-content">
+            <button class="close-choice-modal" id="closeAuthChoiceModal"><i class="fas fa-times"></i></button>
+            <h2>Continuar Pedido</h2>
+            <p>¿Cómo deseas continuar?</p>
+            <div class="choice-modal-buttons">
+                <button class="btn btn-primary" id="loginChoiceBtn">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                <button class="btn btn-secondary" id="guestChoiceBtn">
+                    <i class="fas fa-user-alt-slash"></i> Continuar como Invitado
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="guestOrderModal" class="guest-modal">
+        <div class="guest-modal-content">
+            <button class="close-guest-modal" id="closeGuestModal"><i class="fas fa-times"></i></button>
+            <h2>Pedido como Invitado</h2>
+            <form id="guestOrderForm">
+                <div class="form-group">
+                    <label for="guestName">Nombre completo <span class="required">*</span></label>
+                    <input type="text" id="guestName" name="guestName" required>
+                </div>
+                <div class="form-group">
+                    <label for="guestPhone">Teléfono <span class="required">*</span></label>
+                    <input type="tel" id="guestPhone" name="guestPhone" required pattern="[0-9]{8}" title="Ingrese 8 dígitos">
+                </div>
+                <div class="form-group">
+                    <label for="guestAddress">Dirección <span class="required">*</span></label>
+                    <input type="text" id="guestAddress" name="guestAddress" required>
+                </div>
+                <div class="form-group">
+                    <label for="guestZone">Zona de envío <span class="required">*</span></label>
+                    <select id="guestZone" name="guestZone" required>
+                        <option value="">Selecciona una zona</option>
+                        <option value="centro" data-cost="2.00">Centro ($2.00)</option>
+                        <option value="escalon" data-cost="2.50">Colonia Escalón ($2.50)</option>
+                        <option value="sanbenito" data-cost="3.00">Colonia San Benito ($3.00)</option>
+                        <option value="antiguo" data-cost="3.50">Antiguo Cuscatlán ($3.50)</option>
+                        <option value="santatecla" data-cost="4.00">Santa Tecla ($4.00)</option>
+                        <option value="otra" data-cost="0.00">Otra zona (contactaremos)</option>
+                    </select>
+                </div>
+                <div id="guestShippingCost" class="shipping-cost-info" style="display:none;"></div>
+                <div id="guestShippingMsg" class="shipping-msg" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="guestComment">Punto de referencia</label>
+                    <textarea id="guestComment" name="guestComment" rows="2"></textarea>
+                </div>
+                <button type="submit" class="cta-button" style="width:100%;margin-top:1rem;">
+                    <i class="fas fa-paper-plane"></i> Registrar pedido
+                </button>
+            </form>
+            <div id="guestOrderSuccess" class="guest-success" style="display:none;">
+                <i class="fas fa-check-circle"></i>
+                <p>¡Tu pedido ha sido recibido! Pronto nos pondremos en contacto.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="public/js/main.js"></script>
 
-    <!-- WhatsApp Button -->
-    <a href="https://wa.me/50373821435" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
 </body>
-</html> 
+</html>

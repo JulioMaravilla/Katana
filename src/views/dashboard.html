@@ -18,10 +18,10 @@
             </button>
         </div>
         <ul class="sidebar-menu">
-            <li class="menu-item active">
-                <a href="#perfil">
-                    <i class="fas fa-user"></i>
-                    <span>Mi Perfil</span>
+            <li class="menu-item">
+                <a href="#menu">
+                    <i class="fas fa-utensils"></i>
+                    <span>Menú</span>
                 </a>
             </li>
             <li class="menu-item">
@@ -43,12 +43,6 @@
                 </a>
             </li>
             <li class="menu-item">
-                <a href="#menu">
-                    <i class="fas fa-utensils"></i>
-                    <span>Menú</span>
-                </a>
-            </li>
-            <li class="menu-item">
                 <a href="#promociones">
                     <i class="fas fa-percent"></i>
                     <span>Promociones</span>
@@ -58,6 +52,12 @@
                 <a href="#carrito">
                     <i class="fas fa-shopping-cart"></i>
                     <span>Carrito</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#perfil">
+                    <i class="fas fa-user"></i>
+                    <span>Mi Perfil</span>
                 </a>
             </li>
             <li class="menu-item" style="display: none;">
@@ -79,7 +79,7 @@
     <main class="main-content">
         <header class="dashboard-header">
             <div class="header-left">
-                <h1 id="pageTitle">Mi Perfil</h1>
+                <h1 id="pageTitle">Menú</h1>
             </div>
             <div class="header-right">
                 <div class="user-menu">
@@ -96,7 +96,7 @@
         <!-- Content Area -->
         <div class="content-area">
             <!-- Perfil Section -->
-            <section id="perfilContent" class="dashboard-section active">
+            <section id="perfilContent" class="dashboard-section">
                 <div class="profile-info-dashboard">
                     <div class="info-card">
                         <div class="info-header">
@@ -159,100 +159,14 @@
             </section>
 
             <!-- Menú Section -->
-            <section id="menuContent" class="dashboard-section">
+            <section id="menuContent" class="dashboard-section active">
                 <div class="dashboard-header">
                     <div class="header-left">
                         <h1><i class="fas fa-utensils"></i> Nuestro Menú</h1>
                     </div>
-                </div>
+                    </div>
                 <div class="menu-items">
-                    <!-- Sushi Mix Especial -->
-                    <div class="menu-item-card">
-                        <img src="/public/images/sushi-mix.jpg" alt="Sushi Mix Especial" class="menu-item-image">
-                        <div class="menu-item-content">
-                            <div class="menu-item-header">
-                                <h3 class="menu-item-name">Sushi Mix Especial</h3>
-                                <span class="menu-item-price">$5.00</span>
-                            </div>
-                            <p class="menu-item-description">Deliciosa combinación de rolls variados con pescado fresco y aguacate.</p>
-                            <button class="add-to-cart-btn" onclick="addToCart({
-                                id: 1,
-                                name: 'Sushi Mix Especial',
-                                price: 5.00,
-                                image: '/public/images/sushi-mix.jpg',
-                                description: 'Deliciosa combinación de rolls variados'
-                            })">
-                                <i class="fas fa-cart-plus"></i>
-                                Agregar al Carrito
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Roll de Salmón Premium -->
-                    <div class="menu-item-card">
-                        <img src="/public/images/salmon-roll.jpg" alt="Roll de Salmón Premium" class="menu-item-image">
-                        <div class="menu-item-content">
-                            <div class="menu-item-header">
-                                <h3 class="menu-item-name">Roll de Salmón Premium</h3>
-                                <span class="menu-item-price">$22.50</span>
-                            </div>
-                            <p class="menu-item-description">Roll especial de salmón fresco con aguacate y queso crema.</p>
-                            <button class="add-to-cart-btn" onclick="addToCart({
-                                id: 2,
-                                name: 'Roll de Salmón Premium',
-                                price: 22.50,
-                                image: '/public/images/salmon-roll.jpg',
-                                description: 'Roll especial de salmón fresco'
-                            })">
-                                <i class="fas fa-cart-plus"></i>
-                                Agregar al Carrito
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tempura Roll -->
-                    <div class="menu-item-card">
-                        <img src="/public/images/tempura-roll.jpg" alt="Tempura Roll" class="menu-item-image">
-                        <div class="menu-item-content">
-                            <div class="menu-item-header">
-                                <h3 class="menu-item-name">Tempura Roll</h3>
-                                <span class="menu-item-price">$18.00</span>
-                            </div>
-                            <p class="menu-item-description">Roll tempurizado con camarón y verduras frescas.</p>
-                            <button class="add-to-cart-btn" onclick="addToCart({
-                                id: 3,
-                                name: 'Tempura Roll',
-                                price: 18.00,
-                                image: '/public/images/tempura-roll.jpg',
-                                description: 'Roll tempurizado con camarón'
-                            })">
-                                <i class="fas fa-cart-plus"></i>
-                                Agregar al Carrito
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- California Roll -->
-                    <div class="menu-item-card">
-                        <img src="/public/images/california-roll.jpg" alt="California Roll" class="menu-item-image">
-                        <div class="menu-item-content">
-                            <div class="menu-item-header">
-                                <h3 class="menu-item-name">California Roll</h3>
-                                <span class="menu-item-price">$15.00</span>
-                            </div>
-                            <p class="menu-item-description">Roll clásico con kanikama, pepino y aguacate.</p>
-                            <button class="add-to-cart-btn" onclick="addToCart({
-                                id: 4,
-                                name: 'California Roll',
-                                price: 15.00,
-                                image: '/public/images/california-roll.jpg',
-                                description: 'Roll clásico con kanikama'
-                            })">
-                                <i class="fas fa-cart-plus"></i>
-                                Agregar al Carrito
-                            </button>
-                        </div>
-                    </div>
+                    <p style="text-align: center;">Cargando menú...</p>
                 </div>
             </section>
 
@@ -274,7 +188,7 @@
                         </div>
                         <button class="checkout-btn">
                             <i class="fas fa-credit-card"></i>
-                            Proceder al Pago
+                            Proceder con el pedido
                         </button>
                     </div>
                 </div>

@@ -1,575 +1,425 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Administrativo - Katana</title>
-    <!-- Google Fonts - Roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/admin-dashboard.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <div class="admin-container">
-        <!-- Sidebar -->
+    <div id="adminLoginModal" class="admin-login-modal">
+        <div class="admin-login-content">
+            <h2>Acceso de Administrador</h2>
+            <form id="adminLoginForm">
+                <div class="form-group"> <label for="adminUsername" class="form-label">Usuario:</label> <input type="text" id="adminUsername" name="adminUsername" class="form-control" required> </div>
+                <div class="form-group"> <label for="adminPassword" class="form-label">Contraseña:</label> <input type="password" id="adminPassword" name="adminPassword" class="form-control" required> </div>
+                <p id="adminLoginMessage"></p> <button type="submit" class="admin-btn btn-primary">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-container hidden-for-login">
         <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <img src="img/logo.png" alt="Katana Logo" class="admin-logo">
-                <button class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
+            <div class="sidebar-header"> <img src="/images/logo.png" alt="Katana Logo" class="admin-logo"> <button class="sidebar-toggle"> <i class="fas fa-bars"></i> </button> </div>
+            <ul class="admin-menu">
+                 <li class="menu-item"> <a href="#dashboard" class="menu-link active" data-section="dashboardContent"> <i class="fas fa-home"></i> <span>Dashboard</span> </a> </li>
+                 <li class="menu-item"> <a href="#pedidos" class="menu-link" data-section="ordersContent"> <i class="fas fa-shopping-cart"></i> <span>Pedidos</span> </a> </li>
+                 <li class="menu-item"> <a href="#clientes" class="menu-link" data-section="customersContent"> <i class="fas fa-users"></i> <span>Clientes</span> </a> </li>
+                 <li class="menu-item"> <a href="#registrarPedido" class="menu-link" data-section="registrarPedidoContent"> <i class="fas fa-plus-circle"></i> <span>Registrar Pedido</span> </a> </li>
+                 <li class="menu-item"> <a href="#productos" class="menu-link" data-section="productsContent"> <i class="fas fa-box"></i> <span>Productos</span> </a> </li>
+                 <li class="menu-item"> <a href="#reportes" class="menu-link" data-section="reportsContent"> <i class="fas fa-chart-bar"></i> <span>Reportes</span> </a> </li>
+                 <li class="menu-item"> <a href="#configuracion" class="menu-link" data-section="configuracionContent"> <i class="fas fa-cog"></i> <span>Configuración</span> </a> </li>
+            </ul>
+            <div class="sidebar-footer" style="display: flex; flex-direction: column; align-items: center; margin-top: auto; padding: 1.5rem 0;">
+                <button id="adminLogoutButton" class="admin-btn btn-danger" title="Cerrar sesión de administrador" style="width: 80%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Salir</span>
                 </button>
             </div>
-            <ul class="admin-menu">
-                <li class="menu-item">
-                    <a href="#dashboard" class="menu-link active" data-section="dashboardContent">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#pedidos" class="menu-link" data-section="ordersContent">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Pedidos</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#clientes" class="menu-link" data-section="customersContent">
-                        <i class="fas fa-users"></i>
-                        <span>Clientes</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#productos" class="menu-link" data-section="productsContent">
-                        <i class="fas fa-box"></i>
-                        <span>Productos</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#reportes" class="menu-link" data-section="reportsContent">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Reportes</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <i class="fas fa-cog"></i>
-                        <span>Configuración</span>
-                    </a>
-                </li>
-            </ul>
         </aside>
 
-        <!-- Main Content -->
         <main class="admin-main">
-            <!-- Header -->
             <header class="admin-header">
                 <h1 class="header-title">Dashboard</h1>
-                <div class="admin-user">
-                    <img src="img/admin-avatar.jpg" alt="Admin" class="user-avatar">
-                    <div class="user-info">
-                        <span class="user-name">Admin Usuario</span>
-                        <span class="user-role">Administrador</span>
-                    </div>
-                </div>
             </header>
 
-            <!-- Dashboard Section -->
             <section id="dashboardContent" class="dashboard-section active">
-                <!-- Dashboard Stats -->
                 <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon orders">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
+                    <div class="stat-card"> <div class="stat-header"><div class="stat-icon orders"><i class="fas fa-shopping-cart"></i></div></div> <div class="stat-value" id="statTotalOrders">0</div> <div class="stat-label">Total Pedidos</div> </div>
+                    <div class="stat-card"> <div class="stat-header"><div class="stat-icon users"><i class="fas fa-users"></i></div></div> <div class="stat-value" id="statTotalCustomers">0</div> <div class="stat-label">Clientes Registrados</div> </div>
+                    <div class="stat-card"> <div class="stat-header"><div class="stat-icon revenue"><i class="fas fa-dollar-sign"></i></div></div> <div class="stat-value" id="statMonthlyRevenue">$0</div> <div class="stat-label">Ingresos Mensuales (Est)</div> </div>
+                    <div class="stat-card"> <div class="stat-header"><div class="stat-icon products"><i class="fas fa-box"></i></div></div> <div class="stat-value" id="statActiveProducts">0</div> <div class="stat-label">Productos Activos</div> </div>
+                </div>
+
+                <div class="recent-activity-section">
+                    <h2>Actividad Reciente</h2>
+                    <div class="activity-grid">
+                        <div class="activity-list-card">
+                            <h3><i class="fas fa-receipt"></i> Pedidos Recientes</h3>
+                            <ul class="activity-list" id="recentOrdersList">
+                                <li class="loading-placeholder">Cargando...</li>
+                                </ul>
                         </div>
-                        <div class="stat-value">1,234</div>
-                        <div class="stat-label">Total Pedidos</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon users">
-                                <i class="fas fa-users"></i>
-                            </div>
+                        <div class="activity-list-card">
+                            <h3><i class="fas fa-user-plus"></i> Clientes Recientes</h3>
+                            <ul class="activity-list" id="recentCustomersList">
+                                 <li class="loading-placeholder">Cargando...</li>
+                                </ul>
                         </div>
-                        <div class="stat-value">856</div>
-                        <div class="stat-label">Clientes Registrados</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon revenue">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
+                        <div class="activity-list-card">
+                            <h3><i class="fas fa-plus-circle"></i> Productos Añadidos</h3>
+                            <ul class="activity-list" id="recentProductsList">
+                                 <li class="loading-placeholder">Cargando...</li>
+                                </ul>
                         </div>
-                        <div class="stat-value">$45,678</div>
-                        <div class="stat-label">Ingresos Mensuales</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-icon products">
-                                <i class="fas fa-box"></i>
-                            </div>
-                        </div>
-                        <div class="stat-value">324</div>
-                        <div class="stat-label">Productos Activos</div>
                     </div>
                 </div>
             </section>
 
-            <!-- Orders Section -->
             <section id="ordersContent" class="dashboard-section">
                 <div class="orders-section">
-                    <div class="section-header">
-                        <h2>Pedidos Recientes</h2>
-                        <button class="admin-btn btn-primary">
-                            <i class="fas fa-download"></i>
-                            Exportar
-                        </button>
+                    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;gap:1.5rem;">
+                        <h2>Gestión de Pedidos</h2>
+                        <div class="header-actions">
+                            <button class="admin-btn btn-success" id="openRegisterOrderModalBtn">
+                                <i class="fas fa-plus"></i> Registrar Pedido
+                            </button>
+                            <button class="admin-btn btn-pdf" id="exportPdfBtn">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                            <button class="admin-btn btn-csv" id="exportCsvBtn">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </button>
+                            <button class="admin-btn btn-word" id="exportWordBtn">
+                                <i class="fas fa-file-word"></i> Word
+                            </button>
+                            <button class="admin-btn btn-primary" id="exportOrdersBtn">
+                                <i class="fas fa-download"></i> Exportar
+                            </button>
+                        </div> </div>
+                    <div class="orders-cards-container" id="adminOrdersList"> <p style="text-align: center; width: 100%; padding: 2rem 0;">Cargando pedidos...</p> </div>
+                </div>
+            </section>
+
+            <section id="customersContent" class="dashboard-section">
+                <div class="customers-section">
+                    <div class="section-header"> <h2>Clientes Registrados</h2> <div class="header-actions"> <div class="search-box"> <i class="fas fa-search"></i> <input type="text" placeholder="Buscar cliente..."> </div> </div> </div>
+                    <div class="customers-table-container"> <table class="admin-table"> <thead> <tr> <th>ID</th> <th>Nombre</th> <th>Email</th> <th>Teléfono</th> <th>Registro</th> <th>Pedidos</th> <th>Acciones</th> </tr> </thead> <tbody> <tr> <td colspan="7" style="text-align:center;">Cargando...</td> </tr> </tbody> </table> </div>
+                </div>
+            </section>
+
+            <section id="productsContent" class="dashboard-section">
+                <div class="products-section">
+                    <div class="section-header"> <h2>Gestión de Productos</h2> </div>
+                    <div class="admin-form">
+                        <h2 class="form-title">Agregar Nuevo Producto</h2>
+                        <form id="addProductForm">
+                            <div class="form-row"> <div class="form-group"> <label for="productName" class="form-label">Nombre</label> <input type="text" id="productName" name="productName" class="form-control" required> </div> <div class="form-group"> <label for="productPrice" class="form-label">Precio</label> <input type="number" id="productPrice" name="productPrice" class="form-control" required step="0.01" min="0"> </div> </div>
+                            <div class="form-row"> <div class="form-group"> <label for="productCategory" class="form-label">Categoría</label> <select id="productCategory" name="productCategory" class="form-control" required> <option value="">Seleccione</option> <option value="Rolls">Rolls</option> <option value="Nigiri">Nigiri</option> <option value="Sashimi">Sashimi</option> <option value="Bebidas">Bebidas</option> <option value="Entradas">Entradas</option> <option value="Postres">Postres</option> </select> </div> <div class="form-group"> <label for="productStock" class="form-label">Stock</label> <input type="number" id="productStock" name="productStock" class="form-control" min="0"> </div> </div>
+                            <div class="form-group"> <label for="productDescription" class="form-label">Descripción</label> <textarea id="productDescription" name="productDescription" class="form-control" rows="3"></textarea> </div>
+                            <div class="form-group"> <label for="productImageUrl" class="form-label">URL Imagen</label> <input type="url" id="productImageUrl" name="productImageUrl" class="form-control"> </div>
+                            <p id="addProductMessage" style="margin-top: 15px; text-align: center; font-weight: bold;"></p>
+                            <div class="form-actions"> <button type="submit" class="admin-btn btn-primary"><i class="fas fa-save"></i> Guardar</button> <button type="reset" class="admin-btn btn-danger"> <i class="fas fa-times"></i> Limpiar</button> </div>
+                        </form>
                     </div>
-                    <div class="orders-table-container">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID Pedido</th>
-                                    <th>Cliente</th>
-                                    <th>Fecha</th>
-                                    <th>Total</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#KS001</td>
-                                    <td>Juan Pérez</td>
-                                    <td>23/03/2024</td>
-                                    <td>$45.00</td>
-                                    <td><span class="status-badge pending">Pendiente</span></td>
-                                    <td>
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#KS002</td>
-                                    <td>María García</td>
-                                    <td>23/03/2024</td>
-                                    <td>$32.50</td>
-                                    <td><span class="status-badge processing">En proceso</span></td>
-                                    <td>
-                                        <button class="action-btn view-btn" title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="products-table-section">
+                        <div class="section-header"> <h2>Lista de Productos</h2> </div>
+                        <div class="products-table-container"> <table class="admin-table"> <thead> <tr> <th>Imagen</th> <th>Nombre</th> <th>Precio</th> <th>Categoría</th> <th>Stock</th> <th>Estado</th> <th>Acciones</th> </tr> </thead> <tbody> <tr> <td colspan="7" style="text-align:center;">Cargando...</td> </tr> </tbody> </table> </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Customers Section -->
-            <section id="customersContent" class="dashboard-section">
-                <div class="customers-section">
-                    <div class="section-header">
-                        <h2>Clientes Registrados</h2>
-                        <div class="header-actions">
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input type="text" placeholder="Buscar cliente...">
+            <section id="reportsContent" class="dashboard-section">
+                <div class="reports-section">
+                    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;gap:1.5rem;">
+                        <h2>Reportes</h2>
+                        <div style="display:flex;align-items:center;gap:18px;">
+                            <div class="report-type-selector" style="display:flex;align-items:center;gap:10px;">
+                                <span id="reportTypeIcon" class="report-type-icon" style="font-size:1.5em;color:#3498db;"><i class="fas fa-chart-bar"></i></span>
+                                <select id="reportTypeSelect" class="admin-select">
+                                    <option value="ventas">Reporte de ventas</option>
+                                    <option value="pedidos">Reporte de pedidos</option>
+                                    <option value="clientes">Reporte de clientes</option>
+                                    <option value="productos">Reporte de productos</option>
+                                </select>
                             </div>
-                            <button class="admin-btn btn-primary">
-                                <i class="fas fa-plus"></i>
-                                Nuevo Cliente
+                            <button class="admin-btn btn-pdf" id="exportReportPdfBtn">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                            <button class="admin-btn btn-csv" id="exportReportCsvBtn">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </button>
+                            <button class="admin-btn btn-word" id="exportReportWordBtn">
+                                <i class="fas fa-file-word"></i> Word
                             </button>
                         </div>
                     </div>
-                    <div class="customers-table-container">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Teléfono</th>
-                                    <th>Fecha Registro</th>
-                                    <th>Pedidos</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#001</td>
-                                    <td>Juan Pérez</td>
-                                    <td>juan@email.com</td>
-                                    <td>7382-1435</td>
-                                    <td>20/03/2024</td>
-                                    <td>5</td>
-                                    <td>
-                                        <button class="action-btn view-btn" title="Ver perfil">
-                                            <i class="fas fa-user"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete-btn" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#002</td>
-                                    <td>María García</td>
-                                    <td>maria@email.com</td>
-                                    <td>7382-1436</td>
-                                    <td>21/03/2024</td>
-                                    <td>3</td>
-                                    <td>
-                                        <button class="action-btn view-btn" title="Ver perfil">
-                                            <i class="fas fa-user"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete-btn" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="ventasReportContent">
+                        <div class="date-filters">
+                            <select class="admin-select" id="ventasDateFilter">
+                                <option value="dia">Día</option>
+                                <option value="semana">Semana</option>
+                                <option value="mes" selected>Mes</option>
+                                <option value="trimestre">Trimestre</option>
+                                <option value="semestre">Semestre</option>
+                                <option value="anio">Año</option>
+                            </select>
+                            <button class="admin-btn btn-primary"><i class="fas fa-sync-alt"></i> Actualizar</button>
+                        </div>
+                        <div class="metrics-grid"> <div class="metric-card"> <div class="metric-icon"><i class="fas fa-box"></i></div> <div class="metric-info"> <h3>Total vendidos</h3> <div class="metric-value">0</div> </div> </div> <div class="metric-card"> <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div> <div class="metric-info"> <h3>Ingresos</h3> <div class="metric-value">$0</div> </div> </div> <div class="metric-card"> <div class="metric-icon"><i class="fas fa-shopping-cart"></i></div> <div class="metric-info"> <h3>Ventas hoy</h3> <div class="metric-value">0</div> </div> </div> </div>
+                        <div class="charts-grid"> <div class="chart-card"> <h3>Ventas</h3> <div class="chart-container"><canvas id="salesChart"></canvas></div> </div> <div class="chart-card"> <h3>Ventas por Categoría</h3> <div class="chart-container"><canvas id="categoryChart"></canvas></div> </div> </div>
+                    </div>
+                    <div id="pedidosReportContent" style="display:none;">
+                        <div class="admin-form">
+                            <h3 style="display:flex;align-items:center;gap:10px;"><i class="fas fa-shopping-cart" style="color:#3498db;"></i> Reporte de Pedidos</h3>
+                            <table class="admin-table" style="margin-top:1.5rem;">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>KS-0001</td><td>Walter Lozano</td><td>2024-05-08</td><td>Pendiente</td><td>$3.50</td></tr>
+                                    <tr><td>KS-0002</td><td>Miguel Ruiz</td><td>2024-05-08</td><td>Cancelado</td><td>$7.50</td></tr>
+                                    <tr><td>KS-0003</td><td>Rigo Alexander</td><td>2024-05-08</td><td>Entregado</td><td>$3.50</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="clientesReportContent" style="display:none;">
+                        <div class="admin-form">
+                            <h3 style="display:flex;align-items:center;gap:10px;"><i class="fas fa-users" style="color:#27ae60;"></i> Reporte de Clientes</h3>
+                            <table class="admin-table" style="margin-top:1.5rem;">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Pedidos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>CL-001</td><td>Walter Lozano</td><td>walter@mail.com</td><td>76251719</td><td>5</td></tr>
+                                    <tr><td>CL-002</td><td>Miguel Ruiz</td><td>miguel@mail.com</td><td>73672842</td><td>2</td></tr>
+                                    <tr><td>CL-003</td><td>Rigo Alexander</td><td>rigo@mail.com</td><td>74747172</td><td>3</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="productosReportContent" style="display:none;">
+                        <div class="admin-form">
+                            <h3 style="display:flex;align-items:center;gap:10px;"><i class="fas fa-box" style="color:#e67e22;"></i> Reporte de Productos</h3>
+                            <table class="admin-table" style="margin-top:1.5rem;">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>PR-001</td><td>Roll Camarón</td><td>Rolls</td><td>$3.50</td><td>20</td><td>Activo</td></tr>
+                                    <tr><td>PR-002</td><td>Roll Salmón</td><td>Rolls</td><td>$4.00</td><td>15</td><td>Activo</td></tr>
+                                    <tr><td>PR-003</td><td>Refresco</td><td>Bebidas</td><td>$1.00</td><td>50</td><td>Activo</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="otherReportContent" style="display:none;">
+                        <div class="admin-form" style="text-align:center; margin-top:2rem;">
+                            <h3>Próximamente disponible</h3>
+                            <p>El reporte seleccionado estará disponible en una próxima actualización.</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Products Section -->
-            <section id="productsContent" class="dashboard-section">
-                <div class="products-section">
-                    <div class="section-header">
-                        <h2>Gestión de Productos</h2>
-                        <button class="admin-btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            Nuevo Producto
-                        </button>
+            <section id="configuracionContent" class="dashboard-section">
+                <div class="admin-user" style="margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center;">
+                    <img src="/images/admin-avatar.jpg" alt="Admin" class="user-avatar" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; margin-bottom: 0.5rem; display: block;">
+                    <div class="user-info" style="text-align: center;">
+                        <span class="user-name" id="adminUserName">Admin</span>
+                        <span class="user-role">Administrador</span>
+                        <span class="user-email" id="adminUserEmail" style="display:block; color:#888; font-size:0.98em; margin-top:2px;"></span>
+                        <span class="user-phone" id="adminUserPhone" style="display:block; color:#888; font-size:0.98em; margin-top:2px;"></span>
                     </div>
-                    <div class="admin-form">
-                        <h2 class="form-title">Agregar Nuevo Producto</h2>
-                        <form>
+                </div>
+                <div class="configuracion-section">
+                    <div class="section-header">
+                        <h2>Configuración General</h2>
+                    </div>
+                    
+                    <!-- Admin Profile Section -->
+                    <div class="admin-profile-section admin-form">
+                        <h2 class="form-title">Perfil de Administrador</h2>
+                        <form id="adminProfileForm">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label class="form-label">Nombre del Producto</label>
-                                    <input type="text" class="form-control" placeholder="Ingrese el nombre del producto">
+                                    <label for="adminFullName" class="form-label">Nombre Completo</label>
+                                    <input type="text" id="adminFullName" name="fullName" class="form-control" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Precio</label>
-                                    <input type="number" class="form-control" placeholder="Ingrese el precio">
+                                    <label for="adminEmail" class="form-label">Correo Electrónico</label>
+                                    <input type="email" id="adminEmail" name="email" class="form-control" required>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label class="form-label">Categoría</label>
-                                    <select class="form-control">
-                                        <option value="">Seleccione una categoría</option>
-                                        <option value="basic">Basic</option>
-                                        <option value="pro">Pro</option>
-                                        <option value="premium">Premium</option>
-                                    </select>
+                                    <label for="adminPhone" class="form-label">Teléfono</label>
+                                    <input type="tel" id="adminPhone" name="phone" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Stock</label>
-                                    <input type="number" class="form-control" placeholder="Ingrese el stock disponible">
+                                    <label for="adminRole" class="form-label">Rol</label>
+                                    <input type="text" id="adminRole" name="role" class="form-control" readonly>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Descripción</label>
-                                <textarea class="form-control" rows="4" placeholder="Ingrese la descripción del producto"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Imagen del Producto</label>
-                                <input type="file" class="form-control" accept="image/*">
+                                <label for="adminAvatar" class="form-label">Avatar</label>
+                                <input type="file" id="adminAvatar" name="avatar" class="form-control" accept="image/*">
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="admin-btn btn-primary">
-                                    <i class="fas fa-save"></i>
-                                    Guardar Producto
-                                </button>
-                                <button type="button" class="admin-btn btn-danger">
-                                    <i class="fas fa-times"></i>
-                                    Cancelar
+                                    <i class="fas fa-save"></i> Guardar Cambios
                                 </button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- Products Table -->
-                    <div class="products-table-section">
-                        <div class="section-header">
-                            <h2>Lista de Productos</h2>
-                            <div class="header-actions">
-                                <div class="search-box">
-                                    <i class="fas fa-search"></i>
-                                    <input type="text" placeholder="Buscar producto...">
+                    <!-- Change Password Section -->
+                    <div class="admin-password-section admin-form" style="margin-top: 2rem;">
+                        <h2 class="form-title">Cambiar Contraseña</h2>
+                        <form id="adminPasswordForm">
+                            <div class="form-group">
+                                <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                                    <input type="password" id="newPassword" name="newPassword" class="form-control" required>
                                 </div>
-                                <select class="admin-select">
-                                    <option value="">Todas las categorías</option>
-                                    <option value="basic">Basic</option>
-                                    <option value="pro">Pro</option>
-                                    <option value="premium">Premium</option>
-                                </select>
+                                <div class="form-group">
+                                    <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                                </div>
                             </div>
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn btn-primary">
+                                    <i class="fas fa-key"></i> Actualizar Contraseña
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Carousel Section -->
+                    <div class="carousel-admin-section admin-form" style="margin-top: 2rem;">
+                        <h2 class="form-title">Imágenes del Carrusel Principal</h2>
+                        <div class="carousel-images-list" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div class="carousel-image-placeholder" style="width: 120px; height: 80px; background: #eee; border: 1px dashed #bbb; display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 2rem;">+</div>
                         </div>
-                        <div class="products-table-container">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Imagen</th>
-                                        <th>Nombre</th>
-                                        <th>Precio</th>
-                                        <th>Categoría</th>
-                                        <th>Stock</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <img src="img/sushi.jpg" alt="sushi" class="product-thumbnail">
-                                        </td>
-                                        <td>Sushi Roll</td>
-                                        <td>$5.00</td>
-                                        <td>Rolls</td>
-                                        <td>50</td>
-                                        <td><span class="status-badge success">Activo</span></td>
-                                        <td>
-                                            <button class="action-btn view-btn" title="Ver detalles">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="action-btn edit-btn" title="Editar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="action-btn delete-btn" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <img src="img/coca-cola.jpg" alt="coca-cola" class="product-thumbnail">
-                                        </td>
-                                        <td>Coca-Cola</td>
-                                        <td>$1.00</td>
-                                        <td>Bebidas</td>
-                                        <td>100</td>
-                                        <td><span class="status-badge success">Activo</span></td>
-                                        <td>
-                                            <button class="action-btn view-btn" title="Ver detalles">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="action-btn edit-btn" title="Editar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="action-btn delete-btn" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <p style="color:#888; font-size:0.95rem; margin-top:1rem;">Funcionalidad pendiente: Gestionar imágenes del carrusel.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="couponsContent" class="dashboard-section">
+                <div class="coupons-section">
+                    <div class="section-header"> <h2>Cupones y Promociones</h2> </div>
+                    <div class="coupons-admin-grid">
+                        <div class="coupon-form-card">
+                            <h3>Crear Cupón</h3>
+                            <form id="createCouponForm">
+                                <div class="form-group"><label>Nombre</label><input type="text" name="couponName" required></div>
+                                <div class="form-group"><label>Código</label><input type="text" name="couponCode" required></div>
+                                <div class="form-group"><label>Tipo</label><select name="discountType" required><option value="porcentaje">Porcentaje</option><option value="monto">Monto fijo</option></select></div>
+                                <div class="form-group"><label>Valor</label><input type="number" name="discountValue" min="1" required></div>
+                                <div class="form-group"><label>Válido desde</label><input type="date" name="startDate" required></div>
+                                <div class="form-group"><label>Válido hasta</label><input type="date" name="endDate" required></div>
+                                <button type="submit" class="admin-btn btn-primary" style="width:100%;margin-top:1rem;">Crear</button>
+                            </form>
+                        </div>
+                        <div class="coupon-preview-card">
+                            <h3>Cupones Activos</h3>
+                            <p style="color:#888;">No hay cupones activos.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Reports Section -->
-            <section id="reportsContent" class="dashboard-section">
-                <div class="reports-section">
-                    <div class="section-header">
-                        <h2>Métricas y Estadísticas</h2>
-                        <div class="date-filters">
-                            <select class="admin-select">
-                                <option>Este mes</option>
-                                <option>Último mes</option>
-                                <option>Este año</option>
-                            </select>
-                            <select class="admin-select">
-                                <option>Enero 2024</option>
-                                <option>Febrero 2024</option>
-                                <option>Marzo 2024</option>
-                            </select>
-                            <select class="admin-select">
-                                <option>2024</option>
-                                <option>2023</option>
-                            </select>
-                            <button class="admin-btn btn-primary">
-                                <i class="fas fa-sync-alt"></i>
-                                Volver al inicio
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Metrics Cards -->
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="metric-info">
-                                <h3>Total vendidos</h3>
-                                <div class="metric-value">600 rollos</div>
-                            </div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                            <div class="metric-info">
-                                <h3>Ingresos</h3>
-                                <div class="metric-value">$1,100</div>
-                            </div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            <div class="metric-info">
-                                <h3>Ventas hoy</h3>
-                                <div class="metric-value">50 rollos</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Charts -->
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <h3>Gráfico de ventas (líneas o barras)</h3>
-                            <div class="chart-container">
-                                <canvas id="salesChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="chart-card">
-                            <h3>Gráfico de ventas por categoría</h3>
-                            <div class="chart-container">
-                                <canvas id="categoryChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
+            <section id="registrarPedidoContent" class="dashboard-section">
+                <div class="admin-form" style="max-width:900px;margin:2rem auto 0 auto;">
+                    <h3 style="margin-bottom:1.2rem;display:flex;align-items:center;gap:10px;"><i class="fas fa-list"></i> Pedidos agregados por el admin</h3>
+                    <table class="admin-table" id="adminOrdersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Teléfono</th>
+                                <th>Dirección</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                                <th>Fecha de Reserva</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se mostrarán los pedidos agregados -->
+                        </tbody>
+                    </table>
                 </div>
             </section>
+
         </main>
     </div>
 
-    <!-- JavaScript -->
-    <script>
-        // Sidebar Toggle
-        const sidebar = document.querySelector('.admin-sidebar');
-        const main = document.querySelector('.admin-main');
-        const toggleBtn = document.querySelector('.sidebar-toggle');
+    <!-- Modal para registrar pedido -->
+    <div id="registerOrderModal" class="admin-modal" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;">
+        <div class="admin-modal-content" style="background:#fff;padding:2rem 2.5rem;border-radius:12px;max-width:520px;width:95vw;box-shadow:0 8px 32px rgba(44,62,80,0.18);position:relative;">
+            <button id="closeRegisterOrderModalBtn" style="position:absolute;top:18px;right:18px;background:none;border:none;font-size:1.5em;color:#888;cursor:pointer;"><i class="fas fa-times"></i></button>
+            <h2 style="margin-bottom:1.2rem;display:flex;align-items:center;gap:10px;"><i class="fas fa-plus"></i> Registrar Pedido</h2>
+            <form id="registerOrderForm">
+                <div class="form-group">
+                    <label class="form-label">Nombre del Cliente</label>
+                    <input type="text" name="nombre" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" name="telefono" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" name="direccion" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Productos</label>
+                    <div id="orderProductsList">
+                        <!-- Aquí se agregarán inputs dinámicos para productos -->
+                    </div>
+                    <button type="button" class="admin-btn btn-primary" id="addProductToOrderBtn" style="margin-top:10px;"><i class="fas fa-plus"></i> Agregar Producto</button>
+                </div>
+                <div class="form-group" style="margin-top:1.2rem;">
+                    <label class="form-label">Total</label>
+                    <div id="orderTotal" style="font-size:1.2em;font-weight:600;">$0.00</div>
+                </div>
+                <div class="form-actions" style="margin-top:1.5rem;">
+                    <button type="submit" class="admin-btn btn-success"><i class="fas fa-save"></i> Registrar Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            main.classList.toggle('expanded');
-        });
-
-        // Navegación entre secciones
-        const menuLinks = document.querySelectorAll('.menu-link');
-        const sections = document.querySelectorAll('.dashboard-section');
-        const headerTitle = document.querySelector('.header-title');
-
-        menuLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Actualizar menú activo
-                menuLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                
-                // Mostrar sección correspondiente
-                const targetSection = link.getAttribute('data-section');
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(targetSection).classList.add('active');
-                
-                // Actualizar título del header
-                headerTitle.textContent = link.querySelector('span').textContent;
-
-                // Inicializar gráficos si estamos en la sección de reportes
-                if (targetSection === 'reportsContent') {
-                    initializeCharts();
-                }
-            });
-        });
-
-        // Inicialización de gráficos
-        function initializeCharts() {
-            // Datos para el gráfico de ventas
-            const salesData = {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [{
-                    label: 'Ventas',
-                    data: [80, 90, 75, 70, 75, 45, 65, 85, 55, 60, 75, 70],
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 2,
-                    tension: 0.4
-                }]
-            };
-
-            // Datos para el gráfico de categorías
-            const categoryData = {
-                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-                datasets: [{
-                    data: [12, 19, 8, 15, 10, 8, 9, 11, 13, 7, 14, 6],
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                        '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                        '#9966FF', '#FF9F40'
-                    ]
-                }]
-            };
-
-            // Configuración del gráfico de ventas
-            const salesChart = new Chart(document.getElementById('salesChart'), {
-                type: 'bar',
-                data: salesData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Configuración del gráfico de categorías
-            const categoryChart = new Chart(document.getElementById('categoryChart'), {
-                type: 'pie',
-                data: categoryData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    }
-                }
-            });
-        }
-    </script>
+    <script src="js/admin.js"></script>
 </body>
-</html> 
+
+</html>

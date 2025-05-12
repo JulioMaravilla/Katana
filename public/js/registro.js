@@ -42,9 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Validar el formato del teléfono (10 dígitos)
-        const phoneRegex = /^\d{10}$/;
+        const phoneRegex = /^\d{8}$/;
         if (!phoneRegex.test(formData.telefono)) {
-            alert('Por favor, ingresa un número de teléfono válido (10 dígitos)');
+            alert('Por favor, ingresa un número de teléfono válido (8 dígitos)');
             return;
         }
 
@@ -54,14 +54,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    nombre: formData.nombres, // Mapea el valor de 'nombres' a la clave 'nombre'
+                    email: formData.email,
+                    telefono: formData.telefono,
+                    password: formData.password
+                    // Puedes añadir otros campos aquí si los necesitas y los agregas al Schema/backend
+                    // Ejemplo: apellidos: formData.apellidos,
+                    // Ejemplo: fechaNacimiento: formData.fechaNacimiento
+                })
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 alert('Registro exitoso');
-                window.location.href = '/views/login.html';
+                window.location.href = '/login';
             } else {
                 alert(data.message || 'Error en el registro');
             }
