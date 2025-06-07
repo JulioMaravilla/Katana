@@ -9,10 +9,9 @@
     "mongoose": "^8.13.2",
     "multer": "^1.4.5-lts.2"
   },
-  {
+  
   "scripts": {
     "start": "node src/server.js",
     "build": "echo \"no build step\""
   }  
-}
 }
