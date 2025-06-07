@@ -4,26 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Katana Sushi - Auténtico Sushi Japonés</title>
+    <link rel="icon" type="image/png" href="./public/images/LOGO-SIN-FONDO.png">
     <link rel="stylesheet" href="public/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
 </head>
 <body>
     <nav class="navbar">
         <a href="#" class="nav-logo">
-            <img src="public/images/logo.png" alt="Katana Sushi Logo" style="height: 50px;">
+            <img src="../public/images/LOGO-SIN-FONDO.png" alt="Katana Sushi Logo">
         </a>
         <ul class="nav-links">
-            <li><a href="#inicio"><i class="fas fa-home"></i>Inicio</a></li>
-            <li><a href="#menu"><i class="fas fa-utensils"></i>Menú</a></li>
-            <li><a href="#promociones"><i class="fas fa-percent"></i>Promociones</a></li>
+            <li><a href="#inicio"><i class="fas fa-torii-gate"></i>Inicio</a></li>
+            <li><a href="#menu"><i class="fas fa-bowl-rice"></i>Menú</a></li>
+            <li><a href="#promociones"><i class="fas fa-tags"></i>Promociones</a></li>
             <li><a href="#nosotros"><i class="fas fa-users"></i>Nosotros</a></li>
             <li><a href="#contacto"><i class="fas fa-envelope"></i>Contacto</a></li>
+            <li><a href="/login" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a></li>
             </ul>
         <div class="nav-buttons">
             <a href="#" class="cart-btn" id="cartBtn">
-                <i class="fas fa-shopping-cart"></i>                <span>0</span>
+                <i class="material-icons">ramen_dining</i>
+                <span>0</span>
             </a>
             <div class="menu-toggle">
                 <i class="fas fa-bars menu-icon"></i>
@@ -31,7 +35,7 @@
         </div>
         <div class="cart-sidebar">
             <div class="cart-header">
-                <h3><i class="fas fa-shopping-cart"></i> Mi Carrito</h3>
+                <h3><i class="material-icons">ramen_dining</i> Mis pedidos</h3>
                 <button class="close-cart"><i class="fas fa-times"></i></button>
             </div>
             <div class="cart-items">
@@ -53,40 +57,12 @@
         <div class="cart-overlay"></div>
     </nav>
 
-    <section class="main-carousel">
-        <div class="carousel-slide active" style="background-image: url('public/images/horaa.jpg');"></div>
-        <div class="carousel-slide" style="background-image: url('public/images/promo.png');"></div>
-        <div class="carousel-slide" style="background-image: url('public/images/Cuadro_MartesPromos.png');"></div>
+    <section class="main-carousel" id="mainCarouselContainer">
         <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
         <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
-        <div class="carousel-indicators">
-            <span class="indicator active"></span>
-            <span class="indicator"></span>
-            <span class="indicator"></span>
-        </div>
-    </section>
-
-    <section class="horario-section">
-        <div class="horario-card">
-            <h2>Horario de Encargos</h2>
-            <div class="horario-item">
-                <div class="horario-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="horario-info">
-                    <div class="horario-row">
-                        <span class="dias">Lunes a Jueves</span>
-                        <span class="horas">8:00 AM - 6:00 PM</span>
-                    </div>
-                    <div class="horario-row">
-                        <span class="dias">Sábados</span>
-                        <span class="horas especial">Entregas desde 12:00 PM</span>
-                    </div>
-                </div>
+        <div class="carousel-indicators" id="carouselIndicatorsContainer">
             </div>
-        </div>
     </section>
-
     <a href="#menu" class="cta-button oculto" style="display:block;text-align:center;margin:2rem auto;max-width:200px;">Ver Menú</a>
 
     <section id="promociones" class="promos">
@@ -116,15 +92,22 @@
     </section>
 
     <section id="menu" class="menu-section">
-        <h2>Nuestro Menú</h2>
+        <h2><i class="material-icons">ramen_dining</i> Nuestro Menú</h2>
         <div class="menu-categories">
-            <button class="category-btn active">Rolls</button>
-            <button class="category-btn">Nigiri</button>
-            <button class="category-btn">Sashimi</button>
-            <button class="category-btn">Bebidas</button>
-            <button class="category-btn">Entradas</button>
-            <button class="category-btn">Postres</button>
+            <button class="category-btn" onclick="toggleSubcategories()">Rolls</button>
+            <button class="category-btn" onclick="displayMenuItems('Nigiri')">Nigiri</button>
+            <button class="category-btn" onclick="displayMenuItems('Sashimi')">Sashimi</button>
+            <button class="category-btn" onclick="displayMenuItems('Bebidas')">Bebidas</button>
+            <button class="category-btn" onclick="displayMenuItems('Entradas')">Entradas</button>
+            <button class="category-btn" onclick="displayMenuItems('Postres')">Postres</button>
         </div>
+
+        <div class="subcategories" style="display: none;">
+            <button class="category-btn" onclick="displayMenuItems('Makis')">Makis</button>
+            <button class="category-btn" onclick="displayMenuItems('Uramakis')">Uramakis</button>
+            <button class="category-btn" onclick="displayMenuItems('Tempurizados')">Tempurizados</button>
+        </div>
+
         <div class="menu-items">
             <p style="text-align:center;">Cargando menú...</p>
         </div>
@@ -181,7 +164,7 @@
                 <ul>
                     <li><a href="#nosotros">Sobre nosotros</a></li>
                     <li><a href="#">Términos de uso</a></li>
-                    <li><a href="#">Política de privacidad</a></li>
+                    <li><a href="/politicas-privacidad" onclick="openPrivacyPolicy(event)">Política de privacidad</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -241,6 +224,7 @@
         <div class="guest-modal-content">
             <button class="close-guest-modal" id="closeGuestModal"><i class="fas fa-times"></i></button>
             <h2>Pedido como Invitado</h2>
+            
             <form id="guestOrderForm">
                 <div class="form-group">
                     <label for="guestName">Nombre completo <span class="required">*</span></label>
@@ -253,16 +237,30 @@
                 <div class="form-group">
                     <label for="guestAddress">Dirección <span class="required">*</span></label>
                     <input type="text" id="guestAddress" name="guestAddress" required>
+                    <button type="button" id="getCurrentLocation" class="location-btn">
+                        <i class="fas fa-map-marker-alt"></i> Usar mi ubicación actual
+                    </button>
                 </div>
+                <div id="map" style="height: 200px; margin: 10px 0; border-radius: 8px;"></div>
                 <div class="form-group">
                     <label for="guestZone">Zona de envío <span class="required">*</span></label>
                     <select id="guestZone" name="guestZone" required>
                         <option value="">Selecciona una zona</option>
-                        <option value="centro" data-cost="2.00">Centro ($2.00)</option>
-                        <option value="escalon" data-cost="2.50">Colonia Escalón ($2.50)</option>
-                        <option value="sanbenito" data-cost="3.00">Colonia San Benito ($3.00)</option>
-                        <option value="antiguo" data-cost="3.50">Antiguo Cuscatlán ($3.50)</option>
-                        <option value="santatecla" data-cost="4.00">Santa Tecla ($4.00)</option>
+                        <option value="centrica" data-cost="2.00">CÉNTRICA (Dentro de Los Pinos, Estadio Sergio Torres Rivera, Puente Gavidia y Barrio El Calvario) - $2.00</option>
+                        <option value="puente-ugb" data-cost="2.50">Del Puente Gavidia hasta la UGB - $2.50</option>
+                        <option value="ugb-montanita" data-cost="3.00">De la UGB hasta La Montañita - $3.00</option>
+                        <option value="montanita-ereguayquin" data-cost="3.50">Desde La Montañita hasta Ereguayquín (Carretera Litoral) - $3.50</option>
+                        <option value="ereguayquin" data-cost="4.00">Dentro de Ereguayquín - $4.00</option>
+                        <option value="sta-maria-centro" data-cost="3.00">Sta. María Centro - $3.00</option>
+                        <option value="sta-elena" data-cost="4.00">Sta. Elena - $4.00</option>
+                        <option value="pto-parada" data-cost="8.00">Pto. Parada - $8.00</option>
+                        <option value="pinos-lemus" data-cost="2.50">De Los Pinos hasta Lemus Home - $2.50</option>
+                        <option value="lemus-tierramar" data-cost="3.00">Desde Lemus Home hasta Tierramar - $3.00</option>
+                        <option value="tierramar-poza" data-cost="3.50">Desde Tierramar hasta La Poza - $3.50</option>
+                        <option value="poza-chilamate" data-cost="4.00">Desde La Poza hasta Chilamate - $4.00</option>
+                        <option value="calvario-veraneras" data-cost="2.00">Desde El Calvario hasta Las Veraneras - $2.00</option>
+                        <option value="estadio-cruz1" data-cost="2.50">Desde el Estadio Sergio Torres Rivera hasta La Cruz 1 - $2.50</option>
+                        <option value="cruz1-bypass" data-cost="3.00">Desde La Cruz 1 hasta el By Pass - $3.00</option>
                         <option value="otra" data-cost="0.00">Otra zona (contactaremos)</option>
                     </select>
                 </div>
@@ -272,6 +270,29 @@
                     <label for="guestComment">Punto de referencia</label>
                     <textarea id="guestComment" name="guestComment" rows="2"></textarea>
                 </div>
+                <div id="guestOrderSummary" style="width: 100%; margin-bottom: 1.5rem; border: 1px solid #eee; border-radius: 8px; padding: 1rem;">
+                    <h3 style="font-size: 1.1em; color: var(--primary-color); margin-bottom: 0.8rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">Resumen de tu Pedido</h3>
+                    <div id="guestOrderSummaryItems" style="margin-bottom: 0.8rem;">
+                        </div>
+                    <div style="border-top: 1px dashed #ddd; padding-top: 0.8rem;">
+                        <p style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                            <span>Subtotal Productos:</span>
+                            <strong id="guestOrderSubtotalProducts">$0.00</strong>
+                        </p>
+                        <div id="guestShippingCost" class="shipping-cost-info" style="display:flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                            <span>Costo de Envío:</span>
+                            <strong id="guestOrderShippingCostValue">$0.00</strong>
+                        </div>
+                        <div id="guestShippingMsg" class="shipping-msg" style="margin-bottom: 0.5rem;"></div>
+                        <p style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; color: var(--primary-color); margin-top: 0.5rem; border-top: 1px solid #ccc; padding-top: 0.5rem;">
+                            <span>Total del Pedido:</span>
+                            <strong id="guestOrderTotal">$0.00</strong>
+                        </p>
+                    </div>
+                </div>
+                <button type="button" id="serfinsaPayBtn" class="cta-button" style="width:100%;margin-top:1rem;background:#1e90ff;color:#fff;">
+                    <i class="fas fa-credit-card"></i> Pagar en Línea
+                </button>
                 <button type="submit" class="cta-button" style="width:100%;margin-top:1rem;">
                     <i class="fas fa-paper-plane"></i> Registrar pedido
                 </button>
@@ -283,7 +304,35 @@
         </div>
     </div>
 
-    <script src="public/js/main.js"></script>
+    <!-- Banner de Cookies -->
+    <div id="cookieBanner" class="cookie-banner glass">
+        <div class="cookie-banner-content">
+            <span class="cookie-emoji" style="color:#f7c948;font-size:2.2rem;">&#9888;</span>
+            <div>
+                <strong>Aviso de Cookies</strong>
+                <p>
+                    Este sitio web utiliza cookies para mejorar tu experiencia y para fines de análisis. Puedes aceptar todas las cookies, o rechazar las que no sean esenciales.
+                    Consulta nuestra <a href="/cookies" target="_blank" class="cookie-link">Política de Cookies</a> para más información.
+                </p>
+                <div class="cookie-banner-buttons">
+                    <button id="acceptCookies" class="cta-button modern-accept">Aceptar</button>
+                    <button id="rejectCookies" class="cta-button modern-reject">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <!-- Cookie Manager -->
+    <script src="public/js/cookieManager.js"></script>
+    <!-- Tus scripts -->
+    <script src="public/js/main.js"></script>
+    <script>
+        function openPrivacyPolicy(event) {
+            event.preventDefault();
+            window.location.href = '/politicas-privacidad';
+        }
+    </script>
 </body>
 </html>

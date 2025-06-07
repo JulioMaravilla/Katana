@@ -56,8 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     nombre: formData.nombres, // Mapea el valor de 'nombres' a la clave 'nombre'
+                    apellidos: formData.apellidos,
                     email: formData.email,
                     telefono: formData.telefono,
+                    fechaNacimiento: formData.fechaNacimiento,
                     password: formData.password
                     // Puedes añadir otros campos aquí si los necesitas y los agregas al Schema/backend
                     // Ejemplo: apellidos: formData.apellidos,

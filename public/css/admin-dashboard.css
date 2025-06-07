@@ -454,7 +454,6 @@ body {
     .admin-header {
         flex-direction: column;
         gap: 15px;
-        text-align: center;
     }
 
     .admin-user {
@@ -1903,4 +1902,64 @@ body {
     border: 2.5px solid #217dbb;
     outline: none;
     box-shadow: 0 0 0 2px #b7d6f6;
+}
+
+/* Estilos para la sección de gestión de premios */
+.prize-management-section {
+    margin-top: 30px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: var(--admin-shadow);
+}
+
+.prize-management-section h2 {
+    font-size: 18px;
+    color: var(--admin-dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.prize-management-section .form-group {
+    margin-bottom: 15px;
+}
+
+.prize-management-section .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--admin-text);
+    font-weight: 500;
+}
+
+.prize-management-section .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--admin-border);
+    border-radius: 5px;
+    transition: border 0.2s;
+}
+
+.prize-management-section .form-group input:focus {
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.prize-management-section button {
+    margin-top: 10px;
+}
+
+#addPrizeMessage {
+    margin-top: 10px;
+    font-weight: bold;
+    color: red; /* Cambia el color según sea necesario */
+}
+
+.payment-status.paid {
+    color: #28a745;
+    font-weight: bold;
+}
+.payment-status.not-paid {
+    color: #dc3545;
+    font-weight: bold;
 }
