@@ -84,7 +84,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://raanndomlz:jXXYYC69QR
     .catch(err => console.error("Error de conexión MongoDB:", err));
 
 // --- Modelos ---
-// User Schema (sin cambios)
+// User Schema
 const userSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     apellidos: { type: String, trim: true },
@@ -92,11 +92,12 @@ const userSchema = new mongoose.Schema({
     telefono: { type: String, required: true, trim: true },
     fechaNacimiento: { type: Date },
     password: { type: String, required: true },
+    role: { type: String, default: 'cliente' }, // Añadido para diferenciar roles
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
 
-// Product Schema (sin cambios)
+// Product Schema
 const productSchema = new mongoose.Schema({
     name: { type: String, required: [true, 'El nombre del producto es requerido'] },
     price: { type: Number, required: [true, 'El precio es requerido'], min: [0, 'El precio no puede ser negativo'] },
@@ -109,7 +110,7 @@ const productSchema = new mongoose.Schema({
 });
 const Product = mongoose.model('Product', productSchema);
 
-// AdminUser Schema (sin cambios)
+// AdminUser Schema
 const adminUserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
@@ -131,7 +132,7 @@ adminUserSchema.pre('save', async function(next) {
 });
 const AdminUser = mongoose.model('AdminUser', adminUserSchema);
 
-// Order Schemas (sin cambios)
+// Order Schemas
 const orderItemSchema = new mongoose.Schema({
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, min: 1 },
@@ -171,13 +172,13 @@ const orderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     items: [orderItemSchema],
     totalAmount: { type: Number, required: true },
-    shippingCost: { type: Number, default: 0 }, // NUEVO: Costo de envío
+    shippingCost: { type: Number, default: 0 },
     status: { type: String, default: 'pending', enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] },
     deliveryDetails: deliveryDetailsSchema,
     paymentMethod: { type: String, default: 'contra_entrega' },
     isGuestOrder: { type: Boolean, default: false },
     clientRequestId: { type: String, unique: true, sparse: true },
-    source: { type: String, enum: ['web_guest', 'web_user', 'admin_manual'], default: 'web_user' }, // NUEVO
+    source: { type: String, enum: ['web_guest', 'web_user', 'admin_manual'], default: 'web_user' },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -212,12 +213,12 @@ async function initializeCounters() {
     }
 }
 
-// --- NUEVO: Modelo para Imágenes del Carrusel ---
+// Modelo para Imágenes del Carrusel
 const carouselImageSchema = new mongoose.Schema({
-    imageUrl: { type: String, required: true }, // URL pública de la imagen
-    filename: { type: String, required: true }, // Nombre del archivo en el servidor para poder eliminarlo
-    title: { type: String }, // Opcional
-    order: { type: Number, default: 0 }, // Opcional, para ordenar
+    imageUrl: { type: String, required: true },
+    filename: { type: String, required: true },
+    title: { type: String },
+    order: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 const CarouselImage = mongoose.model('CarouselImage', carouselImageSchema);
@@ -229,30 +230,17 @@ cron.schedule('0 8 * * 6', async () => {
     const taskName = 'CAMBIAR_A_EN_PREPARACION';
     console.log(`[${new Date().toLocaleString()}] Iniciando tarea cron: ${taskName}`);
     try {
-        // Lógica para seleccionar qué pedidos deben cambiar a "En preparación"
-        // Ejemplo: Todos los pedidos de clientes (no manuales) que están 'pending'
-        // Podrías añadir más filtros, como fecha de creación o una fecha de entrega esperada.
         const filter = {
             status: 'pending',
-            source: { $in: ['web_guest', 'web_user'] } // Excluye 'admin_manual' o ajústalo si es necesario
-            // Si tuvieras un campo deliveryDate:
-            // deliveryDate: { $gte: new Date(), $lte: new Date(new Date().setDate(new Date().getDate() + 2)) } // Pedidos para hoy o los próximos 2 días
+            source: { $in: ['web_guest', 'web_user'] }
         };
-
         const update = { $set: { status: 'processing' } };
         const result = await Order.updateMany(filter, update);
-
         console.log(`[${taskName}] ${result.modifiedCount} pedidos actualizados a "processing". Matched: ${result.matchedCount}`);
-        if (result.modifiedCount > 0) {
-            // Aquí podrías añadir lógica de notificación si es necesario
-        }
     } catch (error) {
         console.error(`[${taskName}] Error en la tarea cron:`, error);
     }
-}, {
-    scheduled: true,
-    timezone: CRON_TIMEZONE
-});
+}, { scheduled: true, timezone: CRON_TIMEZONE });
 
 // Sábado a las 5:00 PM (17:00): Cambiar pedidos "En preparación" a "En camino"
 cron.schedule('0 17 * * 6', async () => {
@@ -261,25 +249,18 @@ cron.schedule('0 17 * * 6', async () => {
     try {
         const filter = {
             status: 'processing',
-             source: { $in: ['web_guest', 'web_user'] } // Opcional: aplicar la misma lógica de origen
+             source: { $in: ['web_guest', 'web_user'] }
         };
-        const update = { $set: { status: 'shipped' } }; // 'shipped' es el equivalente a 'en camino'
+        const update = { $set: { status: 'shipped' } };
         const result = await Order.updateMany(filter, update);
-
         console.log(`[${taskName}] ${result.modifiedCount} pedidos actualizados a "shipped". Matched: ${result.matchedCount}`);
-        if (result.modifiedCount > 0) {
-            // Lógica de notificación
-        }
     } catch (error) {
         console.error(`[${taskName}] Error en la tarea cron:`, error);
     }
-}, {
-    scheduled: true,
-    timezone: CRON_TIMEZONE
-});
+}, { scheduled: true, timezone: CRON_TIMEZONE });
 
 
-// --- Middleware de Autenticación (sin cambios) ---
+// --- Middleware de Autenticación ---
 const auth = (req, res, next) => {
     const authHeader = req.header('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ success: false, message: 'Acceso denegado. No se proporcionó token.' });
@@ -318,7 +299,7 @@ const adminAuth = (req, res, next) => {
 
 // --- Rutas API ---
 
-// Autenticación Usuario (sin cambios)
+// Autenticación Usuario
 app.post('/api/register', async (req, res) => {
     try {
         const { nombre, apellidos, email, telefono, fechaNacimiento, password } = req.body;
@@ -354,7 +335,7 @@ app.post('/api/login', async (req, res) => {
     } catch (error) { console.error(error); res.status(500).json({ message: 'Error en el servidor' }); }
 });
 
-// Perfil Usuario (sin cambios)
+// Perfil Usuario
 app.get('/api/profile', auth, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select('-password');
@@ -390,7 +371,7 @@ app.post('/api/profile/change-password', auth, async (req, res) => {
     } catch (error) { console.error("Error changing password:", error); res.status(500).json({ success: false, message: 'Error interno del servidor.' }); }
 });
 
-// Productos (sin cambios)
+// Productos
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find({ isActive: true }).sort({ category: 1, name: 1 });
@@ -420,10 +401,10 @@ app.delete('/api/products/:id', adminAuth, async (req, res) => {
     } catch (error) { console.error(error); res.status(500).json({ message: 'Error al eliminar producto' }); }
 });
 
-// Pedidos (sin cambios)
+// Pedidos
 app.post('/api/orders/guest', async (req, res) => {
     try {
-        const { items, deliveryDetails, clientRequestId, shippingCost, totalAmount: totalAmountFromClient } = req.body; // MODIFICADO: extraer shippingCost y totalAmountFromClient
+        const { items, deliveryDetails, clientRequestId, shippingCost, totalAmount: totalAmountFromClient } = req.body;
         if (!items || !Array.isArray(items) || items.length === 0 || !deliveryDetails) {
             return res.status(400).json({ success: false, message: 'Datos del pedido incompletos o inválidos.' });
         }
@@ -446,20 +427,19 @@ app.post('/api/orders/guest', async (req, res) => {
             return { productId: product._id, quantity: item.quantity, price: product.price, name: product.name, image: product.imageUrl };
         });
 
-        // Usar el totalAmount y shippingCost del cliente, o recalcular si no se proveen (aunque deberían)
         const finalShippingCost = shippingCost !== undefined ? parseFloat(shippingCost) : 0;
         const finalTotalAmount = totalAmountFromClient !== undefined ? parseFloat(totalAmountFromClient) : (calculatedSubtotal + finalShippingCost);
 
         const newOrder = new Order({
             userId: null, 
             items: processedItems, 
-            totalAmount: finalTotalAmount, // MODIFICADO
-            shippingCost: finalShippingCost, // MODIFICADO
+            totalAmount: finalTotalAmount,
+            shippingCost: finalShippingCost,
             status: 'pending', 
             deliveryDetails, 
             isGuestOrder: true,
             clientRequestId,
-            source: 'web_guest' // Identificar origen del pedido
+            source: 'web_guest'
         });
         const savedOrder = await newOrder.save();
         try {
@@ -477,7 +457,7 @@ app.post('/api/orders/guest', async (req, res) => {
 });
 app.post('/api/orders', auth, async (req, res) => {
     try {
-        const { items, deliveryDetails, paymentMethod, clientRequestId, shippingCost, totalAmount: totalAmountFromClient } = req.body; // MODIFICADO
+        const { items, deliveryDetails, paymentMethod, clientRequestId, shippingCost, totalAmount: totalAmountFromClient } = req.body;
         const userId = req.userId;
         if (!items || !Array.isArray(items) || items.length === 0 || !deliveryDetails) {
             return res.status(400).json({ success: false, message: 'Datos del pedido incompletos.' });
@@ -509,14 +489,14 @@ app.post('/api/orders', auth, async (req, res) => {
         const newOrder = new Order({
             userId, 
             items: processedItems, 
-            totalAmount: finalTotalAmount, // MODIFICADO
-            shippingCost: finalShippingCost, // MODIFICADO
+            totalAmount: finalTotalAmount,
+            shippingCost: finalShippingCost,
             status: 'pending', 
             deliveryDetails, 
             paymentMethod: paymentMethod || 'contra_entrega',
             isGuestOrder: false, 
             clientRequestId,
-            source: 'web_user' // Identificar origen del pedido
+            source: 'web_user'
         });
         const savedOrder = await newOrder.save();
         try {
@@ -541,11 +521,10 @@ app.get('/api/orders', auth, async (req, res) => {
     } catch (error) { console.error("Error al obtener historial de pedidos:", error); res.status(500).json({ success: false, message: 'Error interno del servidor.' }); }
 });
 
-// --- NUEVAS Rutas API para el Carrusel ---
-// Obtener todas las imágenes del carrusel (público)
+// --- Rutas API para el Carrusel ---
 app.get('/api/carousel-images', async (req, res) => {
     try {
-        const images = await CarouselImage.find().sort({ order: 1, createdAt: -1 }); // Ordenar por 'order' y luego por fecha
+        const images = await CarouselImage.find().sort({ order: 1, createdAt: -1 });
         res.json({ success: true, data: images });
     } catch (error) {
         console.error("Error al obtener imágenes del carrusel:", error);
@@ -553,26 +532,21 @@ app.get('/api/carousel-images', async (req, res) => {
     }
 });
 
-// Agregar una nueva imagen al carrusel (admin)
 app.post('/api/admin/carousel-images', adminAuth, carouselUpload.single('carouselImageFile'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'No se proporcionó ninguna imagen.' });
         }
-
-        const imageUrl = `/images/carousel/${req.file.filename}`; // Ruta pública de la imagen
+        const imageUrl = `/images/carousel/${req.file.filename}`;
         const newCarouselImage = new CarouselImage({
             imageUrl: imageUrl,
-            filename: req.file.filename, // Guardar el nombre del archivo para poder eliminarlo del disco
-            title: req.body.title || '' // Opcional, desde el formulario
+            filename: req.file.filename,
+            title: req.body.title || ''
         });
-
         await newCarouselImage.save();
         res.status(201).json({ success: true, message: 'Imagen del carrusel agregada.', data: newCarouselImage });
-
     } catch (error) {
         console.error("Error al agregar imagen al carrusel:", error);
-        // Si hay un error después de subir el archivo, intentar eliminarlo
         if (req.file && req.file.path) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error("Error al eliminar archivo subido tras fallo:", err);
@@ -582,38 +556,28 @@ app.post('/api/admin/carousel-images', adminAuth, carouselUpload.single('carouse
     }
 });
 
-// Eliminar una imagen del carrusel (admin)
 app.delete('/api/admin/carousel-images/:id', adminAuth, async (req, res) => {
     try {
         const imageId = req.params.id;
         if (!mongoose.Types.ObjectId.isValid(imageId)) {
             return res.status(400).json({ success: false, message: 'ID de imagen inválido.' });
         }
-
-        // Verificar la cantidad actual de imágenes
         const currentImageCount = await CarouselImage.countDocuments();
         if (currentImageCount <= 3) {
             return res.status(400).json({ success: false, message: 'No se puede eliminar. Se requiere un mínimo de 3 imágenes en el carrusel.' });
         }
-
         const imageToDelete = await CarouselImage.findById(imageId);
         if (!imageToDelete) {
             return res.status(404).json({ success: false, message: 'Imagen no encontrada.' });
         }
-
-        // Eliminar el archivo del servidor
         const imagePath = path.join(__dirname, '../../public/images/carousel', imageToDelete.filename);
         fs.unlink(imagePath, async (err) => {
             if (err) {
-                // No bloquear si el archivo no existe, pero loguear el error
                 console.warn(`Error al eliminar el archivo ${imageToDelete.filename} del disco:`, err.message);
             }
-            
-            // Eliminar la entrada de la base de datos independientemente de si el archivo se eliminó
             await CarouselImage.findByIdAndDelete(imageId);
             res.json({ success: true, message: 'Imagen del carrusel eliminada.' });
         });
-
     } catch (error) {
         console.error("Error al eliminar imagen del carrusel:", error);
         res.status(500).json({ success: false, message: 'Error al eliminar imagen del carrusel.' });
@@ -621,7 +585,7 @@ app.delete('/api/admin/carousel-images/:id', adminAuth, async (req, res) => {
 });
 
 
-// --- Rutas de Administración (existentes, revisadas para compatibilidad) ---
+// --- Rutas de Administración ---
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -653,17 +617,13 @@ app.get('/api/admin/users', adminAuth, async (req, res) => {
 
 app.get('/api/admin/orders', adminAuth, async (req, res) => {
     try {
-        const { source, status, page = 1, limit = 1000, sort = '-createdAt' } = req.query; // Aumentar límite o implementar paginación real
+        const { source, status, page = 1, limit = 1000, sort = '-createdAt' } = req.query;
         let query = {};
-        if (source) {
-            query.source = source;
-        }
-        if (status && status !== 'all') { // 'all' o sin filtro de estado
-            query.status = status;
-        }
+        if (source) query.source = source;
+        if (status && status !== 'all') query.status = status;
 
         const options = {
-            sort: sort, // Permitir especificar el orden
+            sort: sort,
             limit: parseInt(limit),
             skip: (parseInt(page) - 1) * parseInt(limit),
             populate: { path: 'userId', select: 'nombre email' }
@@ -728,7 +688,6 @@ app.put('/api/admin/profile', adminAuth, async (req, res) => {
         if (email) admin.email = email;
         if (phone) admin.phone = phone;
         await admin.save();
-        // Devolver el perfil actualizado para que el frontend pueda usarlo si es necesario
         const updatedAdmin = await AdminUser.findById(req.adminId).select('-password');
         res.json({ success: true, message: 'Perfil actualizado correctamente.', data: updatedAdmin });
     } catch (error) {
@@ -754,7 +713,6 @@ app.put('/api/admin/password', adminAuth, async (req, res) => {
     }
 });
 
-// Ruta para subir avatar de admin (usar avatarUpload en lugar de upload general)
 app.post('/api/admin/avatar', adminAuth, avatarUpload.single('avatar'), async (req, res) => {
     try {
         if (!req.file) {
@@ -764,7 +722,6 @@ app.post('/api/admin/avatar', adminAuth, avatarUpload.single('avatar'), async (r
         if (!admin) {
             return res.status(404).json({ success: false, message: 'Administrador no encontrado.' });
         }
-        // Si había un avatar anterior, intentar eliminarlo del disco
         if (admin.avatar && admin.avatar.filename) {
             const oldAvatarPath = path.join(__dirname, '../../public/images/avatars', admin.avatar.filename);
             fs.unlink(oldAvatarPath, (err) => {
@@ -783,7 +740,6 @@ app.post('/api/admin/avatar', adminAuth, avatarUpload.single('avatar'), async (r
         });
     } catch (error) {
         console.error('Error al actualizar avatar de admin:', error);
-        // Si hay un error después de subir el archivo, intentar eliminar el nuevo archivo
         if (req.file && req.file.path) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error("Error al eliminar archivo subido tras fallo en POST /api/admin/avatar:", err);
@@ -797,13 +753,13 @@ app.get('/api/admin/avatar/:adminId', async (req, res) => {
     try {
         const admin = await AdminUser.findById(req.params.adminId);
         if (!admin || !admin.avatar || !admin.avatar.filename) {
-            return res.redirect('/images/admin-avatar.jpg'); // Imagen por defecto
+            return res.redirect('/images/admin-avatar.jpg');
         }
         const avatarPath = path.join(__dirname, '../../public/images/avatars', admin.avatar.filename);
         res.sendFile(avatarPath, (err) => {
             if (err) {
                 console.error('Error sirviendo avatar desde disco:', err);
-                res.redirect('/images/admin-avatar.jpg'); // Fallback a imagen por defecto
+                res.redirect('/images/admin-avatar.jpg');
             }
         });
     } catch (error) {
@@ -815,8 +771,6 @@ app.get('/api/admin/avatar/:adminId', async (req, res) => {
 app.post('/api/admin/manual-order', adminAuth, async (req, res) => {
     try {
         const { deliveryDetails, items, totalAmount, shippingCost, status, source } = req.body;
-
-        // Validación básica de entrada
         if (!deliveryDetails || !deliveryDetails.nombre || !deliveryDetails.telefono || !deliveryDetails.direccion) {
             return res.status(400).json({ success: false, message: 'Faltan detalles del cliente o dirección.' });
         }
@@ -829,16 +783,13 @@ app.post('/api/admin/manual-order', adminAuth, async (req, res) => {
         if (shippingCost === undefined || isNaN(parseFloat(shippingCost)) || parseFloat(shippingCost) < 0) {
             return res.status(400).json({ success: false, message: 'Costo de envío inválido.' });
         }
-
-
         for (const item of items) {
             if (!item.productId || !item.quantity || item.quantity <= 0 || !item.price || item.price < 0 || !item.name) {
                 return res.status(400).json({ success: false, message: 'Datos de producto inválidos en el pedido.' });
             }
         }
-
         const newOrder = new Order({
-            userId: null, // Pedido manual, no asociado a un User_ID específico de la DB
+            userId: null,
             items: items.map(item => ({
                 productId: item.productId,
                 quantity: parseInt(item.quantity, 10),
@@ -848,32 +799,24 @@ app.post('/api/admin/manual-order', adminAuth, async (req, res) => {
             })),
             totalAmount: parseFloat(totalAmount),
             shippingCost: parseFloat(shippingCost),
-            status: status || 'processing', // Estado por defecto para pedidos manuales
+            status: status || 'processing',
             deliveryDetails: {
                 nombre: deliveryDetails.nombre,
                 telefono: deliveryDetails.telefono,
                 direccion: deliveryDetails.direccion,
-                zona: deliveryDetails.zona || 'N/A', // Hacer zona opcional o requerida según necesites
+                zona: deliveryDetails.zona || 'N/A',
                 referencia: deliveryDetails.referencia || ''
             },
-            isGuestOrder: true, // Se comporta como un pedido de invitado en términos de no tener userId
-            source: source || 'admin_manual', // Identificador de origen
-            // clientRequestId: Se podría generar uno si fuera necesario para evitar duplicados,
-            // pero para pedidos manuales podría no ser tan crítico como los web.
+            isGuestOrder: true,
+            source: source || 'admin_manual',
         });
-
-        const savedOrder = await newOrder.save(); // El orderId se genera con el hook pre-save
-
-        // Notificación por correo (opcional)
+        const savedOrder = await newOrder.save();
         try {
              await notificarNuevoPedido(savedOrder);
         } catch (emailError) {
              console.error("Error enviando correo de notificación para pedido manual:", emailError);
-             // No hacer fallar la creación del pedido por esto, solo loguear.
         }
-
         res.status(201).json({ success: true, message: 'Pedido manual registrado con éxito.', data: savedOrder });
-
     } catch (error) {
         console.error("Error registrando pedido manual:", error);
         if (error.name === 'ValidationError') {
@@ -883,7 +826,263 @@ app.post('/api/admin/manual-order', adminAuth, async (req, res) => {
     }
 });
 
-// --- Rutas HTML (sin cambios) ---
+
+// --- NUEVO: API PARA REPORTES ---
+
+// Endpoint para métricas clave del dashboard
+app.get('/api/admin/reports/metrics', adminAuth, async (req, res) => {
+    try {
+        const totalOrders = await Order.countDocuments();
+        const totalCustomers = await User.countDocuments({ role: 'cliente' }); // Contar solo clientes
+        
+        // Ingresos totales (excluyendo pedidos cancelados o pendientes)
+        const revenueData = await Order.aggregate([
+            { $match: { status: { $nin: ['cancelled', 'pending'] } } },
+            { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } }
+        ]);
+        const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
+        
+        // Productos más vendidos
+        const topProductData = await Order.aggregate([
+            { $match: { status: { $nin: ['cancelled', 'pending'] } } }, // Opcional: excluir cancelados de esta métrica también
+            { $unwind: '$items' },
+            { $group: { _id: '$items.name', totalSold: { $sum: '$items.quantity' } } },
+            { $sort: { totalSold: -1 } },
+            { $limit: 1 }
+        ]);
+        const topProduct = topProductData.length > 0 ? topProductData[0]._id : 'N/A';
+
+        res.json({
+            success: true,
+            data: {
+                totalOrders,
+                totalCustomers,
+                totalRevenue,
+                topProduct,
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching admin report metrics:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+});
+
+
+// Endpoint para datos del gráfico de ventas (modificado para rangos de fecha)
+app.get('/api/admin/reports/sales-chart', adminAuth, async (req, res) => {
+    try {
+        const { startDate: startDateStr, endDate: endDateStr } = req.query;
+
+        // Validar y establecer fechas por defecto si no se proporcionan
+        const endDate = endDateStr ? new Date(endDateStr) : new Date();
+        // Ajustar endDate para que incluya todo el día
+        endDate.setHours(23, 59, 59, 999);
+        
+        let startDate;
+        if (startDateStr) {
+            startDate = new Date(startDateStr);
+            startDate.setHours(0, 0, 0, 0); // Asegurar que la fecha de inicio comience a las 00:00
+        } else {
+            // Por defecto, últimos 30 días si no hay fecha de inicio
+            startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            startDate.setHours(0, 0, 0, 0);
+        }
+
+        const dateRangeInDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
+
+        // Decidir el formato de agrupación y etiqueta basado en el rango de fechas
+        let groupFormat, labelFormatOptions;
+        const timezone = "America/El_Salvador"; // Usa tu zona horaria local
+
+        if (dateRangeInDays <= 1) { // Rango de un solo día, agrupar por hora
+            groupFormat = { $dateToString: { format: "%Y-%m-%dT%H:00:00", date: "$createdAt", timezone } };
+            labelFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+        } else if (dateRangeInDays <= 90) { // Hasta 3 meses, agrupar por día
+            groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone } };
+            labelFormatOptions = { month: 'short', day: 'numeric' };
+        } else { // Más de 3 meses, agrupar por mes
+            groupFormat = { $dateToString: { format: "%Y-%m", date: "$createdAt", timezone } };
+            labelFormatOptions = { year: 'numeric', month: 'long' };
+        }
+
+        const salesData = await Order.aggregate([
+            { 
+                $match: { 
+                    createdAt: { $gte: startDate, $lte: endDate }, 
+                    status: { $nin: ['cancelled', 'pending'] } 
+                } 
+            },
+            { 
+                $group: {
+                    _id: groupFormat,
+                    totalRevenue: { $sum: "$totalAmount" }
+                } 
+            },
+            { $sort: { _id: 1 } }
+        ]);
+        
+        const labels = salesData.map(d => new Date(d._id).toLocaleDateString('es-ES', labelFormatOptions));
+        const values = salesData.map(d => d.totalRevenue);
+
+        // Generar un título dinámico para el gráfico
+        const chartTitle = `Ventas del ${startDate.toLocaleDateString('es-ES')} al ${endDate.toLocaleDateString('es-ES')}`;
+
+        res.json({ success: true, data: { labels, values, title: chartTitle } });
+    } catch (error)
+    {
+        console.error("Error fetching sales chart data:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+});
+
+
+// Endpoint para datos del gráfico de categorías
+app.get('/api/admin/reports/category-chart', adminAuth, async (req, res) => {
+    try {
+        const categoryData = await Order.aggregate([
+            { $match: { status: { $nin: ['cancelled', 'pending'] } } },
+            { $unwind: '$items' },
+            { $lookup: { from: 'products', localField: 'items.productId', foreignField: '_id', as: 'productInfo' } },
+            { $unwind: '$productInfo' },
+            { 
+                $group: {
+                    _id: '$productInfo.category',
+                    count: { $sum: 1 } // Contar número de items vendidos por categoría
+                } 
+            },
+            { $sort: { count: -1 } }
+        ]);
+        
+        const labels = categoryData.map(d => d._id);
+        const values = categoryData.map(d => d.count);
+        
+        res.json({ success: true, data: { labels, values } });
+
+    } catch (error) {
+        console.error("Error fetching category chart data:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+});
+
+// Endpoint para datos del reporte de clientes
+app.get('/api/admin/reports/customers', adminAuth, async (req, res) => {
+    try {
+        const sortBy = req.query.sort || '-totalSpent'; // Ordenar por gasto total por defecto
+
+        const customerData = await Order.aggregate([
+            // 1. Filtrar solo pedidos completados (puedes ajustar los estados según tu negocio)
+            { $match: { status: { $nin: ['cancelled', 'pending'] }, userId: { $ne: null } } },
+
+            // 2. Agrupar por userId para calcular métricas
+            {
+                $group: {
+                    _id: '$userId',
+                    totalSpent: { $sum: '$totalAmount' },
+                    orderCount: { $sum: 1 },
+                    lastOrderDate: { $max: '$createdAt' }
+                }
+            },
+            
+            // 3. Unir con la colección de usuarios para obtener nombre y email
+            {
+                $lookup: {
+                    from: 'users', // El nombre de tu colección de usuarios
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'customerInfo'
+                }
+            },
+            
+            // 4. Desplegar el array de la información del cliente
+            { $unwind: '$customerInfo' },
+
+            // 5. Formatear la salida final
+            {
+                $project: {
+                    _id: 0, // Ocultar el _id del grupo
+                    userId: '$_id',
+                    name: '$customerInfo.nombre',
+                    email: '$customerInfo.email',
+                    totalSpent: '$totalSpent',
+                    orderCount: '$orderCount',
+                    lastOrderDate: '$lastOrderDate'
+                }
+            },
+
+            // 6. Ordenar según el parámetro
+            { $sort: (sortBy === 'orderCount' ? { orderCount: -1 } : { totalSpent: -1 }) }
+        ]);
+
+        res.json({ success: true, data: customerData });
+
+    } catch (error) {
+        console.error("Error fetching customer report data:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+});
+
+// Endpoint para datos del reporte de productos
+app.get('/api/admin/reports/products', adminAuth, async (req, res) => {
+    try {
+        const sortBy = req.query.sort || '-unitsSold'; // Ordenar por unidades vendidas por defecto
+
+        const productData = await Order.aggregate([
+            // 1. Filtrar solo pedidos completados
+            { $match: { status: { $nin: ['cancelled', 'pending'] } } },
+
+            // 2. Desplegar el array de items para procesar cada producto individualmente
+            { $unwind: '$items' },
+
+            // 3. Agrupar por ID de producto y calcular métricas de venta
+            {
+                $group: {
+                    _id: '$items.productId',
+                    unitsSold: { $sum: '$items.quantity' },
+                    totalRevenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } }
+                }
+            },
+
+            // 4. Unir con la colección de productos para obtener detalles (nombre, stock, etc.)
+            {
+                $lookup: {
+                    from: 'products', // El nombre de tu colección de productos
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+
+            // 5. Desplegar el array de detalles del producto
+            { $unwind: '$productDetails' },
+
+            // 6. Formatear la salida final
+            {
+                $project: {
+                    _id: 0,
+                    productId: '$_id',
+                    name: '$productDetails.name',
+                    category: '$productDetails.category',
+                    stock: '$productDetails.stock',
+                    unitsSold: '$unitsSold',
+                    totalRevenue: '$totalRevenue'
+                }
+            },
+
+            // 7. Ordenar según el parámetro
+            { $sort: (sortBy === 'totalRevenue' ? { totalRevenue: -1 } : { unitsSold: -1 }) }
+        ]);
+
+        res.json({ success: true, data: productData });
+
+    } catch (error) {
+        console.error("Error fetching product report data:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+});
+
+
+// --- Rutas HTML ---
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '../../index.html')); });
 app.get('/:viewName', (req, res, next) => {
     const viewName = req.params.viewName;
@@ -915,7 +1114,7 @@ app.get('/politicas-privacidad', (req, res) => {
     res.sendFile(path.join(__dirname, '../politicas-privacidad.html'));
 });
 
-// --- Inicio del Servidor (sin cambios) ---
+// --- Inicio del Servidor ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
@@ -935,13 +1134,13 @@ function notificarNuevoPedido(pedido) {
   const mailOptions = {
     from: '"Katana Sushi" <sortomejia66@gmail.com>',
     to: 'sortomejia66@gmail.com', // Correo del admin
-    subject: '¡Nuevo pedido recibido!',
+    subject: `¡Nuevo pedido recibido! - #${pedido.orderId}`,
     html: `
-      <h2>Nuevo pedido recibido</h2>
+      <h2>Nuevo pedido recibido #${pedido.orderId}</h2>
       <p><strong>Cliente:</strong> ${pedido.deliveryDetails?.nombre || 'Invitado'}</p>
       <p><strong>Teléfono:</strong> ${pedido.deliveryDetails?.telefono || '-'}</p>
       <p><strong>Zona:</strong> ${pedido.deliveryDetails?.zona || '-'}</p>
-      <p><strong>Total:</strong> $${pedido.totalAmount || 0}</p>
+      <p><strong>Total:</strong> $${(pedido.totalAmount || 0).toFixed(2)}</p>
       <hr>
       <p>Revisa el panel de administración para más detalles.</p>
     `

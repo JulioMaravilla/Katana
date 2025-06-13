@@ -337,111 +337,187 @@
                             <div class="report-type-selector" style="display:flex;align-items:center;gap:10px;">
                                 <span id="reportTypeIcon" class="report-type-icon" style="font-size:1.5em;color:#3498db;"><i class="fas fa-chart-bar"></i></span>
                                 <select id="reportTypeSelect" class="admin-select">
-                                    <option value="ventas">Reporte de ventas</option>
+                                    <option value="ventas" selected>Reporte de ventas</option>
                                     <option value="pedidos">Reporte de pedidos</option>
                                     <option value="clientes">Reporte de clientes</option>
                                     <option value="productos">Reporte de productos</option>
                                 </select>
                             </div>
-                            <button class="admin-btn btn-pdf" id="exportReportPdfBtn">
-                                <i class="fas fa-file-pdf"></i> PDF
-                            </button>
-                            <button class="admin-btn btn-csv" id="exportReportCsvBtn">
-                                <i class="fas fa-file-csv"></i> CSV
-                            </button>
-                            <button class="admin-btn btn-word" id="exportReportWordBtn">
-                                <i class="fas fa-file-word"></i> Word
-                            </button>
-                        </div>
-                    </div>
-                    <div id="ventasReportContent">
-                        <div class="date-filters">
-                            <select class="admin-select" id="ventasDateFilter">
-                                <option value="dia">Día</option>
-                                <option value="semana">Semana</option>
-                                <option value="mes" selected>Mes</option>
-                                <option value="trimestre">Trimestre</option>
-                                <option value="semestre">Semestre</option>
-                                <option value="anio">Año</option>
-                            </select>
-                            <button class="admin-btn btn-primary"><i class="fas fa-sync-alt"></i> Actualizar</button>
-                        </div>
-                        <div class="metrics-grid"> <div class="metric-card"> <div class="metric-icon"><i class="fas fa-box"></i></div> <div class="metric-info"> <h3>Total vendidos</h3> <div class="metric-value">0</div> </div> </div> <div class="metric-card"> <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div> <div class="metric-info"> <h3>Ingresos</h3> <div class="metric-value">$0</div> </div> </div> <div class="metric-card"> <div class="metric-icon"><i class="fas fa-shopping-cart"></i></div> <div class="metric-info"> <h3>Ventas hoy</h3> <div class="metric-value">0</div> </div> </div> </div>
-                        <div class="charts-grid"> <div class="chart-card"> <h3>Ventas</h3> <div class="chart-container"><canvas id="salesChart"></canvas></div> </div> <div class="chart-card"> <h3>Ventas por Categoría</h3> <div class="chart-container"><canvas id="categoryChart"></canvas></div> </div> </div>
-                    </div>
-                    <div id="pedidosReportContent" style="display:none;">
-                        <div class="admin-form">
-                            <h3 style="display:flex;align-items:center;gap:10px;"><i class="fas fa-shopping-cart" style="color:#3498db;"></i> Reporte de Pedidos</h3>
-                            <div style="margin-bottom: 1rem;">
-                                <input type="date" id="filtroFechaPedidos" class="form-control" placeholder="📅 Fecha">
                             </div>
-                            <table class="admin-table" style="margin-top:1.5rem;">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Fecha</th>
-                                        <th>Estado</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>KS-0001</td><td>Walter Lozano</td><td>2024-05-08</td><td>Pendiente</td><td>$3.50</td></tr>
-                                    <tr><td>KS-0002</td><td>Miguel Ruiz</td><td>2024-05-08</td><td>Cancelado</td><td>$7.50</td></tr>
-                                    <tr><td>KS-0003</td><td>Rigo Alexander</td><td>2024-05-08</td><td>Entregado</td><td>$3.50</td></tr>
-                                </tbody>
-                            </table>
+                    </div>
+            
+                    <div id="ventasReportContent">
+                        <!-- Filtros de fecha mejorados -->
+    <div class="date-filters">
+        <div class="filter-group">
+            <label for="salesDateRangeFilter">Ver ventas por:</label>
+            <select id="salesDateRangeFilter" class="admin-select">
+                <option value="today">Hoy</option>
+                <option value="week">Últimos 7 días</option>
+                <option value="month" selected>Últimos 30 días</option>
+                <option value="quarter">Últimos 90 días</option>
+                <option value="semester">Últimos 6 meses</option>
+                <option value="year">Último año</option>
+                <option value="custom">Rango Personalizado</option>
+            </select>
+        </div>
+        <!-- Contenedor para el rango de fechas personalizado (oculto por defecto) -->
+        <div id="salesCustomDateContainer" class="filter-group" style="display: none; gap: 10px; align-items: flex-end;">
+            <div>
+                <label for="salesStartDate">Desde:</label>
+                <input type="date" id="salesStartDate" class="admin-input">
+            </div>
+            <div>
+                <label for="salesEndDate">Hasta:</label>
+                <input type="date" id="salesEndDate" class="admin-input">
+            </div>
+            <button id="applyCustomDateFilter" class="admin-button">Aplicar</button>
+        </div>
+    </div>
+                        
+                        <div class="metrics-grid">
+                            <div class="metric-card"><div class="metric-info"><h3>Cargando...</h3><div class="metric-value">...</div></div></div>
+                            <div class="metric-card"><div class="metric-info"><h3>Cargando...</h3><div class="metric-value">...</div></div></div>
+                            <div class="metric-card"><div class="metric-info"><h3>Cargando...</h3><div class="metric-value">...</div></div></div>
+                            <div class="metric-card"><div class="metric-info"><h3>Cargando...</h3><div class="metric-value">...</div></div></div>
+                        </div>
+            
+                        <div class="charts-grid">
+                            <!-- Añadimos un ID a este 'chart-card' para poder cambiar su título -->
+                            <div class="chart-card" id="salesChartCard">
+                                <h3>Ventas (Últimos 30 días)</h3>
+                                <div class="chart-container"><canvas id="salesChart"></canvas></div>
+                            </div>
+                            <div class="chart-card">
+                                <h3>Ventas por Categoría</h3>
+                                <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+                            </div>
                         </div>
                     </div>
-                    <div id="clientesReportContent" style="display:none;">
-                        <div class="admin-form">
-                            <h3 style="display:flex;align-items:center;gap:10px;"><i class="fas fa-users" style="color:#27ae60;"></i> Reporte de Clientes</h3>
-                            <table class="admin-table" style="margin-top:1.5rem;">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Teléfono</th>
-                                        <th>Pedidos</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>CL-001</td><td>Walter Lozano</td><td>walter@mail.com</td><td>76251719</td><td>5</td></tr>
-                                    <tr><td>CL-002</td><td>Miguel Ruiz</td><td>miguel@mail.com</td><td>73672842</td><td>2</td></tr>
-                                    <tr><td>CL-003</td><td>Rigo Alexander</td><td>rigo@mail.com</td><td>74747172</td><td>3</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="productosReportContent" style="display:none;">
-                        <div class="admin-form">
-                            <h3 style="display:flex;align-items:center;gap:10px;"><i class="fas fa-box" style="color:#e67e22;"></i> Reporte de Productos</h3>
-                            <table class="admin-table" style="margin-top:1.5rem;">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nombre</th>
-                                        <th>Categoría</th>
-                                        <th>Precio</th>
-                                        <th>Stock</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>PR-001</td><td>Roll Camarón</td><td>Rolls</td><td>$3.50</td><td>20</td><td>Activo</td></tr>
-                                    <tr><td>PR-002</td><td>Roll Salmón</td><td>Rolls</td><td>$4.00</td><td>15</td><td>Activo</td></tr>
-                                    <tr><td>PR-003</td><td>Refresco</td><td>Bebidas</td><td>$1.00</td><td>50</td><td>Activo</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="otherReportContent" style="display:none;">
-                        <div class="admin-form" style="text-align:center; margin-top:2rem;">
-                            <h3>Próximamente disponible</h3>
-                            <p>El reporte seleccionado estará disponible en una próxima actualización.</p>
-                        </div>
-                    </div>
+            
+                    <div id="pedidosReportContent" style="display:none;">
+    <div class="report-filters">
+        <div class="filter-group">
+            <label for="pedidosStatusFilter">Filtrar por Estado:</label>
+            <select id="pedidosStatusFilter" class="admin-select">
+                <option value="all" selected>Todos los estados</option>
+                <option value="pending">Pendiente</option>
+                <option value="processing">En preparación</option>
+                <option value="shipped">En camino</option>
+                <option value="delivered">Entregado</option>
+                <option value="cancelled">Cancelado</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="pedidosSourceFilter">Filtrar por Origen:</label>
+            <select id="pedidosSourceFilter" class="admin-select">
+                <option value="all" selected>Todos los orígenes</option>
+                <option value="web_user">Usuario Web</option>
+                <option value="web_guest">Invitado Web</option>
+                <option value="admin_manual">Manual</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="pedidosSortFilter">Ordenar por:</label>
+            <select id="pedidosSortFilter" class="admin-select">
+                <option value="-createdAt" selected>Más Recientes</option>
+                <option value="createdAt">Más Antiguos</option>
+                <option value="-totalAmount">Mayor Monto</option>
+                <option value="totalAmount">Menor Monto</option>
+            </select>
+        </div>
+        <div class="export-buttons" style="margin-left: auto;">
+            <button id="exportPedidosCSV" class="admin-button secondary-button"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
+            <button id="exportPedidosPDF" class="admin-button secondary-button"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="pedidosReportTable">
+            <thead>
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Origen</th>
+                    <th>Items</th>
+                    <th>Monto Total</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+    
+    <div class="pagination-controls" id="pedidosPagination">
+        </div>
+</div>
+
+<div id="clientesReportContent" style="display:none;">
+    <div class="report-filters">
+        <div class="filter-group">
+            <label for="clientesSortFilter">Mostrar Top Clientes por:</label>
+            <select id="clientesSortFilter" class="admin-select">
+                <option value="-totalSpent" selected>Mayor Gasto</option>
+                <option value="orderCount">Más Pedidos</option>
+            </select>
+        </div>
+        <div class="export-buttons" style="margin-left: auto;">
+            <button id="exportClientesCSV" class="admin-button secondary-button"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
+            <button id="exportClientesPDF" class="admin-button secondary-button"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="clientesReportTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th class="text-center">Pedidos Realizados</th>
+                    <th class="text-center">Gasto Total</th>
+                    <th>Último Pedido</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+</div>
+<div id="productosReportContent" style="display:none;">
+    <div class="report-filters">
+        <div class="filter-group">
+            <label for="productosSortFilter">Mostrar Top Productos por:</label>
+            <select id="productosSortFilter" class="admin-select">
+                <option value="-unitsSold" selected>Más Vendidos</option>
+                <option value="-totalRevenue">Mayores Ingresos</option>
+            </select>
+        </div>
+        <div class="export-buttons" style="margin-left: auto;">
+            <button id="exportProductosCSV" class="admin-button secondary-button"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
+            <button id="exportProductosPDF" class="admin-button secondary-button"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table" id="productosReportTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="text-center">Unidades Vendidas</th>
+                    <th class="text-center">Ingresos Generados</th>
+                    <th class="text-center">Stock Actual</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+</div>
                 </div>
             </section>
 
@@ -672,7 +748,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="js/admin.js"></script>
+    <script type="module" src="js/admin.js"></script>
     <script src="js/docx.min.js"></script>
     <script src="js/qrious.min.js"></script>
 </body>

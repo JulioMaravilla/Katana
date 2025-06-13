@@ -1963,3 +1963,48 @@ body {
     color: #dc3545;
     font-weight: bold;
 }
+
+/* --- NUEVOS ESTILOS PARA LA GESTIÓN DEL CARRUSEL --- */
+.carousel-images-list {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border: 1px solid #eee;
+    padding: 1rem;
+    border-radius: 8px;
+    min-height: 100px;
+    background-color: #f8f9fa;
+}
+
+.carousel-image-item {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    border-radius: 4px;
+    text-align: center;
+    width: 150px; /* Ancho fijo para cada tarjeta de imagen */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.carousel-image-item img {
+    width: 100%;
+    height: 80px; /* Altura fija para la previsualización */
+    object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+    margin-bottom: 0.5rem;
+    border-radius: 2px;
+}
+
+.carousel-image-item p {
+    font-size: 0.8em;
+    margin-bottom: 0.5rem;
+    word-break: break-all; /* Evita que nombres largos rompan el layout */
+    flex-grow: 1; /* Permite que el párrafo ocupe el espacio disponible */
+    color: #333;
+}
+
+.carousel-image-item .admin-btn {
+    width: 100%; /* El botón ocupa todo el ancho de la tarjeta */
+}
