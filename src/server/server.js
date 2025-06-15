@@ -14,7 +14,7 @@ const mainApiRouter = require('./routes'); // Importa el enrutador principal des
 
 // --- Inicialización de la Aplicación ---
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // --- Middleware Esenciales ---
 app.use(helmet()); // Agregar seguridad básica
