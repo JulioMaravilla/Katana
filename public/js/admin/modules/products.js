@@ -36,7 +36,6 @@ function setupProductForm() {
         return;
     }
     
-    // Evitar añadir múltiples listeners si la sección se recarga
     if (addProductForm.dataset.listenerAttached === 'true') return;
     addProductForm.dataset.listenerAttached = 'true';
 
@@ -45,31 +44,18 @@ function setupProductForm() {
         const messageElement = document.querySelector(SELECTORS.MESSAGE);
         const submitButton = addProductForm.querySelector('button[type="submit"]');
         
-        messageElement.textContent = '';
-        messageElement.style.color = 'inherit';
-
+        // La principal diferencia está aquí. Usamos FormData directamente.
+        // Esto toma todos los campos del formulario, incluyendo el archivo.
         const formData = new FormData(addProductForm);
-        const productData = {
-            name: formData.get('productName')?.trim(),
-            price: parseFloat(formData.get('productPrice')),
-            category: formData.get('productCategory'),
-            stock: parseInt(formData.get('productStock'), 10) || 0,
-            description: formData.get('productDescription')?.trim(),
-            imageUrl: formData.get('productImageUrl')?.trim()
-        };
         
-        // Validación
-        if (!productData.name || !productData.price || !productData.category || isNaN(productData.price) || productData.price < 0 || (productData.imageUrl && !isValidHttpUrl(productData.imageUrl))) {
-            showAdminNotification('Por favor, verifica los campos. El nombre, precio y categoría son requeridos.', 'error');
-            return;
-        }
+        // Ya no creamos un objeto JSON manual, FormData lo hace por nosotros.
 
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
         try {
-            // Nota: El endpoint de creación de productos es protegido por adminAuth por defecto.
-            const result = await makeAdminApiCall('/products', 'POST', productData);
+            // makeAdminApiCall ya está preparado para manejar FormData.
+            const result = await makeAdminApiCall('/products', 'POST', formData);
 
             if (result.success) {
                 showAdminNotification(result.message || '¡Producto guardado!', 'success');

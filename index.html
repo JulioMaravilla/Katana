@@ -13,13 +13,13 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="#" class="nav-logo">
+        <a href="/" class="nav-logo">
             <img src="../public/images/LOGO-SIN-FONDO.png" alt="Katana Sushi Logo">
         </a>
         <ul class="nav-links">
-            <li><a href="#inicio"><i class="fas fa-torii-gate"></i>Inicio</a></li>
-            <li><a href="#menu"><i class="fas fa-bowl-rice"></i>Menú</a></li>
+            <li><a href="/"><i class="fas fa-torii-gate"></i>Inicio</a></li>
             <li><a href="#promociones"><i class="fas fa-tags"></i>Promociones</a></li>
+            <li><a href="#menu"><i class="fas fa-bowl-rice"></i>Menú</a></li>
             <li><a href="#nosotros"><i class="fas fa-users"></i>Nosotros</a></li>
             <li><a href="#contacto"><i class="fas fa-envelope"></i>Contacto</a></li>
             <li><a href="/login" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a></li>
@@ -41,7 +41,7 @@
             <div class="cart-items">
                 <div class="empty-cart">
                     <i class="fas fa-shopping-basket"></i>
-                    <p>Tu carrito está vacío</p>
+                    <p>Tu reserva está vacía</p>
                 </div>
             </div>
             <div class="cart-footer">
@@ -323,7 +323,25 @@
     </div>
 
     <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <script>
+        // Verificar si la clave de API de Google Maps está disponible
+        const mapsApiKey = 'YOUR_API_KEY'; // Reemplazar con tu clave API real
+        if (mapsApiKey && mapsApiKey !== 'YOUR_API_KEY') {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${mapsApiKey}&libraries=places`;
+            document.head.appendChild(script);
+        } else {
+            console.log('Clave de API de Google Maps no configurada. Las funciones de ubicación estarán deshabilitadas.');
+            // Deshabilitar botones relacionados con la ubicación si no hay clave API
+            document.addEventListener('DOMContentLoaded', function() {
+                const locationBtn = document.getElementById('getCurrentLocation');
+                if (locationBtn) {
+                    locationBtn.disabled = true;
+                    locationBtn.title = 'Servicios de ubicación no disponibles';
+                }
+            });
+        }
+    </script>
     <!-- Cookie Manager -->
     <script src="public/js/cookieManager.js"></script>
     <!-- Tus scripts -->

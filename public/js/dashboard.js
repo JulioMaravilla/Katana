@@ -18,8 +18,8 @@
 
 // --- 1. Constants & Configuration ---
 const API_ENDPOINTS = {
-    PROFILE: '/api/profile',
-    CHANGE_PASSWORD: '/api/profile/change-password',
+    PROFILE: '/api/users/profile',
+    CHANGE_PASSWORD: '/api/users/profile/change-password',
     ORDERS: '/api/orders', // Endpoint para obtener los pedidos del usuario logueado
     PRODUCTS: '/api/products'
 };
@@ -91,12 +91,34 @@ const SELECTORS = {
 
 const DEFAULT_SECTION = 'menu';
 
+// Añade esto al principio de public/js/dashboard.js
+
+const ZONAS_DE_ENTREGA = [
+    { value: 'centrica', text: 'CÉNTRICA (Usulután Ciudad, hasta Puente Gavidia, etc.)', cost: 2.00 },
+    { value: 'puente-ugb', text: 'Del Puente Gavidia hasta la UGB', cost: 2.50 },
+    { value: 'ugb-montanita', text: 'De la UGB hasta La Montañita', cost: 3.00 },
+    { value: 'montanita-ereguayquin', text: 'De La Montañita hasta Ereguayquín (Carretera Litoral)', cost: 3.50 },
+    { value: 'ereguayquin', text: 'Dentro de Ereguayquín', cost: 4.00 },
+    { value: 'sta-maria-centro', text: 'Sta. María Centro', cost: 3.00 },
+    { value: 'sta-elena', text: 'Sta. Elena', cost: 4.00 },
+    { value: 'pto-parada', text: 'Pto. Parada', cost: 8.00 },
+    { value: 'pinos-lemus', text: 'De Los Pinos hasta Lemus Home', cost: 2.50 },
+    { value: 'lemus-tierramar', text: 'De Lemus Home hasta Tierramar', cost: 3.00 },
+    { value: 'tierramar-poza', text: 'De Tierramar hasta La Poza', cost: 3.50 },
+    { value: 'poza-chilamate', text: 'De La Poza hasta Chilamate', cost: 4.00 },
+    { value: 'calvario-veraneras', text: 'De El Calvario hasta Las Veraneras', cost: 2.00 },
+    { value: 'estadio-cruz1', text: 'Del Estadio Sergio Torres Rivera hasta La Cruz 1', cost: 2.50 },
+    { value: 'cruz1-bypass', text: 'De La Cruz 1 hasta el By Pass', cost: 3.00 },
+    { value: 'otra', text: 'Otra zona (se confirmará costo)', cost: 0.00 }
+];
+
 // --- 2. State Management ---
 const dashboardState = {
     currentSection: DEFAULT_SECTION,
     userProfile: null,
     dashboardProducts: [],
-    userOrders: [], // Para almacenar los pedidos del usuario
+    userOrders: [],
+    userAddresses: [],
     isSidebarCollapsed: false,
 };
 
@@ -139,10 +161,23 @@ function logout() {
 // --- 4. Initialization ---
 async function initializeDashboard() {
     console.log("Initializing dashboard...");
+    populateZoneSelectors('#addressZona');
     setupSidebar();
     setupCommonEventListeners();
     setupModalListeners();
     setupSectionSpecificListeners();
+    // Aplicar preferencia de sidebar colapsado
+    const sidebar = document.querySelector(SELECTORS.SIDEBAR);
+    const collapsedPref = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (sidebar) {
+        if (collapsedPref) {
+            sidebar.classList.add('collapsed');
+            dashboardState.isSidebarCollapsed = true;
+        } else {
+            sidebar.classList.remove('collapsed');
+            dashboardState.isSidebarCollapsed = false;
+        }
+    }
     await fetchAndDisplayUserProfile();
 
     const lastSection = getUserPreference('lastSection') || DEFAULT_SECTION;
@@ -194,6 +229,11 @@ function setupSectionSpecificListeners() {
         const zoneSelectDashboard = document.querySelector(SELECTORS.DASHBOARD_ZONE_SELECT);
         if (zoneSelectDashboard) {
             zoneSelectDashboard.addEventListener('change', updateDashboardShippingInfoAndTotals);
+        }
+
+        const savedAddressSelect = document.getElementById('savedAddressSelector');
+        if (savedAddressSelect) {
+            savedAddressSelect.addEventListener('change', handleSavedAddressSelection);
         }
     }
 
@@ -312,35 +352,30 @@ function handleMenuActions(event) {
 function setupSidebar() { console.log("Sidebar setup initiated."); }
 function toggleSidebar() {
     const sidebar = document.querySelector(SELECTORS.SIDEBAR);
-    const mainContent = document.querySelector(SELECTORS.MAIN_CONTENT);
-    if (!sidebar || !mainContent) return;
-    const shouldCollapse = !sidebar.classList.contains('collapsed');
-    if (shouldCollapse) collapseSidebar();
-    else expandSidebar();
-    if (window.innerWidth > 768) saveUserPreference('sidebarCollapsed', shouldCollapse);
+    if (!sidebar) return;
+    const isCollapsed = sidebar.classList.toggle('collapsed');
+    dashboardState.isSidebarCollapsed = isCollapsed;
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
+    console.log(isCollapsed ? "Sidebar collapsed." : "Sidebar expanded.");
 }
 function collapseSidebar() {
     const sidebar = document.querySelector(SELECTORS.SIDEBAR);
-    const mainContent = document.querySelector(SELECTORS.MAIN_CONTENT);
-    if (!sidebar || !mainContent) return;
+    if (!sidebar) return;
     sidebar.classList.add('collapsed');
-    mainContent.classList.add('expanded');
     dashboardState.isSidebarCollapsed = true;
     console.log("Sidebar collapsed.");
 }
 function expandSidebar() {
     const sidebar = document.querySelector(SELECTORS.SIDEBAR);
-    const mainContent = document.querySelector(SELECTORS.MAIN_CONTENT);
-    if (!sidebar || !mainContent) return;
+    if (!sidebar) return;
     sidebar.classList.remove('collapsed');
-    mainContent.classList.remove('expanded');
     dashboardState.isSidebarCollapsed = false;
     console.log("Sidebar expanded.");
 }
 function openModal(selectorOrElement, onOpenCallback) {
     const modalElement = typeof selectorOrElement === 'string' ? document.querySelector(selectorOrElement) : selectorOrElement;
     if (modalElement) {
-        modalElement.style.display = 'flex';
+        modalElement.classList.add('show-modal');
         console.log(`Modal opened: ${modalElement.id}`);
         if (typeof onOpenCallback === 'function') {
             try { onOpenCallback(); } catch (error) { console.error(`Error in modal open callback for ${modalElement.id}:`, error); }
@@ -350,7 +385,7 @@ function openModal(selectorOrElement, onOpenCallback) {
 function closeModal(selectorOrElement) {
     const modalElement = typeof selectorOrElement === 'string' ? document.querySelector(selectorOrElement) : selectorOrElement;
     if (modalElement) {
-        modalElement.style.display = 'none';
+        modalElement.classList.remove('show-modal');
         console.log(`Modal closed: ${modalElement.id}`);
         const forms = modalElement.querySelectorAll('form');
         forms.forEach(form => form.reset());
@@ -414,17 +449,20 @@ async function handleSectionChange(sectionId, menuItem) {
 async function loadSectionContent(sectionId) {
     console.log(`Loading dynamic content for section: ${sectionId}`);
     switch (sectionId) {
-        case 'perfil': break;
-        case 'pedidos': await loadOrders(); break;
-        case 'carrito': updateCartDisplay(); break;
+        case 'perfil': 
+            break;
+        case 'pedidos': 
+            await loadOrders(); 
+            break;
+        case 'carrito': 
+            updateCartDisplay(); 
+            break;
         case 'checkout': 
             initializeCheckout(); 
             loadCheckoutSummary();
-            // Inicializar el mapa cuando se carga la sección de checkout
             if (typeof google !== 'undefined' && google.maps) {
                 initMap();
             } else {
-                // Si Google Maps no está cargado, esperar a que se cargue
                 window.addEventListener('load', () => {
                     if (typeof google !== 'undefined' && google.maps) {
                         initMap();
@@ -432,9 +470,18 @@ async function loadSectionContent(sectionId) {
                 });
             }
             break;
-        case 'menu': await loadDashboardMenu(); break;
-        case 'puntos': loadPuntosContent(); break;
-        default: console.log(`No specific content loading defined for section: ${sectionId}`);
+        case 'menu': 
+            await loadDashboardMenu(); 
+            break;
+        case 'direcciones':
+            initializeDireccionesSection();
+            break;
+        case 'favoritos':
+        case 'promociones':
+            break; 
+
+        default: 
+            console.log(`No specific content loading defined for section: ${sectionId}`);
     }
 }
 
@@ -620,7 +667,7 @@ function updateCartDisplay() {
     const cart = getCart(); 
 
     if (cart.length === 0) {
-        cartContainer.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-cart fa-3x text-gray-400"></i><p class="my-4 text-gray-600">Tu carrito está vacío.</p><a href="#" class="continue-shopping inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-150" data-target-section="menu"><i class="fas fa-arrow-left mr-2"></i>Ver Menú</a></div>`;
+        cartContainer.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-cart fa-3x text-gray-400"></i><p class="my-4 text-gray-600">Tu reserva está vacía.</p><a href="#" class="continue-shopping inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-150" data-target-section="menu"><i class="fas fa-arrow-left mr-2"></i>Ver Menú</a></div>`;
         totalAmountElement.textContent = '$0.00';
         checkoutButton.disabled = true;
         checkoutButton.classList.add('opacity-50', 'cursor-not-allowed');
@@ -657,6 +704,7 @@ function initializeCheckout() { console.log("Checkout section initialized/prepar
 
 function loadCheckoutSummary() {
     console.log("Loading checkout summary...");
+    populateSavedAddressSelector();
     const orderItemsContainer = document.querySelector(SELECTORS.CHECKOUT_ORDER_ITEMS);
     const productSubtotalElement = document.querySelector(SELECTORS.CHECKOUT_PRODUCT_SUBTOTAL_AMOUNT); // Nuevo
     const shippingCostElement = document.querySelector(SELECTORS.CHECKOUT_SHIPPING_COST_AMOUNT); // Nuevo
@@ -672,7 +720,7 @@ function loadCheckoutSummary() {
     
     const cart = getCart();
     if (cart.length === 0) {
-        orderItemsContainer.innerHTML = '<p class="empty-cart-message text-center text-gray-600 my-4">Tu carrito está vacío. Añade productos desde el menú para continuar.</p>';
+        orderItemsContainer.innerHTML = '<p class="empty-cart-message text-center text-gray-600 my-4">Tu reserva está vacía. Añade productos desde el menú para continuar.</p>';
         productSubtotalElement.textContent = '$0.00';
         shippingCostElement.textContent = '$0.00';
         shippingMsgElement.style.display = 'none';
@@ -861,6 +909,74 @@ async function confirmOrder() {
     }
 }
 
+/**
+ * Carga las direcciones guardadas del usuario y las añade al menú desplegable del checkout.
+ */
+async function populateSavedAddressSelector() {
+    const selector = document.getElementById('savedAddressSelector');
+    if (!selector) return;
+
+    // Limpiar opciones anteriores, excepto la primera
+    while (selector.options.length > 1) {
+        selector.remove(1);
+    }
+
+    // Usamos las direcciones que ya están en el estado del dashboard si existen
+    if (!dashboardState.userAddresses || dashboardState.userAddresses.length === 0) {
+        const result = await makeApiCall('/api/users/profile/addresses', 'GET');
+        if (result.success) {
+            dashboardState.userAddresses = result.data;
+        }
+    }
+    
+    if (dashboardState.userAddresses.length > 0) {
+        dashboardState.userAddresses.forEach(addr => {
+            const option = document.createElement('option');
+            option.value = addr._id;
+            option.textContent = addr.alias;
+            selector.appendChild(option);
+        });
+        selector.parentElement.parentElement.style.display = 'block'; // Muestra el dropdown
+    } else {
+        selector.parentElement.parentElement.style.display = 'none'; // Oculta el dropdown si no hay direcciones
+    }
+}
+
+/**
+ * Rellena el formulario de envío cuando se selecciona una dirección guardada.
+ */
+function handleSavedAddressSelection() {
+    const selector = document.getElementById('savedAddressSelector');
+    const shippingForm = document.getElementById('shippingForm');
+    if (!selector || !shippingForm) return;
+
+    const selectedId = selector.value;
+    if (!selectedId) {
+        // Opcional: Limpiar el formulario si el usuario vuelve a "Seleccionar..."
+        // shippingForm.direccion.value = '';
+        // shippingForm.zona.value = '';
+        // shippingForm.referencia.value = '';
+        return;
+    }
+
+    const selectedAddress = dashboardState.userAddresses.find(addr => addr._id === selectedId);
+
+    if (selectedAddress) {
+        shippingForm.direccion.value = selectedAddress.direccion;
+        shippingForm.zona.value = selectedAddress.zona;
+        shippingForm.referencia.value = selectedAddress.referencia || '';
+
+        // Disparamos el evento 'change' en el select de zona para que se actualice el costo de envío
+        const zoneSelect = document.getElementById('dashboardZoneSelect');
+        if (zoneSelect) {
+            const changeEvent = new Event('change');
+            zoneSelect.dispatchEvent(changeEvent);
+        }
+        
+        showNotification(`Dirección "${selectedAddress.alias}" cargada.`, 'success');
+    }
+}
+
 // Orders Module
 async function loadOrders() {
     console.log("Loading user order history...");
@@ -907,52 +1023,43 @@ function renderOrderCard(order) {
     const totalItems = order.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
     const itemsHTML = order.items.map(item => `
-        <div class="order-item flex justify-between items-center py-2 border-t first:border-t-0">
-             <div class="flex items-center">
-                 <img src="${item.image || '/public/images/placeholder.png'}" alt="${item.name || 'Producto'}" class="w-12 h-12 object-cover rounded mr-3" onerror="this.onerror=null; this.src='/public/images/placeholder.png';">
-                 <div class="item-details">
-                     <h4 class="text-sm font-medium">${item.name || 'Producto Desconocido'}</h4>
-                     <p class="text-xs text-gray-600">Cantidad: ${item.quantity || 0}</p>
-                 </div>
+        <div class="order-item improved-item">
+             <img src="${item.image || '/public/images/placeholder.png'}" alt="${item.name || 'Producto'}" class="order-item-img" onerror="this.onerror=null; this.src='/public/images/placeholder.png';">
+             <div class="item-details">
+                 <h4>${item.name || 'Producto Desconocido'}</h4>
+                 <p>Cantidad: ${item.quantity || 0}</p>
              </div>
-             <span class="item-price text-sm font-medium">$${((parseFloat(item.price) || 0) * (item.quantity || 0)).toFixed(2)}</span>
+             <span class="item-price">$${((parseFloat(item.price) || 0) * (item.quantity || 0)).toFixed(2)}</span>
         </div>
     `).join('');
 
     return `
-        <div class="order-card bg-white shadow rounded-lg mb-4 overflow-hidden" data-order-id="${order.orderId || order._id}" data-status="${order.status?.toLowerCase() || 'pending'}">
-            <div class="order-header p-4 flex justify-between items-center cursor-pointer">
+        <div class="order-card modern improved" data-order-id="${order.orderId || order._id}" data-status="${order.status?.toLowerCase() || 'pending'}">
+            <div class="order-header">
                 <div class="order-info">
-                    <h3 class="font-semibold text-lg text-gray-800">Pedido #${order.orderId || order._id}</h3>
-                    <span class="order-date text-sm text-gray-500">${orderDateFormatted}</span>
-                    <p class="text-sm text-gray-600 mt-1">${totalItems} producto(s)</p>
+                    <h3>Pedido #${order.orderId || order._id}</h3>
+                    <span class="order-date"><i class="fas fa-calendar-alt"></i> ${orderDateFormatted}</span>
+                    <p class="order-products-count">${totalItems} producto(s)</p>
                 </div>
-                <div class="order-status-container flex flex-col items-end ml-2">
-                     <span class="status-badge text-xs font-semibold px-3 py-1.5 rounded-full ${statusClass} flex items-center">
-                        <i class="fas ${statusIcon} mr-1.5"></i>
-                        ${statusText}
-                     </span>
-                     <div class="order-total mt-1.5">
-                        <span class="text-lg font-bold text-gray-800">$${(parseFloat(order.totalAmount) || 0).toFixed(2)}</span>
+                <div class="order-status-container">
+                    <span class="order-status ${order.status?.toLowerCase()}"><i class="fas ${statusIcon}"></i> ${statusText}</span>
+                    <div class="order-total">
+                        <span>$${(parseFloat(order.totalAmount) || 0).toFixed(2)}</span>
                     </div>
                 </div>
-                 <button class="details-btn-icon text-gray-500 hover:text-gray-700 ml-2 p-1">
-                     <i class="fas fa-chevron-down transition-transform duration-300"></i>
-                 </button>
+                <button class="details-btn-icon improved-btn"><i class="fas fa-chevron-down"></i></button>
             </div>
-             <div class="order-details p-4 border-t bg-gray-50" style="display: none;">
-                <h4 class="font-semibold mb-2 text-gray-700">Detalles del Pedido:</h4>
-                ${itemsHTML}
-                ${order.deliveryDetails ? `
-                <div class="delivery-info mt-3 pt-3 border-t">
-                    <h5 class="font-semibold text-sm text-gray-700 mb-1">Detalles de Entrega:</h5>
-                    <p class="text-xs text-gray-600"><strong>Nombre:</strong> ${order.deliveryDetails.nombre || 'N/A'}</p>
-                    <p class="text-xs text-gray-600"><strong>Teléfono:</strong> ${order.deliveryDetails.telefono || 'N/A'}</p>
-                    <p class="text-xs text-gray-600"><strong>Dirección:</strong> ${order.deliveryDetails.direccion || 'N/A'}</p>
-                    <p class="text-xs text-gray-600"><strong>Zona:</strong> ${order.deliveryDetails.zona || 'N/A'}</p>
-                    ${order.deliveryDetails.referencia ? `<p class="text-xs text-gray-600"><strong>Referencia:</strong> ${order.deliveryDetails.referencia}</p>` : ''}
+            <div class="order-details improved-details" style="display: none;">
+                <h4>Detalles del Pedido:</h4>
+                <div class="order-items improved-items">${itemsHTML}</div>
+                <div class="delivery-info">
+                    <h5>Detalles de Entrega:</h5>
+                    <p><strong>Nombre:</strong> ${order.deliveryDetails.nombre || 'N/A'}</p>
+                    <p><strong>Teléfono:</strong> ${order.deliveryDetails.telefono || 'N/A'}</p>
+                    <p><strong>Dirección:</strong> ${order.deliveryDetails.direccion || 'N/A'}</p>
+                    <p><strong>Zona:</strong> ${order.deliveryDetails.zona || 'N/A'}</p>
+                    ${order.deliveryDetails.referencia ? `<p><strong>Referencia:</strong> ${order.deliveryDetails.referencia}</p>` : ''}
                 </div>
-                ` : ''}
             </div>
         </div>
     `;
@@ -1052,147 +1159,6 @@ function renderMenuItemCard(item) {
     return `<div class="menu-item-card bg-white shadow rounded-lg overflow-hidden flex flex-col"><img src="${productImage}" alt="${productName}" class="menu-item-image w-full h-48 object-cover" onerror="this.onerror=null; this.src='/public/images/placeholder.png';"><div class="menu-item-content p-4 flex flex-col flex-grow"><div class="menu-item-header flex justify-between items-start mb-2"><h3 class="menu-item-name font-semibold text-lg flex-grow mr-2">${productName}</h3><span class="menu-item-price font-bold text-lg text-green-600 whitespace-nowrap">$${productPrice.toFixed(2)}</span></div><p class="menu-item-description text-sm text-gray-600 mb-4 flex-grow">${productDescription}</p><button class="add-to-cart-btn mt-auto w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-150 flex items-center justify-center" data-product-info='${productInfo.replace(/'/g, "&apos;")}'> <i class="fas fa-cart-plus mr-2"></i>Reservar pedido</button></div></div>`;
 }
 
-// Puntos Module
-function loadPuntosContent() {
-    // Premios personalizados de la ruleta
-    const premios = [
-        { texto: "Rollo de sushi gratis 🍣", color: "#FFD700" },
-        { texto: "10% de descuento 💸", color: "#FF6347" },
-        { texto: "Bebida de cortesía 🥤", color: "#1E90FF" },
-        { texto: "Postre sorpresa 🎂", color: "#8A2BE2" },
-        { texto: "15% de descuento 💸", color: "#4CAF50" },
-        { texto: "Sello extra en tu tarjeta 🔖", color: "#FF69B4" },
-    ];
-
-    // Elementos del DOM
-    const tarjetasCount = document.getElementById('tarjetasCount');
-    const girarBtn = document.getElementById('girarRuletaBtn');
-    const ruletaCanvas = document.getElementById('ruletaCanvas');
-    const premioResultado = document.getElementById('premioResultado');
-    const historialPremios = document.getElementById('historialPremios');
-
-    // Utilidades para localStorage
-    function getTarjetas() {
-        return parseInt(localStorage.getItem('tarjetasVirtuales') || '0', 10);
-    }
-    function setTarjetas(n) {
-        localStorage.setItem('tarjetasVirtuales', n);
-        tarjetasCount.textContent = n;
-        girarBtn.disabled = n <= 0;
-        girarBtn.classList.toggle('opacity-50', n <= 0);
-    }
-    function getHistorial() {
-        try {
-            return JSON.parse(localStorage.getItem('historialPremios') || '[]');
-        } catch { return []; }
-    }
-    function addHistorial(premio) {
-        const hist = getHistorial();
-        hist.unshift({ premio, fecha: new Date().toLocaleString('es-ES') });
-        localStorage.setItem('historialPremios', JSON.stringify(hist.slice(0, 10)));
-        renderHistorial();
-    }
-    function renderHistorial() {
-        const hist = getHistorial();
-        historialPremios.innerHTML = hist.length === 0
-            ? '<li>No has ganado premios aún.</li>'
-            : hist.map(h => `<li><b>${h.premio}</b> <span style="color:#888;font-size:0.9em;">(${h.fecha})</span></li>`).join('');
-    }
-
-    // Dibuja la ruleta
-    function drawRuleta(angle = 0) {
-        const ctx = ruletaCanvas.getContext('2d');
-        const size = ruletaCanvas.width;
-        const radio = size / 2;
-        ctx.clearRect(0, 0, size, size);
-        const numPremios = premios.length;
-        const arc = 2 * Math.PI / numPremios;
-        for (let i = 0; i < numPremios; i++) {
-            ctx.beginPath();
-            ctx.moveTo(radio, radio);
-            ctx.arc(radio, radio, radio - 5, angle + i * arc, angle + (i + 1) * arc);
-            ctx.closePath();
-            ctx.fillStyle = premios[i].color;
-            ctx.fill();
-            ctx.save();
-            ctx.translate(radio, radio);
-            ctx.rotate(angle + (i + 0.5) * arc);
-            ctx.textAlign = "right";
-            ctx.font = "bold 16px Noto Sans JP, Arial";
-            ctx.fillStyle = "#fff";
-            ctx.fillText(premios[i].texto, radio - 20, 8);
-            ctx.restore();
-        }
-        // Flecha
-        ctx.save();
-        ctx.translate(radio, radio);
-        ctx.beginPath();
-        ctx.moveTo(0, -radio + 10);
-        ctx.lineTo(15, -radio + 35);
-        ctx.lineTo(-15, -radio + 35);
-        ctx.closePath();
-        ctx.fillStyle = "#222";
-        ctx.fill();
-        ctx.restore();
-    }
-
-    // Animación de giro
-    let girando = false;
-    function girarRuleta() {
-        if (girando || getTarjetas() <= 0) return;
-        girando = true;
-        premioResultado.textContent = '';
-        let angulo = 0;
-        let velocidad = Math.random() * 0.2 + 0.35;
-        let vueltas = Math.floor(Math.random() * 3) + 5;
-        let totalGiros = vueltas * 2 * Math.PI + Math.random() * 2 * Math.PI;
-        let start = null;
-        function animar(ts) {
-            if (!start) start = ts;
-            let progreso = (ts - start) / 1200;
-            let ease = 1 - Math.pow(1 - progreso, 3);
-            angulo = ease * totalGiros;
-            drawRuleta(angulo);
-            if (progreso < 1) {
-                requestAnimationFrame(animar);
-            } else {
-                // Determinar premio
-                const numPremios = premios.length;
-                const arc = 2 * Math.PI / numPremios;
-                let anguloFinal = (angulo % (2 * Math.PI));
-                let indice = numPremios - Math.floor((anguloFinal) / arc) - 1;
-                if (indice < 0) indice += numPremios;
-                const premio = premios[indice].texto;
-                premioResultado.textContent = `¡Ganaste: ${premio}!`;
-                addHistorial(premio);
-                setTarjetas(getTarjetas() - 1);
-                girando = false;
-            }
-        }
-        requestAnimationFrame(animar);
-    }
-
-    // Inicializar
-    setTarjetas(getTarjetas());
-    renderHistorial();
-    drawRuleta();
-
-    girarBtn.onclick = girarRuleta;
-}
-
-function sumarTarjetaPorCompra() {
-    let compras = parseInt(localStorage.getItem('comprasAcumuladas') || '0', 10) + 1;
-    localStorage.setItem('comprasAcumuladas', compras);
-    if (compras % 3 === 0) {
-        let tarjetas = parseInt(localStorage.getItem('tarjetasVirtuales') || '0', 10) + 1;
-        localStorage.setItem('tarjetasVirtuales', tarjetas);
-        if (document.getElementById('tarjetasCount')) {
-            document.getElementById('tarjetasCount').textContent = tarjetas;
-        }
-        alert('¡Felicidades! Has recibido una tarjeta virtual para girar la ruleta.');
-    }
-}
-
 // --- 9. API Utility Functions ---
 async function makeApiCall(endpoint, method = 'GET', body = null) {
     const token = localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN);
@@ -1246,6 +1212,202 @@ function handleResize() {
         if (sidebarCollapsedPref && !dashboardState.isSidebarCollapsed) collapseSidebar();
         else if (!sidebarCollapsedPref && dashboardState.isSidebarCollapsed) expandSidebar();
     }
+}
+
+/**
+ * Inicializa los listeners específicos para la sección de direcciones.
+ */
+function initializeDireccionesSection() {
+    console.log("Módulo de Direcciones inicializado.");
+    const addAddressBtn = document.getElementById('addAddressBtn');
+    const addressListContainer = document.getElementById('addressListContainer');
+    const addressForm = document.getElementById('addressForm');
+
+    addAddressBtn?.addEventListener('click', () => openAddressModal());
+    addressListContainer?.addEventListener('click', handleAddressListActions);
+    addressForm?.addEventListener('submit', handleAddressFormSubmit);
+
+    loadUserAddresses();
+}
+
+/**
+ * Carga las direcciones del usuario desde la API.
+ */
+async function loadUserAddresses() {
+    const listContainer = document.getElementById('addressListContainer');
+    listContainer.innerHTML = '<p>Cargando direcciones...</p>';
+    
+    const result = await makeApiCall('/api/users/profile/addresses', 'GET');
+    if (result.success) {
+        dashboardState.userAddresses = result.data;
+        displayUserAddresses();
+    } else {
+        listContainer.innerHTML = '<p>No se pudieron cargar las direcciones.</p>';
+    }
+}
+
+/**
+ * Muestra las direcciones del usuario en la interfaz.
+ */
+function displayUserAddresses() {
+    const listContainer = document.getElementById('addressListContainer');
+    const addresses = dashboardState.userAddresses;
+
+    if (!addresses || addresses.length === 0) {
+        listContainer.innerHTML = '<div class="empty-placeholder"><i class="fas fa-map-marked-alt"></i><p>No tienes ninguna dirección guardada. ¡Añade una!</p></div>';
+        return;
+    }
+
+    listContainer.innerHTML = addresses.map(addr => `
+        <div class="address-card ${addr.isDefault ? 'default' : ''}" data-address-id="${addr._id}">
+            <div class="address-card-header">
+                <h3>
+                    ${addr.alias}
+                    ${addr.isDefault ? '<span class="default-badge">Predeterminada</span>' : ''}
+                </h3>
+                <div class="address-actions">
+                    ${!addr.isDefault ? `<button class="action-btn set-default-btn" title="Establecer como predeterminada"><i class="fas fa-thumbtack"></i></button>` : ''}
+                    <button class="action-btn edit-address-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-address-btn" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <div class="address-card-body">
+                <p class="address-line">${addr.direccion}</p>
+                <p class="address-zone"><b>Zona:</b> ${addr.zona}</p>
+                ${addr.referencia ? `<p class="address-reference"><b>Ref:</b> ${addr.referencia}</p>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Abre el modal para añadir o editar una dirección.
+ * @param {object | null} address - El objeto de la dirección a editar, o null para añadir una nueva.
+ */
+function openAddressModal(address = null) {
+    const modal = document.getElementById('addressModal');
+    const form = document.getElementById('addressForm');
+    const title = document.getElementById('addressModalTitle');
+
+    form.reset();
+    document.getElementById('addressId').value = '';
+
+    if (address) {
+        title.textContent = 'Editar Dirección';
+        document.getElementById('addressId').value = address._id;
+        form.alias.value = address.alias;
+        form.direccion.value = address.direccion;
+        form.zona.value = address.zona;
+        form.referencia.value = address.referencia || '';
+        form.isDefault.checked = address.isDefault;
+    } else {
+        title.textContent = 'Nueva Dirección';
+    }
+    openModal(modal);
+}
+
+/**
+ * Maneja el envío del formulario de dirección (crear o actualizar).
+ */
+async function handleAddressFormSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const addressId = form.addressId.value;
+    
+    const addressData = {
+        alias: form.alias.value,
+        direccion: form.direccion.value,
+        zona: form.zona.value,
+        referencia: form.referencia.value,
+        isDefault: form.isDefault.checked,
+    };
+
+    const method = addressId ? 'PUT' : 'POST';
+    const endpoint = addressId ? `/api/users/profile/addresses/${addressId}` : '/api/users/profile/addresses';
+
+    const result = await makeApiCall(endpoint, method, addressData);
+
+    if (result.success) {
+        showNotification(`Dirección ${addressId ? 'actualizada' : 'añadida'} con éxito.`, 'success');
+        closeModal(document.getElementById('addressModal'));
+        loadUserAddresses();
+    } else {
+        showNotification(`Error: ${result.message || 'No se pudo guardar la dirección.'}`, 'error');
+    }
+}
+
+/**
+ * Maneja los clics en los botones de la lista de direcciones (editar, eliminar, etc.).
+ */
+function handleAddressListActions(event) {
+    const button = event.target.closest('.action-btn');
+    if (!button) return;
+
+    const card = button.closest('.address-card');
+    const addressId = card.dataset.addressId;
+    const address = dashboardState.userAddresses.find(addr => addr._id === addressId);
+
+    if (button.classList.contains('edit-address-btn')) {
+        openAddressModal(address);
+    } else if (button.classList.contains('delete-address-btn')) {
+        if (confirm(`¿Estás seguro de que quieres eliminar la dirección "${address.alias}"?`)) {
+            deleteAddress(addressId);
+        }
+    } else if (button.classList.contains('set-default-btn')) {
+        setDefaultAddress(addressId);
+    }
+}
+
+async function deleteAddress(addressId) {
+    const result = await makeApiCall(`/api/users/profile/addresses/${addressId}`, 'DELETE');
+    if(result.success) {
+        showNotification('Dirección eliminada.', 'success');
+        loadUserAddresses();
+    } else {
+        showNotification(`Error: ${result.message || 'No se pudo eliminar.'}`, 'error');
+    }
+}
+
+async function setDefaultAddress(addressId) {
+    const result = await makeApiCall(`/api/users/profile/addresses/${addressId}`, 'PUT', { isDefault: true });
+    if(result.success) {
+        showNotification('Dirección predeterminada actualizada.', 'success');
+        loadUserAddresses();
+    } else {
+        showNotification(`Error: ${result.message || 'No se pudo actualizar.'}`, 'error');
+    }
+}
+
+/**
+ * Rellena un elemento <select> con las zonas de entrega definidas.
+ * @param {string} selector - El selector CSS del elemento <select> a rellenar.
+ */
+function populateZoneSelectors(selector) {
+    const selectElement = document.querySelector(selector);
+    if (!selectElement) {
+        console.error(`No se encontró el elemento select con el selector: ${selector}`);
+        return;
+    }
+
+    // Guardar el valor seleccionado si ya existe (para el caso de edición)
+    const currentValue = selectElement.value;
+
+    // Limpiar opciones existentes, excepto la primera (placeholder)
+    while (selectElement.options.length > 1) {
+        selectElement.remove(1);
+    }
+    
+    // Añadir las zonas desde la constante
+    ZONAS_DE_ENTREGA.forEach(zona => {
+        const option = document.createElement('option');
+        option.value = zona.value;
+        option.textContent = `${zona.text} - $${zona.cost.toFixed(2)}`;
+        option.dataset.cost = zona.cost;
+        selectElement.appendChild(option);
+    });
+
+    // Restaurar el valor si existía
+    selectElement.value = currentValue;
 }
 
 // --- 11. Global Event Listeners & Initial Load ---
@@ -1384,3 +1546,21 @@ function getCurrentLocation() {
         }
     }, 30000);
 }
+
+// Asegura que los listeners de cierre de modal funcionen con el nuevo botón de cerrar
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Listener para todos los botones de cerrar modal
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = btn.closest('.modal');
+            if (modal) closeModal(modal);
+        });
+    });
+    // Permite cerrar el modal haciendo click fuera del contenido
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal(modal);
+        });
+    });
+});

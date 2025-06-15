@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Katana Sushi</title>
     <link rel="stylesheet" href="../../public/css/styles.css">
+    <link rel="stylesheet" href="../../public/css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body class="dashboard-body">
     <nav class="sidebar">
         <div class="sidebar-header">
-            <img src="/public/images/LOGO-SIN-FONDO.png" alt="/Katana-main//public/images/LOGO-SIN-FONDO.png" class="sidebar-logo">
+            <img src="/public/images/LOGO-SIN-FONDO.png" alt="/Katana-main//public/images/LOGO-SIN-FONDO.png"
+                class="sidebar-logo">
             <button class="sidebar-toggle" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -43,17 +47,42 @@
             </li>
             <li class="menu-item">
                 <a href="#promociones">
-                    <i class="fas fa-percent"></i>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem; vertical-align: middle;"><path d="M20.59 13.41l-8-8A2 2 0 0 0 10.17 5H5a2 2 0 0 0-2 2v5.17a2 2 0 0 0 .59 1.41l8 8a2 2 0 0 0 2.83 0l6.17-6.17a2 2 0 0 0 0-2.83zM7.5 8A1.5 1.5 0 1 1 6 9.5A1.5 1.5 0 0 1 7.5 8z"></path></svg>
                     <span>Promociones</span>
                 </a>
             </li>
             <li class="menu-item">
                 <a href="#carrito">
-                    <svg width="20px" height="20px" viewBox="0 0 512 512" fill="currentColor" version="1.1" xmlns="http://www.w3.org/2000/svg" style="margin-right: 15px; vertical-align: middle;">
-                        <g> <g> <path d="M511.999,272.657c0-45.93-37.367-83.297-83.297-83.297h-1.111h-65.527h-1.111c-45.93,0-83.297,37.367-83.297,83.297 v66.637c0,18.737,6.223,36.046,16.705,49.978h-76.724c10.482-13.932,16.705-31.241,16.705-49.978v-66.637 c0-45.93-37.367-83.297-83.297-83.297h-1.111H84.408h-1.111c-45.93,0-83.297,37.367-83.297,83.297v66.637 c0,18.737,6.223,36.046,16.705,49.978H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,44.361,35.371,83.297,84.407,83.297 c5.872,0,335.182,0,344.294,0c45.93,0,83.297-37.367,83.297-83.297c0-9.2-7.459-16.659-16.659-16.659h-0.046 c10.482-13.932,16.705-31.241,16.705-49.978V272.657z M34.43,272.657c0-27.558,22.42-49.978,49.978-49.978h65.527 c27.558,0,49.978,22.42,49.978,49.978v66.637c0,27.558-22.42,49.978-49.978,49.978H84.408c-27.558,0-49.978-22.42-49.978-49.978 V272.657z M427.59,455.91H84.408c-21.719,0-40.248-13.926-47.124-33.319c15.564,0,420.086,0,437.429,0 C467.838,441.983,449.31,455.91,427.59,455.91z M477.569,339.294c0,27.558-22.42,49.978-49.978,49.978h-65.527 c-27.558,0-49.978-22.42-49.978-49.978v-66.637c0-27.558,22.42-49.978,49.978-49.978h65.527c27.558,0,49.978,22.42,49.978,49.978 V339.294z"></path> </g> </g>
-                        <g> <g> <path d="M495.339,89.404h-1.111H17.771H17.77c0.384,0,0.772-0.013,1.161-0.04l477.568-33.319c9.178-0.641,16.1-8.601,15.46-17.779 c-0.622-8.911-8.153-15.665-16.983-15.474c-0.629-0.028-1.264-0.03-1.907,0.014L15.501,56.125 c-9.178,0.641-16.1,8.601-15.46,17.779c0.613,8.784,7.93,15.501,16.603,15.501c0.214,0,0.431-0.014,0.646-0.022 c0.151,0.004,0.3,0.022,0.453,0.022H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,9.2,7.459,16.659,16.659,16.659h1.111h476.458 h1.111c9.2,0,16.659-7.459,16.659-16.659C511.999,96.864,504.54,89.404,495.339,89.404z"></path> </g> </g>
-                        <g> <g> <path d="M117.727,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S145.285,255.997,117.727,255.997z M117.172,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S126.1,322.31,117.172,322.607z"></path> </g> </g>
-                        <g> <g> <path d="M395.383,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S422.941,255.997,395.383,255.997z M394.828,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S403.756,322.31,394.828,322.607z"></path> </g> </g>
+                    <svg width="20px" height="20px" viewBox="0 0 512 512" fill="currentColor" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" style="margin-right: 15px; vertical-align: middle;">
+                        <g>
+                            <g>
+                                <path
+                                    d="M511.999,272.657c0-45.93-37.367-83.297-83.297-83.297h-1.111h-65.527h-1.111c-45.93,0-83.297,37.367-83.297,83.297 v66.637c0,18.737,6.223,36.046,16.705,49.978h-76.724c10.482-13.932,16.705-31.241,16.705-49.978v-66.637 c0-45.93-37.367-83.297-83.297-83.297h-1.111H84.408h-1.111c-45.93,0-83.297,37.367-83.297,83.297v66.637 c0,18.737,6.223,36.046,16.705,49.978H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,44.361,35.371,83.297,84.407,83.297 c5.872,0,335.182,0,344.294,0c45.93,0,83.297-37.367,83.297-83.297c0-9.2-7.459-16.659-16.659-16.659h-0.046 c10.482-13.932,16.705-31.241,16.705-49.978V272.657z M34.43,272.657c0-27.558,22.42-49.978,49.978-49.978h65.527 c27.558,0,49.978,22.42,49.978,49.978v66.637c0,27.558-22.42,49.978-49.978,49.978H84.408c-27.558,0-49.978-22.42-49.978-49.978 V272.657z M427.59,455.91H84.408c-21.719,0-40.248-13.926-47.124-33.319c15.564,0,420.086,0,437.429,0 C467.838,441.983,449.31,455.91,427.59,455.91z M477.569,339.294c0,27.558-22.42,49.978-49.978,49.978h-65.527 c-27.558,0-49.978-22.42-49.978-49.978v-66.637c0-27.558,22.42-49.978,49.978-49.978h65.527c27.558,0,49.978,22.42,49.978,49.978 V339.294z">
+                                </path>
+                            </g>
+                        </g>
+                        <g>
+                            <g>
+                                <path
+                                    d="M495.339,89.404h-1.111H17.771H17.77c0.384,0,0.772-0.013,1.161-0.04l477.568-33.319c9.178-0.641,16.1-8.601,15.46-17.779 c-0.622-8.911-8.153-15.665-16.983-15.474c-0.629-0.028-1.264-0.03-1.907,0.014L15.501,56.125 c-9.178,0.641-16.1,8.601-15.46,17.779c0.613,8.784,7.93,15.501,16.603,15.501c0.214,0,0.431-0.014,0.646-0.022 c0.151,0.004,0.3,0.022,0.453,0.022H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,9.2,7.459,16.659,16.659,16.659h1.111h476.458 h1.111c9.2,0,16.659-7.459,16.659-16.659C511.999,96.864,504.54,89.404,495.339,89.404z">
+                                </path>
+                            </g>
+                        </g>
+                        <g>
+                            <g>
+                                <path
+                                    d="M117.727,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S145.285,255.997,117.727,255.997z M117.172,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S126.1,322.31,117.172,322.607z">
+                                </path>
+                            </g>
+                        </g>
+                        <g>
+                            <g>
+                                <path
+                                    d="M395.383,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S422.941,255.997,395.383,255.997z M394.828,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S403.756,322.31,394.828,322.607z">
+                                </path>
+                            </g>
+                        </g>
                     </svg>
                     <span>Reservas</span>
                 </a>
@@ -64,11 +93,6 @@
                     <span>Mi Perfil</span>
                 </a>
             </li>
-             <li class="menu-item"> <a href="#puntos">
-                    <i class="fas fa-gift"></i>
-                    <span>Ruleta</span>
-                </a>
-            </li>
             <li class="menu-item" style="display: none;"> <a href="#checkout">
                     <i class="fas fa-credit-card"></i>
                     <span>Proceso de Pago</span>
@@ -76,9 +100,9 @@
             </li>
         </ul>
         <div class="sidebar-footer">
-            <a href="/" class="menu-link" style="text-decoration: none; display: flex; align-items: center; padding: 12px 20px; width: 100%; box-sizing: border-box;">
-                <i class="fas fa-home" style="font-size: 20px; margin-right: 15px; width: 25px; text-align: center;"></i>
-                <span style="color: inherit;">Volver al Inicio</span>
+            <a href="/" class="footer-btn footer-home-btn" title="Volver al Inicio">
+                <i class="fas fa-home"></i>
+                <span class="footer-btn-text">Volver al Inicio</span>
             </a>
             <button class="logout-btn"> <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
@@ -87,20 +111,6 @@
     </nav>
 
     <main class="main-content">
-        <header class="dashboard-header">
-            <div class="header-left">
-                <h1 id="pageTitle">Menú</h1>
-            </div>
-            <div class="header-right">
-                <div class="user-menu">
-                    <img src="/public/images/default-avatar.png" alt="Usuario" class="user-avatar">
-                    <span class="user-name" id="userName">Cargando...</span>
-                    <div class="notification-badge">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge">0</span> </div>
-                </div>
-            </div>
-        </header>
 
         <div class="content-area">
             <section id="perfilContent" class="dashboard-section">
@@ -179,17 +189,42 @@
             <section id="carritoContent" class="dashboard-section">
                 <div class="dashboard-header">
                     <div class="header-left">
-                        <h1><svg width="20px" height="20px" viewBox="0 0 512 512" fill="currentColor" version="1.1" xmlns="http://www.w3.org/2000/svg" style="margin-right: 15px; vertical-align: middle;">
-                            <g> <g> <path d="M511.999,272.657c0-45.93-37.367-83.297-83.297-83.297h-1.111h-65.527h-1.111c-45.93,0-83.297,37.367-83.297,83.297 v66.637c0,18.737,6.223,36.046,16.705,49.978h-76.724c10.482-13.932,16.705-31.241,16.705-49.978v-66.637 c0-45.93-37.367-83.297-83.297-83.297h-1.111H84.408h-1.111c-45.93,0-83.297,37.367-83.297,83.297v66.637 c0,18.737,6.223,36.046,16.705,49.978H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,44.361,35.371,83.297,84.407,83.297 c5.872,0,335.182,0,344.294,0c45.93,0,83.297-37.367,83.297-83.297c0-9.2-7.459-16.659-16.659-16.659h-0.046 c10.482-13.932,16.705-31.241,16.705-49.978V272.657z M34.43,272.657c0-27.558,22.42-49.978,49.978-49.978h65.527 c27.558,0,49.978,22.42,49.978,49.978v66.637c0,27.558-22.42,49.978-49.978,49.978H84.408c-27.558,0-49.978-22.42-49.978-49.978 V272.657z M427.59,455.91H84.408c-21.719,0-40.248-13.926-47.124-33.319c15.564,0,420.086,0,437.429,0 C467.838,441.983,449.31,455.91,427.59,455.91z M477.569,339.294c0,27.558-22.42,49.978-49.978,49.978h-65.527 c-27.558,0-49.978-22.42-49.978-49.978v-66.637c0-27.558,22.42-49.978,49.978-49.978h65.527c27.558,0,49.978,22.42,49.978,49.978 V339.294z"></path> </g> </g>
-                            <g> <g> <path d="M495.339,89.404h-1.111H17.771H17.77c0.384,0,0.772-0.013,1.161-0.04l477.568-33.319c9.178-0.641,16.1-8.601,15.46-17.779 c-0.622-8.911-8.153-15.665-16.983-15.474c-0.629-0.028-1.264-0.03-1.907,0.014L15.501,56.125 c-9.178,0.641-16.1,8.601-15.46,17.779c0.613,8.784,7.93,15.501,16.603,15.501c0.214,0,0.431-0.014,0.646-0.022 c0.151,0.004,0.3,0.022,0.453,0.022H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,9.2,7.459,16.659,16.659,16.659h1.111h476.458 h1.111c9.2,0,16.659-7.459,16.659-16.659C511.999,96.864,504.54,89.404,495.339,89.404z"></path> </g> </g>
-                            <g> <g> <path d="M117.727,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S145.285,255.997,117.727,255.997z M117.172,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S126.1,322.31,117.172,322.607z"></path> </g> </g>
-                            <g> <g> <path d="M395.383,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S422.941,255.997,395.383,255.997z M394.828,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S403.756,322.31,394.828,322.607z"></path> </g> </g>
-                        </svg> Reservas</h1>
+                        <h1><svg width="20px" height="20px" viewBox="0 0 512 512" fill="currentColor" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" style="margin-right: 15px; vertical-align: middle;">
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M511.999,272.657c0-45.93-37.367-83.297-83.297-83.297h-1.111h-65.527h-1.111c-45.93,0-83.297,37.367-83.297,83.297 v66.637c0,18.737,6.223,36.046,16.705,49.978h-76.724c10.482-13.932,16.705-31.241,16.705-49.978v-66.637 c0-45.93-37.367-83.297-83.297-83.297h-1.111H84.408h-1.111c-45.93,0-83.297,37.367-83.297,83.297v66.637 c0,18.737,6.223,36.046,16.705,49.978H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,44.361,35.371,83.297,84.407,83.297 c5.872,0,335.182,0,344.294,0c45.93,0,83.297-37.367,83.297-83.297c0-9.2-7.459-16.659-16.659-16.659h-0.046 c10.482-13.932,16.705-31.241,16.705-49.978V272.657z M34.43,272.657c0-27.558,22.42-49.978,49.978-49.978h65.527 c27.558,0,49.978,22.42,49.978,49.978v66.637c0,27.558-22.42,49.978-49.978,49.978H84.408c-27.558,0-49.978-22.42-49.978-49.978 V272.657z M427.59,455.91H84.408c-21.719,0-40.248-13.926-47.124-33.319c15.564,0,420.086,0,437.429,0 C467.838,441.983,449.31,455.91,427.59,455.91z M477.569,339.294c0,27.558-22.42,49.978-49.978,49.978h-65.527 c-27.558,0-49.978-22.42-49.978-49.978v-66.637c0-27.558,22.42-49.978,49.978-49.978h65.527c27.558,0,49.978,22.42,49.978,49.978 V339.294z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M495.339,89.404h-1.111H17.771H17.77c0.384,0,0.772-0.013,1.161-0.04l477.568-33.319c9.178-0.641,16.1-8.601,15.46-17.779 c-0.622-8.911-8.153-15.665-16.983-15.474c-0.629-0.028-1.264-0.03-1.907,0.014L15.501,56.125 c-9.178,0.641-16.1,8.601-15.46,17.779c0.613,8.784,7.93,15.501,16.603,15.501c0.214,0,0.431-0.014,0.646-0.022 c0.151,0.004,0.3,0.022,0.453,0.022H16.66c-9.2,0-16.659,7.459-16.659,16.659c0,9.2,7.459,16.659,16.659,16.659h1.111h476.458 h1.111c9.2,0,16.659-7.459,16.659-16.659C511.999,96.864,504.54,89.404,495.339,89.404z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M117.727,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S145.285,255.997,117.727,255.997z M117.172,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S126.1,322.31,117.172,322.607z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M395.383,255.997c-0.187,0-0.37,0.012-0.555,0.014c-0.185-0.002-0.369-0.014-0.555-0.014 c-27.558,0-49.978,22.42-49.978,49.978s22.42,49.978,49.978,49.978c0.187,0,0.37-0.012,0.555-0.014 c0.185,0.002,0.369,0.014,0.555,0.014c27.558,0,49.978-22.42,49.978-49.978S422.941,255.997,395.383,255.997z M394.828,322.607 c-8.928-0.297-16.104-7.632-16.104-16.632s7.176-16.335,16.104-16.632c8.927,0.298,16.104,7.633,16.104,16.632 S403.756,322.31,394.828,322.607z">
+                                        </path>
+                                    </g>
+                                </g>
+                            </svg> Reservas</h1>
                     </div>
                 </div>
                 <div class="cart-container">
                     <div class="cart-items">
-                        </div>
+                    </div>
                     <div class="cart-summary">
                         <div class="cart-total">
                             <span>Total:</span>
@@ -213,18 +248,24 @@
                     <div class="order-summary">
                         <h2>Resumen del pedido</h2>
                         <div class="order-items">
-                            </div>
+                        </div>
                         <div class="order-total">
-                            <div class="product-subtotal" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #555;">
+                            <div class="product-subtotal"
+                                style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #555;">
                                 <span>Subtotal Productos:</span>
-                                <span class="amount" id="checkoutProductSubtotalAmount" style="font-weight: 500;">$0.00</span>
+                                <span class="amount" id="checkoutProductSubtotalAmount"
+                                    style="font-weight: 500;">$0.00</span>
                             </div>
-                            <div class="shipping" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #555;">
+                            <div class="shipping"
+                                style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #555;">
                                 <span>Costo de Envío:</span>
-                                <span class="amount" id="checkoutShippingCostAmount" style="font-weight: 500;">$0.00</span>
+                                <span class="amount" id="checkoutShippingCostAmount"
+                                    style="font-weight: 500;">$0.00</span>
                             </div>
-                            <div id="checkoutShippingMsg" class="shipping-msg" style="text-align: right; font-size: 0.9em; color: #E67E22; margin-bottom: 8px;"></div>
-                            <div class="total" style="font-size: 1.2rem; font-weight: 600; color: #333; margin-top: 10px; border-top: 2px solid #eee; padding-top: 10px;">
+                            <div id="checkoutShippingMsg" class="shipping-msg"
+                                style="text-align: right; font-size: 0.9em; color: #E67E22; margin-bottom: 8px;"></div>
+                            <div class="total"
+                                style="font-size: 1.2rem; font-weight: 600; color: #333; margin-top: 10px; border-top: 2px solid #eee; padding-top: 10px;">
                                 <span>Total General:</span>
                                 <span class="amount" id="checkoutGrandTotalAmount">$0.00</span>
                             </div>
@@ -240,10 +281,20 @@
                                     <span>Envío a domicilio</span>
                                 </div>
                             </label>
-                            </div>
+                        </div>
                     </div>
                     <form class="shipping-form active" id="shippingForm">
                         <h2>Detalles de envío</h2>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-bookmark"></i>
+                                <select name="saved_address" id="savedAddressSelector" class="form-select custom-select">
+                                    <option value="">-- Seleccionar una dirección guardada --</option>
+                                    </select>
+                            </div>
+                        </div>
+
+                        <p style="text-align: center; margin-bottom: 20px; color: #555;">... o llena los campos manualmente ...</p>
                         <div class="form-group">
                             <div class="input-icon">
                                 <i class="fas fa-user"></i>
@@ -265,22 +316,34 @@
                         <div class="form-group">
                             <div class="input-icon">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <select name="zona" id="dashboardZoneSelect" class="custom-select" required> <option value="">Selecciona la zona de entrega</option>
-                                    <option value="centrica" data-cost="2.00">CÉNTRICA (Dentro de Los Pinos, Estadio Sergio Torres Rivera, Puente Gavidia y Barrio El Calvario) - $2.00</option>
-                                    <option value="puente-ugb" data-cost="2.50">Del Puente Gavidia hasta la UGB - $2.50</option>
-                                    <option value="ugb-montanita" data-cost="3.00">De la UGB hasta La Montañita - $3.00</option>
-                                    <option value="montanita-ereguayquin" data-cost="3.50">Desde La Montañita hasta Ereguayquín (Carretera Litoral) - $3.50</option>
+                                <select name="zona" id="dashboardZoneSelect" class="custom-select" required>
+                                    <option value="">Selecciona la zona de entrega</option>
+                                    <option value="centrica" data-cost="2.00">CÉNTRICA (Dentro de Los Pinos, Estadio
+                                        Sergio Torres Rivera, Puente Gavidia y Barrio El Calvario) - $2.00</option>
+                                    <option value="puente-ugb" data-cost="2.50">Del Puente Gavidia hasta la UGB - $2.50
+                                    </option>
+                                    <option value="ugb-montanita" data-cost="3.00">De la UGB hasta La Montañita - $3.00
+                                    </option>
+                                    <option value="montanita-ereguayquin" data-cost="3.50">Desde La Montañita hasta
+                                        Ereguayquín (Carretera Litoral) - $3.50</option>
                                     <option value="ereguayquin" data-cost="4.00">Dentro de Ereguayquín - $4.00</option>
                                     <option value="sta-maria-centro" data-cost="3.00">Sta. María Centro - $3.00</option>
                                     <option value="sta-elena" data-cost="4.00">Sta. Elena - $4.00</option>
                                     <option value="pto-parada" data-cost="8.00">Pto. Parada - $8.00</option>
-                                    <option value="pinos-lemus" data-cost="2.50">De Los Pinos hasta Lemus Home - $2.50</option>
-                                    <option value="lemus-tierramar" data-cost="3.00">Desde Lemus Home hasta Tierramar - $3.00</option>
-                                    <option value="tierramar-poza" data-cost="3.50">Desde Tierramar hasta La Poza - $3.50</option>
-                                    <option value="poza-chilamate" data-cost="4.00">Desde La Poza hasta Chilamate - $4.00</option>
-                                    <option value="calvario-veraneras" data-cost="2.00">Desde El Calvario hasta Las Veraneras - $2.00</option>
-                                    <option value="estadio-cruz1" data-cost="2.50">Desde el Estadio Sergio Torres Rivera hasta La Cruz 1 - $2.50</option>
-                                    <option value="cruz1-bypass" data-cost="3.00">Desde La Cruz 1 hasta el By Pass - $3.00</option>
+                                    <option value="pinos-lemus" data-cost="2.50">De Los Pinos hasta Lemus Home - $2.50
+                                    </option>
+                                    <option value="lemus-tierramar" data-cost="3.00">Desde Lemus Home hasta Tierramar -
+                                        $3.00</option>
+                                    <option value="tierramar-poza" data-cost="3.50">Desde Tierramar hasta La Poza -
+                                        $3.50</option>
+                                    <option value="poza-chilamate" data-cost="4.00">Desde La Poza hasta Chilamate -
+                                        $4.00</option>
+                                    <option value="calvario-veraneras" data-cost="2.00">Desde El Calvario hasta Las
+                                        Veraneras - $2.00</option>
+                                    <option value="estadio-cruz1" data-cost="2.50">Desde el Estadio Sergio Torres Rivera
+                                        hasta La Cruz 1 - $2.50</option>
+                                    <option value="cruz1-bypass" data-cost="3.00">Desde La Cruz 1 hasta el By Pass -
+                                        $3.00</option>
                                     <option value="otra" data-cost="0.00">Otra zona (contactaremos)</option>
                                 </select>
                             </div>
@@ -288,7 +351,8 @@
                         <div class="form-group">
                             <div class="input-icon">
                                 <i class="fas fa-map"></i>
-                                <input type="text" name="direccion" id="direccionInput" placeholder="Dirección exacta" required>
+                                <input type="text" name="direccion" id="direccionInput" placeholder="Dirección exacta"
+                                    required>
                             </div>
                             <button type="button" id="getCurrentLocation" class="location-btn">
                                 <i class="fas fa-map-marker-alt"></i> Usar mi ubicación actual
@@ -303,7 +367,8 @@
                         <div class="form-group">
                             <div class="input-icon">
                                 <i class="fas fa-comment-alt"></i>
-                                <textarea name="indicaciones" class="custom-textarea" placeholder="Indicaciones adicionales para la entrega"></textarea>
+                                <textarea name="indicaciones" class="custom-textarea"
+                                    placeholder="Indicaciones adicionales para la entrega"></textarea>
                             </div>
                         </div>
                     </form>
@@ -312,7 +377,8 @@
                             <i class="fas fa-check-circle"></i>
                             Confirmar Pedido
                         </button>
-                        <button type="button" id="serfinsaPayBtn" class="cta-button" style="width:100%;margin-top:1rem;background:#1e90ff;color:#fff;">
+                        <button type="button" id="serfinsaPayBtn" class="cta-button"
+                            style="width:100%;margin-top:1rem;background:#1e90ff;color:#fff;">
                             <i class="fas fa-credit-card"></i> Pagar en Línea
                         </button>
                     </div>
@@ -327,9 +393,9 @@
                 </div>
                 <div class="orders-container">
                     <div class="orders-filters">
-                        <div class="search-order">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Buscar pedido por número o producto..." id="searchOrder">
+                        <div class="search-order" style="display:flex;align-items:center;background:#fff;border-radius:16px;box-shadow:0 4px 18px rgba(44,62,80,0.10);padding:0.7rem 2rem;width:100%;max-width:600px;min-width:280px;height:64px;gap:0.5rem;">
+                            <span style="display:flex;align-items:center;justify-content:center;height:100%;"><i class="fas fa-search" style="font-size:2rem;color:#888;"></i></span>
+                            <input type="text" placeholder="Buscar pedido por número o producto..." id="searchOrder" style="border:none;outline:none;background:transparent;font-size:1.35rem;color:#333;width:100%;padding:0.2rem 0 0.2rem 0.5rem;font-weight:500;line-height:1.2;" />
                         </div>
                         <div class="filter-buttons">
                             <button class="filter-btn active" data-filter="all">Todos</button>
@@ -340,16 +406,17 @@
                         </div>
                     </div>
                     <div class="orders-list">
-                        <div class="order-card modern">
+                        <div class="order-card modern improved">
                             <div class="order-header">
                                 <div class="order-info">
                                     <h3>#KS-0020</h3>
                                     <span class="order-date"><i class="fas fa-calendar-alt"></i> 12/06/2024</span>
                                 </div>
-                                <span class="order-status delivered"><i class="fas fa-check-circle"></i> Entregado</span>
+                                <span class="order-status delivered"><i class="fas fa-check-circle"></i>
+                                    Entregado</span>
                             </div>
-                            <div class="order-items">
-                                <div class="order-item">
+                            <div class="order-items improved-items">
+                                <div class="order-item improved-item">
                                     <img src="/public/images/sushi-mix.jpg" alt="Sushi Mix">
                                     <div class="item-details">
                                         <h4>Sushi Mix</h4>
@@ -358,11 +425,11 @@
                                     <span class="item-price">$16.00</span>
                                 </div>
                             </div>
-                            <div class="order-footer">
+                            <div class="order-footer improved-footer">
                                 <div class="order-total">
                                     <strong>Total:</strong> $16.00
                                 </div>
-                                <button class="details-btn modern">
+                                <button class="details-btn modern improved-btn">
                                     <i class="fas fa-eye"></i> Ver Detalles
                                 </button>
                             </div>
@@ -370,69 +437,37 @@
                     </div>
                 </div>
             </section>
+            <section id="favoritosContent" class="dashboard-section"
+                style="text-align: center; padding: 4rem 2rem;">
+                <i class="fas fa-tools fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <h2 style="font-size: 1.5rem; color: #555;">Funcionalidad en Desarrollo</h2>
+                <p style="color: #777;">La sección para ver tus productos favoritos estará disponible próximamente.</p>
+            </section>
 
-            <section id="puntosContent" class="dashboard-section">
+            <section id="direccionesContent" class="dashboard-section">
                 <div class="dashboard-header">
                     <div class="header-left">
-                        <h1><i class="fas fa-gift"></i> La Ruleta del Samurai</h1>
+                        <h1><i class="fas fa-map-marker-alt"></i> Mis Direcciones</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button id="addAddressBtn" class="admin-btn btn-primary modern-btn">
+                            <i class="fas fa-plus"></i> Añadir Nueva Dirección
+                        </button>
                     </div>
                 </div>
-                <div class="info-card" style="width: 100%; margin-bottom: 2rem; background: #f8fafc; border-left: 5px solid #1e90ff;">
-                    <h2 style="margin-bottom: 0.5rem; color: #1e90ff;">🎉 ¡Gira y Gana con Nuestra Ruleta de Premios!</h2>
-                    <p>¡Premiamos tu fidelidad! Ahora cada vez que compres, acumulas beneficios con nuestra <b>Tarjeta Virtual de Cliente Frecuente</b>.</p>
-                    <ul style="margin: 1rem 0 0 1.5rem; color: #333;">
-                        <li>🔖 <b>¿Cómo funciona?</b></li>
-                        <li>Por cada compra que hagas, obtienes un sello virtual en tu tarjeta.</li>
-                        <li>Al completar <b>3 compras</b>, ¡desbloqueas un giro en nuestra exclusiva Ruleta de Premios!</li>
-                    </ul>
-                    <ul style="margin: 1rem 0 0 1.5rem; color: #333;">
-                        <li>🎁 <b>¿Qué puedes ganar en la ruleta?</b></li>
-                        <li>Rollos de sushi gratis 🍣</li>
-                        <li>Descuentos especiales en tu próxima compra 💸</li>
-                        <li>Bebidas de cortesía 🥤</li>
-                        <li>¡Y muchas sorpresas más!</li>
-                    </ul>
-                    <ul style="margin: 1rem 0 0 1.5rem; color: #333;">
-                        <li>✅ Cada sello es automático, no necesitas hacer nada extra.</li>
-                        <li>🔄 Cada 3 compras, obtienes un nuevo giro. ¡Entre más compras, más oportunidades!</li>
-                    </ul>
-                </div>
-                <div class="profile-info-dashboard" style="display: flex; flex-wrap: wrap; gap: 2rem;">
-                    <div class="info-card" style="flex: 1 1 300px;">
-                        <div class="info-header">
-                            <i class="fas fa-id-card"></i>
-                            <h2>Tarjetas Virtuales</h2>
-                        </div>
-                        <div class="info-body" style="text-align: center;">
-                            <div style="font-size: 2.5rem; font-weight: bold; color: #1e90ff;" id="tarjetasCount">0</div>
-                            <div class="stat-label">Giros disponibles</div>
-                            <p style="margin-top: 1rem; color: #666;">¡Por cada 3 compras recibes una tarjeta para girar la ruleta!</p>
-                        </div>
-                    </div>
-                    <div class="info-card" style="flex: 2 1 400px; display: flex; flex-direction: column; align-items: center;">
-                        <div class="info-header">
-                            <i class="fas fa-dice"></i>
-                            <h2>¡Gira la Ruleta!</h2>
-                        </div>
-                        <div class="info-body" style="display: flex; flex-direction: column; align-items: center;">
-                            <canvas id="ruletaCanvas" width="300" height="300" style="margin-bottom: 1rem;"></canvas>
-                            <button id="girarRuletaBtn" class="cta-button" style="margin-bottom: 1rem;">Girar Ruleta</button>
-                            <div id="premioResultado" style="font-size: 1.2rem; color: #28a745; min-height: 2.5rem;"></div>
-                        </div>
-                    </div>
-                    <div class="info-card" style="flex: 1 1 300px;">
-                        <div class="info-header">
-                            <i class="fas fa-history"></i>
-                            <h2>Historial de Premios</h2>
-                        </div>
-                        <div class="info-body">
-                            <ul id="historialPremios" style="font-size: 1rem; color: #444; padding-left: 1.2rem;"></ul>
-                        </div>
-                    </div>
+                <div id="addressListContainer" class="orders-list">
+                    <p>Cargando direcciones...</p>
                 </div>
             </section>
 
-        </div> </main>
+            <section id="promocionesContent" class="dashboard-section"
+                style="text-align: center; padding: 4rem 2rem;">
+                <i class="fas fa-tools fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <h2 style="font-size: 1.5rem; color: #555;">Funcionalidad en Desarrollo</h2>
+                <p style="color: #777;">Pronto verás aquí las promociones exclusivas para ti.</p>
+            </section>
+        </div>
+    </main>
 
     <div id="editModal" class="modal">
         <div class="modal-content">
@@ -488,7 +523,8 @@
                 <div class="form-group">
                     <div class="input-icon">
                         <i class="fas fa-lock"></i>
-                        <input type="password" name="confirmNewPassword" placeholder="Confirmar Nueva Contraseña" required>
+                        <input type="password" name="confirmNewPassword" placeholder="Confirmar Nueva Contraseña"
+                            required>
                     </div>
                 </div>
                 <button type="submit" class="save-btn">Cambiar Contraseña</button>
@@ -496,7 +532,44 @@
         </div>
     </div>
 
+    <!-- Modal for Address Management -->
+    <div id="addressModal" class="modal modern-modal">
+        <div class="modal-content modern-modal-content">
+            <button class="close-modal modern-close" aria-label="Cerrar">&times;</button>
+            <h2 id="addressModalTitle" class="modern-modal-title">Nueva Dirección</h2>
+            <form id="addressForm" class="edit-form modern-form">
+                <input type="hidden" id="addressId" name="addressId">
+                <div class="form-group modern-form-group">
+                    <label for="addressAlias">Alias <span class="hint">(Ej: Casa, Oficina)</span></label>
+                    <input type="text" id="addressAlias" name="alias" required placeholder="Ej: Casa, Oficina">
+                </div>
+                <div class="form-group modern-form-group">
+                    <label for="addressDireccion">Dirección Completa</label>
+                    <textarea id="addressDireccion" name="direccion" rows="3" required placeholder="Calle, número, colonia, etc."></textarea>
+                </div>
+                <div class="form-group modern-form-group">
+                    <label for="addressZona">Zona de Entrega</label>
+                    <select id="addressZona" name="zona" required>
+                        <option value="">Selecciona una zona</option>
+                    </select>
+                </div>
+                <div class="form-group modern-form-group">
+                    <label for="addressReferencia">Punto de Referencia</label>
+                    <input type="text" id="addressReferencia" name="referencia" placeholder="Ej: Cerca del parque">
+                </div>
+                <div class="form-group modern-form-group form-check-group">
+                    <input type="checkbox" id="addressIsDefault" name="isDefault" style="width: auto;">
+                    <label for="addressIsDefault">Establecer como dirección predeterminada</label>
+                </div>
+                <button type="submit" class="save-btn modern-save-btn">
+                    <i class="fas fa-save"></i> Guardar Dirección
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/dashboard.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
 </body>
+
 </html>

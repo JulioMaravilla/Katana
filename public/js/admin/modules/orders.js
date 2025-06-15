@@ -275,7 +275,6 @@ function displayAdminOrders() {
 }
 
 function renderAdminOrderCard(order) {
-    // ... (sin cambios)
     const orderDate = new Date(order.createdAt || Date.now());
     const orderDateFormatted = orderDate.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const orderDateForFilter = orderDate.toISOString().split('T')[0]; 
@@ -284,6 +283,14 @@ function renderAdminOrderCard(order) {
     const orderDataString = JSON.stringify(order).replace(/'/g, "&apos;");
     const subtotalProductos = (parseFloat(order.totalAmount) || 0) - (parseFloat(order.shippingCost) || 0);
     const isActionable = order.status !== 'delivered' && order.status !== 'cancelled';
+
+    // Mostrar todos los productos del pedido
+    const productosHTML = (order.items || []).map(item => `
+        <div class='order-info-row' style='display:flex;align-items:center;gap:10px;margin-bottom:0.3rem;'>
+            <img src='${item.image || './images/no-image.png'}' alt='${item.name}' style='width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid #eee;' />
+            <span style='font-size:1em;color:#555;'>${item.name} <span style='color:#111;font-size:0.95em;margin-left:8px;font-weight:bold;'><b>Cant: ${item.quantity}</b></span></span>
+        </div>
+    `).join('');
     
     return `
         <div class="order-card-visual status-border-${order.status}" 
@@ -307,6 +314,9 @@ function renderAdminOrderCard(order) {
                 <div class="order-info-row"><i class="fas fa-phone"></i> <strong>Teléfono:</strong> ${order.deliveryDetails?.telefono || '-'}</div>
                 <div class="order-info-row"><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> ${order.deliveryDetails?.direccion || '-'} (${order.deliveryDetails?.zona || 'N/A'})</div>
                 <div class="order-info-row"><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> ${orderDateFormatted}</div>
+                <div style='margin-bottom:0.5rem;margin-top:0.2rem;'>
+                    ${productosHTML}
+                </div>
                 <div class="order-info-row" style="font-weight: bold; color: var(--admin-accent, #3498DB); margin-top: 0.5rem; border-top: 1px dashed #eee; padding-top: 0.5rem;">
                     <i class="fas fa-dollar-sign"></i> <strong>Total General:</strong> $${(parseFloat(order.totalAmount) || 0).toFixed(2)}
                 </div>
@@ -725,4 +735,64 @@ function getOrderStatusInfo(status) {
         case 'cancelled': return { statusClass: 'status-cancelado', statusText: 'Cancelado' };
         default: return { statusClass: 'status-todos', statusText: 'Desconocido' };
     }
+}
+
+/**
+ * Inicializa la sección de pedidos manuales.
+ */
+export function initializeManualOrdersSection() {
+    console.log("Módulo de Pedidos Manuales inicializado.");
+    loadManualOrders();
+}
+
+/**
+ * Carga los pedidos registrados manualmente desde la API y los muestra en la tabla.
+ */
+async function loadManualOrders() {
+    const tableBody = document.querySelector('#adminManualOrdersTable tbody');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Cargando pedidos manuales...</td></tr>';
+
+    try {
+        const result = await makeAdminApiCall('/admin/manual-orders', 'GET');
+        if (result.success && Array.isArray(result.data)) {
+            renderManualOrdersTable(result.data);
+        } else {
+            throw new Error(result.message || 'No se pudieron cargar los pedidos manuales.');
+        }
+    } catch (error) {
+        console.error("Error cargando pedidos manuales:", error);
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: red;">Error: ${error.message}</td></tr>`;
+    }
+}
+
+/**
+ * Renderiza las filas de la tabla para los pedidos manuales.
+ * @param {Array} orders - La lista de pedidos manuales.
+ */
+function renderManualOrdersTable(orders) {
+    const tableBody = document.querySelector('#adminManualOrdersTable tbody');
+    if (!tableBody) return;
+
+    if (orders.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay pedidos registrados manualmente.</td></tr>';
+        return;
+    }
+
+    tableBody.innerHTML = orders.map(order => {
+        const orderDate = new Date(order.createdAt).toLocaleDateString('es-ES');
+        return `
+            <tr>
+                <td>${order.orderId || order._id.slice(-6)}</td>
+                <td>${order.deliveryDetails.nombre || 'N/A'}</td>
+                <td>${order.deliveryDetails.telefono || 'N/A'}</td>
+                <td>${order.deliveryDetails.direccion || 'N/A'}</td>
+                <td>${order.deliveryDetails.zona || 'N/A'}</td>
+                <td>$${(order.totalAmount || 0).toFixed(2)}</td>
+                <td>${orderDate}</td>
+                <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+            </tr>
+        `;
+    }).join('');
 }

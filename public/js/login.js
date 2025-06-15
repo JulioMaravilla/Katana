@@ -29,7 +29,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
     try {
         // Asegúrate que la URL del fetch sea correcta
-        const response = await fetch('/api/login', { // Cambia si es necesario
+        const response = await fetch('/api/auth/login', { // Cambia si es necesario
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -28,7 +28,7 @@ export function initializeReports() {
     loadAllReportData(); 
 
     const reportSelect = document.getElementById('reportTypeSelect');
-    // Asegurarse de que el listener principal se añade solo una vez
+    // Asegurarse de que el listener principal se añada solo una vez
     if (reportSelect.dataset.mainListenerAttached !== 'true') {
         reportSelect.addEventListener('change', (e) => {
             const selectedValue = e.target.value;
@@ -65,18 +65,54 @@ export function initializeReports() {
  */
 function setupReportTypeSwitcher() {
     const select = document.getElementById('reportTypeSelect');
+    const selector = document.querySelector('.report-type-selector');
+    const icon = document.getElementById('reportTypeIcon');
+    
     if (!select || select.dataset.listenerAttached === 'true') return;
+
+    // Función para actualizar los estilos
+    function updateStyles(reportType) {
+        // Remover todas las clases de fondo
+        selector.classList.remove('bg-ventas', 'bg-pedidos', 'bg-clientes', 'bg-productos');
+        
+        // Agregar la clase correspondiente
+        selector.classList.add(`bg-${reportType}`);
+        
+        // Actualizar el ícono y su color
+        const icons = {
+            ventas: { icon: 'fa-chart-bar', color: '#1565c0' },
+            pedidos: { icon: 'fa-shopping-cart', color: '#b8860b' },
+            clientes: { icon: 'fa-users', color: '#388e3c' },
+            productos: { icon: 'fa-box', color: '#7c3aed' }
+        };
+        
+        if (icon) {
+            icon.innerHTML = `<i class="fas ${icons[reportType].icon}"></i>`;
+            icon.style.color = icons[reportType].color;
+        }
+    }
 
     select.addEventListener('change', (e) => {
         const selectedReport = e.target.value;
+        
+        // Actualizar estilos
+        updateStyles(selectedReport);
+        
+        // Ocultar todos los paneles
         document.querySelectorAll('.reports-section > div[id$="ReportContent"]').forEach(div => {
             div.style.display = 'none';
         });
+        
+        // Mostrar el panel seleccionado
         const activePanel = document.getElementById(`${selectedReport}ReportContent`);
         if (activePanel) {
             activePanel.style.display = 'block';
         }
     });
+
+    // Aplicar estilos iniciales
+    updateStyles(select.value);
+    
     select.dataset.listenerAttached = 'true';
 }
 

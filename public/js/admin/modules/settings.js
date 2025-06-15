@@ -228,7 +228,7 @@ async function loadCarouselImages() {
     container.innerHTML = '<p>Cargando imágenes...</p>';
     
     try {
-        const result = await makeAdminApiCall('/carousel-images', 'GET', null, false);
+        const result = await makeAdminApiCall('/carousel/images', 'GET', null, false);
         if (result.success && Array.isArray(result.data)) {
             currentAdminCarouselImages = result.data;
             renderCarouselImages();

@@ -6,7 +6,7 @@
 
 // Importa las funciones de inicialización de cada módulo de sección.
 import { initializeDashboardContent } from './modules/dashboard.js';
-import { initializeOrders } from './modules/orders.js';
+import { initializeOrders, initializeManualOrdersSection } from './modules/orders.js';
 import { initializeProducts } from './modules/products.js';
 import { initializeCustomers } from './modules/customers.js';
 import { initializeSettings } from './modules/settings.js';
@@ -22,11 +22,7 @@ const sectionInitializers = {
     'premiosContent': initializePrizes,
     'reportsContent': initializeReports,
     'configuracionContent': initializeSettings,
-    'registrarPedidoContent': () => {
-        // La lógica para registrar pedidos manuales podría estar en orders.js
-        // o en su propio módulo si crece mucho. Por ahora, un log.
-        console.log("Cargando contenido de Registrar Pedido...");
-    }
+    'registrarPedidoContent': initializeManualOrdersSection
 };
 
 /**
