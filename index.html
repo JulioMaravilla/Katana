@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katana Sushi - Auténtico Sushi Japonés</title>
+    <link rel="icon" type="image/png" href="./public/images/LOGO-SIN-FONDO.png">
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="nav-logo">
+            <img src="../public/images/LOGO-SIN-FONDO.png" alt="Katana Sushi Logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="#inicio"><i class="fas fa-torii-gate"></i>Inicio</a></li>
+            <li><a href="#menu"><i class="fas fa-bowl-rice"></i>Menú</a></li>
+            <li><a href="#promociones"><i class="fas fa-tags"></i>Promociones</a></li>
+            <li><a href="#nosotros"><i class="fas fa-users"></i>Nosotros</a></li>
+            <li><a href="#contacto"><i class="fas fa-envelope"></i>Contacto</a></li>
+            <li><a href="/login" class="login-btn"><i class="fas fa-user"></i>Iniciar Sesión</a></li>
+            </ul>
+        <div class="nav-buttons">
+            <a href="#" class="cart-btn" id="cartBtn">
+                <i class="material-icons">ramen_dining</i>
+                <span>0</span>
+            </a>
+            <div class="menu-toggle">
+                <i class="fas fa-bars menu-icon"></i>
+            </div>
+        </div>
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <h3><i class="material-icons">ramen_dining</i> Mis pedidos</h3>
+                <button class="close-cart"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items">
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-basket"></i>
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">$0.00</span>
+                </div>
+                <button class="checkout-btn"> Continuar con el pedido
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        <div class="cart-overlay"></div>
+    </nav>
+
+    <section class="main-carousel" id="mainCarouselContainer">
+        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+        <div class="carousel-indicators" id="carouselIndicatorsContainer">
+            </div>
+    </section>
+    <a href="#menu" class="cta-button oculto" style="display:block;text-align:center;margin:2rem auto;max-width:200px;">Ver Menú</a>
+
+    <section id="promociones" class="promos">
+        <h2>Promociones Especiales</h2>
+        <div class="promo-container">
+             <div class="promo-card promo-cupon-registrado">
+                 <h3>Cupón exclusivo para usuarios registrados</h3>
+                 <p>Obtén 25% de descuento en tu sushi.<br>Válido hasta el 30 de abril 2025.</p>
+                 <button class="cta-button" style="margin-top:1rem;" id="btnUsarCuponRegistrado">Usar cupón</button>
+             </div>
+             <div class="promo-card">
+                <img src="public/images/shushi.jpg" alt="2x1 en Rolls" onerror="this.onerror=null; this.src='public/images/placeholder.png';">
+                <h3>2x1 en Rolls</h3>
+                <p>Todos los martes</p>
+            </div>
+            <div class="promo-card">
+                <img src="public/images/descarga.jpg" alt="Combo Familiar" onerror="this.onerror=null; this.src='public/images/placeholder.png';">
+                <h3>Combo Familiar</h3>
+                <p>40 piezas + bebidas</p>
+            </div>
+            <div class="promo-card">
+                <img src="public/images/shushi.jpg" alt="Happy Hour" onerror="this.onerror=null; this.src='public/images/placeholder.png';">
+                <h3>Happy Hour</h3>
+                <p>30% off de 3PM a 6PM</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="menu" class="menu-section">
+        <h2><i class="material-icons">ramen_dining</i> Nuestro Menú</h2>
+        <div class="menu-categories">
+            <button class="category-btn" onclick="toggleSubcategories()">Rolls</button>
+            <button class="category-btn" onclick="displayMenuItems('Nigiri')">Nigiri</button>
+            <button class="category-btn" onclick="displayMenuItems('Sashimi')">Sashimi</button>
+            <button class="category-btn" onclick="displayMenuItems('Bebidas')">Bebidas</button>
+            <button class="category-btn" onclick="displayMenuItems('Entradas')">Entradas</button>
+            <button class="category-btn" onclick="displayMenuItems('Postres')">Postres</button>
+        </div>
+
+        <div class="subcategories" style="display: none;">
+            <button class="category-btn" onclick="displayMenuItems('Makis')">Makis</button>
+            <button class="category-btn" onclick="displayMenuItems('Uramakis')">Uramakis</button>
+            <button class="category-btn" onclick="displayMenuItems('Tempurizados')">Tempurizados</button>
+        </div>
+
+        <div class="menu-items">
+            <p style="text-align:center;">Cargando menú...</p>
+        </div>
+    </section>
+
+    <section id="nosotros" class="about">
+        <div class="about-content">
+            <h2>Nuestra Historia</h2>
+            <p>En Katana Sushi, nos enorgullece ofrecer la más auténtica experiencia culinaria japonesa.
+               Nuestros chefs expertos combinan técnicas tradicionales con toques modernos para crear
+               obras maestras gastronómicas.</p>
+        </div>
+    </section>
+
+    <section id="experiencia" class="experiencia">
+        <h2>Experiencia</h2>
+        <p class="subtitle">Descubre el arte del sushi auténtico</p>
+        <div class="experiencia-container">
+            <div class="experiencia-item">
+                <div class="experiencia-icon">
+                    <i class="fas fa-fish"></i>
+                </div>
+                <h3>Ingredientes Frescos</h3>
+                <p>Seleccionamos los mejores ingredientes para crear obras maestras culinarias que deleitan tus sentidos.</p>
+            </div>
+            <div class="experiencia-item">
+                <div class="experiencia-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Calidad Premium</h3>
+                <p>Cada rollo es preparado con precisión y dedicación por nuestros expertos chefs.</p>
+            </div>
+            <div class="experiencia-item">
+                <div class="experiencia-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Servicio Rápido</h3>
+                <p>Entrega puntual para que disfrutes de tu sushi en el momento perfecto.</p>
+            </div>
+            <div class="experiencia-item">
+                <div class="experiencia-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Hecho con Amor</h3>
+                <p>Pasión por la cocina japonesa en cada detalle de nuestros platillos.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content simple-footer">
+            <div class="footer-col">
+                <h4>NUESTRA EMPRESA</h4>
+                <ul>
+                    <li><a href="#nosotros">Sobre nosotros</a></li>
+                    <li><a href="#">Términos de uso</a></li>
+                    <li><a href="/politicas-privacidad" onclick="openPrivacyPolicy(event)">Política de privacidad</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>MENÚ</h4>
+                <ul>
+                    <li><a href="#menu">Ver menú</a></li>
+                    <li><a href="#promociones">Promociones</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>CONTACTO</h4>
+                <ul>
+                    <li><a href="#contacto">Formulario</a></li>
+                    <li><a href="mailto:info@katanasushi.com">info@katanasushi.com</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Katana Sushi. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <div class="social-float">
+        <div class="social-float-button">
+            <i class="fas fa-headset"></i>
+        </div>
+        <div class="social-float-menu">
+            <a href="https://wa.me/50373821435" target="_blank" class="social-float-item">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=100083618180488" target="_blank" class="social-float-item">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://www.instagram.com/katana.sushi.sv?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="social-float-item">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </div>
+
+    <div id="authChoiceModal" class="choice-modal">
+        <div class="choice-modal-content">
+            <button class="close-choice-modal" id="closeAuthChoiceModal"><i class="fas fa-times"></i></button>
+            <h2>Continuar Pedido</h2>
+            <p>¿Cómo deseas continuar?</p>
+            <div class="choice-modal-buttons">
+                <button class="btn btn-primary" id="loginChoiceBtn">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                <button class="btn btn-secondary" id="guestChoiceBtn">
+                    <i class="fas fa-user-alt-slash"></i> Continuar como Invitado
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="guestOrderModal" class="guest-modal">
+        <div class="guest-modal-content">
+            <button class="close-guest-modal" id="closeGuestModal"><i class="fas fa-times"></i></button>
+            <h2>Pedido como Invitado</h2>
+            
+            <form id="guestOrderForm">
+                <div class="form-group">
+                    <label for="guestName">Nombre completo <span class="required">*</span></label>
+                    <input type="text" id="guestName" name="guestName" required>
+                </div>
+                <div class="form-group">
+                    <label for="guestPhone">Teléfono <span class="required">*</span></label>
+                    <input type="tel" id="guestPhone" name="guestPhone" required pattern="[0-9]{8}" title="Ingrese 8 dígitos">
+                </div>
+                <div class="form-group">
+                    <label for="guestAddress">Dirección <span class="required">*</span></label>
+                    <input type="text" id="guestAddress" name="guestAddress" required>
+                    <button type="button" id="getCurrentLocation" class="location-btn">
+                        <i class="fas fa-map-marker-alt"></i> Usar mi ubicación actual
+                    </button>
+                </div>
+                <div id="map" style="height: 200px; margin: 10px 0; border-radius: 8px;"></div>
+                <div class="form-group">
+                    <label for="guestZone">Zona de envío <span class="required">*</span></label>
+                    <select id="guestZone" name="guestZone" required>
+                        <option value="">Selecciona una zona</option>
+                        <option value="centrica" data-cost="2.00">CÉNTRICA (Dentro de Los Pinos, Estadio Sergio Torres Rivera, Puente Gavidia y Barrio El Calvario) - $2.00</option>
+                        <option value="puente-ugb" data-cost="2.50">Del Puente Gavidia hasta la UGB - $2.50</option>
+                        <option value="ugb-montanita" data-cost="3.00">De la UGB hasta La Montañita - $3.00</option>
+                        <option value="montanita-ereguayquin" data-cost="3.50">Desde La Montañita hasta Ereguayquín (Carretera Litoral) - $3.50</option>
+                        <option value="ereguayquin" data-cost="4.00">Dentro de Ereguayquín - $4.00</option>
+                        <option value="sta-maria-centro" data-cost="3.00">Sta. María Centro - $3.00</option>
+                        <option value="sta-elena" data-cost="4.00">Sta. Elena - $4.00</option>
+                        <option value="pto-parada" data-cost="8.00">Pto. Parada - $8.00</option>
+                        <option value="pinos-lemus" data-cost="2.50">De Los Pinos hasta Lemus Home - $2.50</option>
+                        <option value="lemus-tierramar" data-cost="3.00">Desde Lemus Home hasta Tierramar - $3.00</option>
+                        <option value="tierramar-poza" data-cost="3.50">Desde Tierramar hasta La Poza - $3.50</option>
+                        <option value="poza-chilamate" data-cost="4.00">Desde La Poza hasta Chilamate - $4.00</option>
+                        <option value="calvario-veraneras" data-cost="2.00">Desde El Calvario hasta Las Veraneras - $2.00</option>
+                        <option value="estadio-cruz1" data-cost="2.50">Desde el Estadio Sergio Torres Rivera hasta La Cruz 1 - $2.50</option>
+                        <option value="cruz1-bypass" data-cost="3.00">Desde La Cruz 1 hasta el By Pass - $3.00</option>
+                        <option value="otra" data-cost="0.00">Otra zona (contactaremos)</option>
+                    </select>
+                </div>
+                <div id="guestShippingCost" class="shipping-cost-info" style="display:none;"></div>
+                <div id="guestShippingMsg" class="shipping-msg" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="guestComment">Punto de referencia</label>
+                    <textarea id="guestComment" name="guestComment" rows="2"></textarea>
+                </div>
+                <div id="guestOrderSummary" style="width: 100%; margin-bottom: 1.5rem; border: 1px solid #eee; border-radius: 8px; padding: 1rem;">
+                    <h3 style="font-size: 1.1em; color: var(--primary-color); margin-bottom: 0.8rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">Resumen de tu Pedido</h3>
+                    <div id="guestOrderSummaryItems" style="margin-bottom: 0.8rem;">
+                        </div>
+                    <div style="border-top: 1px dashed #ddd; padding-top: 0.8rem;">
+                        <p style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                            <span>Subtotal Productos:</span>
+                            <strong id="guestOrderSubtotalProducts">$0.00</strong>
+                        </p>
+                        <div id="guestShippingCost" class="shipping-cost-info" style="display:flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                            <span>Costo de Envío:</span>
+                            <strong id="guestOrderShippingCostValue">$0.00</strong>
+                        </div>
+                        <div id="guestShippingMsg" class="shipping-msg" style="margin-bottom: 0.5rem;"></div>
+                        <p style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; color: var(--primary-color); margin-top: 0.5rem; border-top: 1px solid #ccc; padding-top: 0.5rem;">
+                            <span>Total del Pedido:</span>
+                            <strong id="guestOrderTotal">$0.00</strong>
+                        </p>
+                    </div>
+                </div>
+                <button type="button" id="serfinsaPayBtn" class="cta-button" style="width:100%;margin-top:1rem;background:#1e90ff;color:#fff;">
+                    <i class="fas fa-credit-card"></i> Pagar en Línea
+                </button>
+                <button type="submit" class="cta-button" style="width:100%;margin-top:1rem;">
+                    <i class="fas fa-paper-plane"></i> Registrar pedido
+                </button>
+            </form>
+            <div id="guestOrderSuccess" class="guest-success" style="display:none;">
+                <i class="fas fa-check-circle"></i>
+                <p>¡Tu pedido ha sido recibido! Pronto nos pondremos en contacto.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner de Cookies -->
+    <div id="cookieBanner" class="cookie-banner glass">
+        <div class="cookie-banner-content">
+            <span class="cookie-emoji" style="color:#f7c948;font-size:2.2rem;">&#9888;</span>
+            <div>
+                <strong>Aviso de Cookies</strong>
+                <p>
+                    Este sitio web utiliza cookies para mejorar tu experiencia y para fines de análisis. Puedes aceptar todas las cookies, o rechazar las que no sean esenciales.
+                    Consulta nuestra <a href="/cookies" target="_blank" class="cookie-link">Política de Cookies</a> para más información.
+                </p>
+                <div class="cookie-banner-buttons">
+                    <button id="acceptCookies" class="cta-button modern-accept">Aceptar</button>
+                    <button id="rejectCookies" class="cta-button modern-reject">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <!-- Cookie Manager -->
+    <script src="public/js/cookieManager.js"></script>
+    <!-- Tus scripts -->
+    <script src="public/js/main.js"></script>
+    <script>
+        function openPrivacyPolicy(event) {
+            event.preventDefault();
+            window.location.href = '/politicas-privacidad';
+        }
+    </script>
+</body>
+</html>
