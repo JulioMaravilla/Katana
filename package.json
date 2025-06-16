@@ -9,7 +9,11 @@
     "dev": "nodemon src/server/server.js",
     "build": "echo \"no build step\""
   },
-  "keywords": ["sushi", "express", "mongodb"],
+  "keywords": [
+    "sushi",
+    "express",
+    "mongodb"
+  ],
   "author": "Julio Maravilla",
   "license": "MIT",
   "dependencies": {
@@ -17,6 +21,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.13.2",

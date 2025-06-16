@@ -126,7 +126,7 @@ async function loadAndBuildCarousel() {
     carouselContainer.insertAdjacentHTML('afterbegin', '<p id="carouselLoadingMsg" style="text-align:center; padding: 50px; color: #555;">Cargando imágenes del carrusel...</p>');
 
     try {
-        const response = await fetch('/api/carousel-images');
+        const response = await fetch('/api/carousel/images');
         if (!response.ok) {
             throw new Error(`Error HTTP ${response.status} al cargar imágenes del carrusel.`);
         }
@@ -453,7 +453,7 @@ function updateCart() {
     if (!cartItemsContainer || !cartCountElement || !totalAmountElement || !checkoutBtn || !cartIconContainer) return;
 
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-basket fa-3x"></i><p>Tu carrito está vacío</p></div>`;
+        cartItemsContainer.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-basket fa-3x"></i><p>Tu reserva está vacía</p></div>`;
         totalAmountElement.textContent = '$0.00';
         checkoutBtn.disabled = true; checkoutBtn.style.opacity = '0.6'; checkoutBtn.style.cursor = 'not-allowed';
         cartIconContainer.innerHTML = '<i class="material-icons">ramen_dining</i><span>0</span>';

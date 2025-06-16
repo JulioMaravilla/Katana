@@ -53,6 +53,53 @@ body {
     width: 70px;
 }
 
+.admin-sidebar.collapsed .menu-link {
+    padding: 12px 0;
+    justify-content: center;
+    width: 70px;
+}
+
+.admin-sidebar.collapsed .menu-link i,
+.admin-sidebar.collapsed .menu-link svg,
+.admin-sidebar.collapsed .menu-link img {
+    margin: 0;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    position: relative;
+    left: 0;
+    transform: none;
+}
+
+.admin-sidebar.collapsed .menu-link svg {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+}
+
+.admin-sidebar.collapsed .menu-link span {
+    display: none;
+}
+
+.admin-sidebar.collapsed .sidebar-footer {
+    padding: 1rem 0;
+}
+
+.admin-sidebar.collapsed #adminLogoutButton {
+    width: 100%;
+    padding: 12px 0;
+    justify-content: center;
+}
+
+.admin-sidebar.collapsed #adminLogoutButton i {
+    margin: 0;
+}
+
+.admin-sidebar.collapsed #adminLogoutButton .logout-text {
+    display: none;
+}
+
 .sidebar-header {
     padding: 20px;
     display: flex;
@@ -108,15 +155,59 @@ body {
     color: white;
 }
 
-.menu-link i {
-    font-size: 20px;
+/* Estilos base para todos los iconos */
+.menu-link i,
+.menu-link svg,
+.menu-link img {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
     margin-right: 15px;
-    width: 25px;
-    text-align: center;
+    color: inherit;
+    fill: currentColor;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.admin-sidebar.collapsed .menu-link span {
-    display: none;
+/* Ajustes específicos para el estado contraído */
+.admin-sidebar.collapsed .menu-link {
+    padding: 12px 0;
+    justify-content: center;
+    width: 70px;
+}
+
+.admin-sidebar.collapsed .menu-link i,
+.admin-sidebar.collapsed .menu-link svg,
+.admin-sidebar.collapsed .menu-link img {
+    margin: 0;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    position: relative;
+    left: 0;
+    transform: none;
+}
+
+.admin-sidebar.collapsed .menu-link svg {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+}
+
+.admin-sidebar.collapsed .admin-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.admin-sidebar.collapsed .menu-item {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .menu-link.active {
@@ -1962,4 +2053,336 @@ body {
 .payment-status.not-paid {
     color: #dc3545;
     font-weight: bold;
+}
+
+/* --- NUEVOS ESTILOS PARA LA GESTIÓN DEL CARRUSEL --- */
+.carousel-images-list {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border: 1px solid #eee;
+    padding: 1rem;
+    border-radius: 8px;
+    min-height: 100px;
+    background-color: #f8f9fa;
+}
+
+.carousel-image-item {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    border-radius: 4px;
+    text-align: center;
+    width: 150px; /* Ancho fijo para cada tarjeta de imagen */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.carousel-image-item img {
+    width: 100%;
+    height: 80px; /* Altura fija para la previsualización */
+    object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+    margin-bottom: 0.5rem;
+    border-radius: 2px;
+}
+
+.carousel-image-item p {
+    font-size: 0.8em;
+    margin-bottom: 0.5rem;
+    word-break: break-all; /* Evita que nombres largos rompan el layout */
+    flex-grow: 1; /* Permite que el párrafo ocupe el espacio disponible */
+    color: #333;
+}
+
+.carousel-image-item .admin-btn {
+    width: 100%; /* El botón ocupa todo el ancho de la tarjeta */
+}
+
+/* Estilos para los botones de exportar en los reportes */
+.export-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.export-buttons .admin-button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.export-buttons .admin-button i {
+    font-size: 1.1em;
+}
+
+.export-buttons .admin-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Colores específicos para cada tipo de exportación */
+.export-buttons .admin-button[data-type="csv"] {
+    background: #27ae60;
+    color: white;
+}
+
+.export-buttons .admin-button[data-type="csv"]:hover {
+    background: #1e8449;
+}
+
+.export-buttons .admin-button[data-type="pdf"] {
+    background: #e74c3c;
+    color: white;
+}
+
+.export-buttons .admin-button[data-type="pdf"]:hover {
+    background: #c0392b;
+}
+
+/* Estilos para los filtros de reportes */
+.report-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(44,62,80,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 220px;
+    position: relative;
+}
+
+.filter-group label {
+    font-size: 0.95em;
+    color: #2c3e50;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label::before {
+    content: '⚡';
+    font-size: 1.1em;
+}
+
+.filter-group .admin-select {
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    color: #2c3e50;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 220px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.filter-group .admin-select:hover {
+    border-color: #3498db;
+    box-shadow: 0 4px 8px rgba(52,152,219,0.1);
+}
+
+.filter-group .admin-select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.15);
+    outline: none;
+}
+
+/* Estilos específicos para los filtros de fecha */
+.date-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(44,62,80,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.date-filters .filter-group {
+    flex: 1;
+    min-width: 220px;
+    max-width: 300px;
+}
+
+.date-filters .admin-input {
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    color: #2c3e50;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.date-filters .admin-input:hover {
+    border-color: #3498db;
+    box-shadow: 0 4px 8px rgba(52,152,219,0.1);
+}
+
+.date-filters .admin-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.15);
+    outline: none;
+}
+
+/* Estilo para el botón de aplicar fechas */
+#applyCustomDateFilter {
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#applyCustomDateFilter:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52,152,219,0.2);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .report-filters,
+    .date-filters {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px;
+    }
+
+    .filter-group {
+        width: 100%;
+        max-width: none;
+    }
+
+    .export-buttons {
+        margin-top: 15px;
+        justify-content: flex-start;
+    }
+
+    #applyCustomDateFilter {
+        width: 100%;
+    }
+}
+
+/* --- Mejoras visuales para la tarjeta de pedido --- */
+.order-products-list {
+    margin: 1rem 0 0.5rem 0;
+    padding: 0.7rem 0.5rem 0.5rem 0.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+.order-products-title {
+    font-weight: 600;
+    color: #2C3E50;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+}
+.order-product-block {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(44,62,80,0.07);
+    padding: 0.5rem 0.7rem;
+    margin-bottom: 0.5rem;
+}
+.order-product-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #eee;
+}
+.order-product-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.order-product-title {
+    font-weight: 500;
+    color: #34495E;
+    font-size: 1rem;
+}
+.order-product-qty {
+    color: #888;
+    font-size: 0.95rem;
+}
+.order-product-price {
+    font-weight: bold;
+    color: #3498DB;
+    font-size: 1.08rem;
+    min-width: 60px;
+    text-align: right;
+}
+.order-total-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #eaf6fb;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1565c0;
+    margin-top: 1rem;
+    box-shadow: 0 1px 6px rgba(44,62,80,0.07);
+}
+.order-total-amount {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1565c0;
+}
+@media (max-width: 600px) {
+    .order-card-visual {
+        padding: 1rem 0.5rem;
+        min-width: 0;
+        max-width: 100%;
+    }
+    .order-product-img {
+        width: 38px;
+        height: 38px;
+    }
+    .order-product-title {
+        font-size: 0.98rem;
+    }
+    .order-total-block {
+        font-size: 1rem;
+        padding: 0.5rem 0.5rem;
+    }
 }
