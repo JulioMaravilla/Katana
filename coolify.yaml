@@ -1,0 +1,48 @@
+# Configuración para Coolify
+# Este archivo contiene las variables de entorno que necesitas configurar en Coolify
+
+# Variables de entorno requeridas para producción:
+environment:
+  # Base de datos
+  MONGODB_URI: "mongodb+srv://usuario:password@cluster.mongodb.net/katana_sushi"
+  
+  # Configuración del servidor
+  NODE_ENV: "production"
+  PORT: "3000"
+  HTTPS_PORT: "3443"
+  
+  # JWT
+  JWT_SECRET: "tu_jwt_secret_super_seguro_y_largo_aqui"
+  JWT_EXPIRES_IN: "24h"
+  
+  # Email (configurar según tu proveedor)
+  EMAIL_HOST: "smtp.gmail.com"
+  EMAIL_PORT: "587"
+  EMAIL_USER: "tu_email@gmail.com"
+  EMAIL_PASS: "tu_password_de_aplicacion"
+  
+  # CORS
+  CORS_ORIGIN: "https://tu-dominio.com"
+  
+  # Subida de archivos
+  UPLOAD_PATH: "public/images/products"
+  MAX_FILE_SIZE: "5242880"
+
+# Variables opcionales para SSL (si usas certificados propios):
+# SSL_CERT_PATH: "/app/ssl/cert.pem"
+# SSL_KEY_PATH: "/app/ssl/key.pem"
+
+# Configuración de puertos:
+ports:
+  - "3000:3000"  # HTTP
+  - "3443:3443"  # HTTPS
+
+# Volúmenes (si necesitas montar certificados SSL):
+volumes:
+  - "./ssl:/app/src/server/ssl:ro"
+
+# Comando de inicio:
+command: "node src/server/server.js"
+
+# Directorio de trabajo:
+workdir: "/app" 

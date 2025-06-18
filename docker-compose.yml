@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  katana-sushi:
+    build: .
+    ports:
+      - "3000:3000"
+      - "3443:3443"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HTTPS_PORT=3443
+      # Configura estas variables en Coolify
+      # - MONGODB_URI=tu_uri_de_mongodb
+      # - JWT_SECRET=tu_jwt_secret
+      # - SSL_CERT_PATH=/app/ssl/cert.pem
+      # - SSL_KEY_PATH=/app/ssl/key.pem
+    volumes:
+      # Montar certificados SSL si los tienes
+      - ./ssl:/app/src/server/ssl:ro
+      # Montar archivos de configuración
+      - ./public:/app/public
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s 
