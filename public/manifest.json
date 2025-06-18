@@ -1,0 +1,26 @@
+{
+  "name": "Katana Sushi",
+  "short_name": "Katana",
+  "description": "Sistema de pedidos online para Katana Sushi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/images/LOGO-SIN-FONDO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/LOGO-SIN-FONDO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+} 

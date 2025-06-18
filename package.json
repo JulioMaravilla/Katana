@@ -2,14 +2,26 @@
   "name": "katana-sushi",
   "version": "1.0.0",
   "private": true,
-  "description": "API y servidor de Katana Sushi",
-  "main": "src/server.js",
+  "description": "Sistema completo de gestión para restaurante de sushi con panel de administración y pedidos online",
+  "main": "src/server/server.js",
   "scripts": {
     "start": "node src/server/server.js",
     "dev": "nodemon src/server/server.js",
-    "build": "echo \"no build step\""
+    "build": "echo \"No build step required\"",
+    "test": "echo \"No tests specified\"",
+    "postinstall": "echo \"Dependencies installed successfully\""
   },
-  "keywords": ["sushi", "express", "mongodb"],
+  "keywords": [
+    "sushi",
+    "restaurant",
+    "express",
+    "mongodb",
+    "nodejs",
+    "mobile-friendly",
+    "responsive",
+    "admin-panel",
+    "ecommerce"
+  ],
   "author": "Julio Maravilla",
   "license": "MIT",
   "dependencies": {
@@ -20,9 +32,35 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.13.2",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "node-cron": "^4.0.7",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "nodemon": "^3.1.9",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10"
   },
   "engines": {
-    "node": ">=18.0.0"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/katana-sushi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/katana-sushi/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/katana-sushi#readme",
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
 }

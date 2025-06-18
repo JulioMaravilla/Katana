@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin Conexión - Katana Sushi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .retry-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .retry-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📱</div>
+        <h1>Sin Conexión</h1>
+        <p>Se requiere conexión a internet para usar Katana Sushi. Por favor, verifica tu conexión.</p>
+        
+        <button class="retry-btn" onclick="checkConnection()">
+            Reintentar Conexión
+        </button>
+        
+        <div class="connection-status">
+            <span class="status-indicator"></span>
+            Verificando conexión...
+        </div>
+    </div>
+
+    <script>
+        function checkConnection() {
+            const statusElement = document.querySelector('.connection-status');
+            const indicator = document.querySelector('.status-indicator');
+            
+            statusElement.innerHTML = '<span class="status-indicator"></span> Verificando conexión...';
+            
+            // Intentar hacer una petición simple
+            fetch('/api/health', { 
+                method: 'GET',
+                cache: 'no-cache'
+            })
+            .then(response => {
+                if (response.ok) {
+                    indicator.style.background = '#51cf66';
+                    statusElement.innerHTML = '<span class="status-indicator"></span> ¡Conexión restaurada!';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    throw new Error('Respuesta no válida');
+                }
+            })
+            .catch(error => {
+                indicator.style.background = '#ff6b6b';
+                statusElement.innerHTML = '<span class="status-indicator"></span> Sin conexión. Intenta más tarde.';
+            });
+        }
+
+        // Verificar conexión automáticamente cada 3 segundos
+        setInterval(checkConnection, 3000);
+
+        // Verificar cuando se restaura la conexión
+        window.addEventListener('online', () => {
+            checkConnection();
+        });
+
+        // Verificar cuando se pierde la conexión
+        window.addEventListener('offline', () => {
+            const statusElement = document.querySelector('.connection-status');
+            const indicator = document.querySelector('.status-indicator');
+            indicator.style.background = '#ff6b6b';
+            statusElement.innerHTML = '<span class="status-indicator"></span> Conexión perdida';
+        });
+
+        // Verificar conexión al cargar la página
+        checkConnection();
+    </script>
+</body>
+</html> 
