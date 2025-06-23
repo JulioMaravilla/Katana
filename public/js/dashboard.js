@@ -1649,3 +1649,65 @@ async function handleDeactivateAccountSubmit(event) {
         showNotification("Error al procesar la solicitud", "error");
     }
 }
+
+function setupSidebarHamburguesaMobile() {
+    const sidebar = document.querySelector('.sidebar');
+    const mobileHamburger = document.getElementById('mobileHamburger');
+    const sidebarOverlay = document.querySelector('.sidebar-overlay');
+    const sidebarClose = document.getElementById('sidebarClose');
+    if (!sidebar || !mobileHamburger || !sidebarOverlay || !sidebarClose) return;
+
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+    function openSidebar() {
+        if (!isMobile()) return;
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        sidebarClose.style.display = 'flex';
+    }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        sidebarClose.style.display = 'none';
+    }
+    mobileHamburger.addEventListener('click', function(e) {
+        if (!isMobile()) return;
+        e.preventDefault();
+        if (sidebar.classList.contains('open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
+    sidebarOverlay.addEventListener('click', function() {
+        closeSidebar();
+    });
+    sidebarClose.addEventListener('click', function() {
+        closeSidebar();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
+    // Cerrar menú si se cambia a desktop
+    window.addEventListener('resize', function() {
+        if (!isMobile()) closeSidebar();
+    });
+
+    // Mostrar nombre de usuario real en la barra superior si está disponible
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+        try {
+            const user = JSON.parse(userInfo);
+            const userName = user.nombres || user.nombre || user.email || 'Usuario';
+            const userNameSpan = document.getElementById('navbarDashboardUser');
+            if (userNameSpan) userNameSpan.textContent = userName;
+        } catch (e) {}
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupSidebarHamburguesaMobile();
+});

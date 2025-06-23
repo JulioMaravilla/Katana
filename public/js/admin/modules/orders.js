@@ -542,15 +542,21 @@ async function handleMarkSelectedAsDelivered() {
 // --- Lógica de Exportación ---
 
 /**
- * Configura los event listeners para los botones de exportación (PDF y Word).
+ * Configura los event listeners para los botones de exportación (PDF, CSV y Word).
  */
 function setupExportButtons() {
     const exportPdfBtn = document.getElementById('exportAdminOrdersPdfBtn');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
     const exportWordBtn = document.getElementById('exportWordBtn');
     
     if (exportPdfBtn && exportPdfBtn.dataset.listenerAttached !== 'true') {
         exportPdfBtn.addEventListener('click', exportOrdersToPDF);
         exportPdfBtn.dataset.listenerAttached = 'true';
+    }
+
+    if (exportCsvBtn && exportCsvBtn.dataset.listenerAttached !== 'true') {
+        exportCsvBtn.addEventListener('click', exportOrdersToCSV);
+        exportCsvBtn.dataset.listenerAttached = 'true';
     }
 
     if (exportWordBtn && exportWordBtn.dataset.listenerAttached !== 'true') {
@@ -710,6 +716,95 @@ async function exportOrdersToWord() {
     link.click();
     URL.revokeObjectURL(link.href);
     showAdminNotification('Documento Word generado.', 'success');
+}
+
+/**
+ * Exporta los pedidos visibles a un archivo CSV.
+ */
+async function exportOrdersToCSV() {
+    const orderCards = document.querySelectorAll('#adminOrdersList .order-card-visual');
+    const visibleOrders = Array.from(orderCards)
+        .filter(card => card.style.display !== 'none')
+        .map(card => JSON.parse(card.dataset.orderData.replace(/&apos;/g, "'")));
+    
+    if (visibleOrders.length === 0) {
+        return showAdminNotification('No hay pedidos visibles para exportar.', 'info');
+    }
+
+    // Preparar los datos para CSV
+    const csvData = [];
+    
+    // Encabezados
+    csvData.push([
+        'ID Pedido',
+        'Cliente',
+        'Teléfono',
+        'Dirección',
+        'Zona',
+        'Fecha',
+        'Estado',
+        'Origen',
+        'Total Productos',
+        'Costo Envío',
+        'Total General',
+        'Productos'
+    ]);
+
+    // Datos de cada pedido
+    visibleOrders.forEach(order => {
+        const orderId = order.orderId || order._id.slice(-6);
+        const customerName = order.deliveryDetails?.nombre || 'N/A';
+        const phone = order.deliveryDetails?.telefono || 'N/A';
+        const address = order.deliveryDetails?.direccion || 'N/A';
+        const zone = order.deliveryDetails?.zona || 'N/A';
+        const orderDate = new Date(order.createdAt).toLocaleDateString('es-ES');
+        const status = order.status || 'N/A';
+        const source = order.source || 'N/A';
+        const totalItems = order.items?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
+        const shippingCost = order.shippingCost || 0;
+        const totalAmount = order.totalAmount || 0;
+        
+        // Lista de productos como texto
+        const productsList = order.items?.map(item => 
+            `${item.quantity}x ${item.name} ($${(item.price || 0).toFixed(2)})`
+        ).join('; ') || 'N/A';
+
+        csvData.push([
+            orderId,
+            customerName,
+            phone,
+            address,
+            zone,
+            orderDate,
+            status,
+            source,
+            totalItems,
+            `$${shippingCost.toFixed(2)}`,
+            `$${totalAmount.toFixed(2)}`,
+            productsList
+        ]);
+    });
+
+    // Convertir a formato CSV
+    const csvContent = csvData.map(row => 
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    // Crear y descargar el archivo
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `pedidos_katana_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showAdminNotification('Archivo CSV de pedidos generado exitosamente.', 'success');
 }
 
 

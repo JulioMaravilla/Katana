@@ -9,16 +9,6 @@ const orderRoutes = require('./order.routes');
 const carouselRoutes = require('./carousel.routes');
 const adminRoutes = require('./admin.routes');
 
-// Health check endpoint para Coolify
-router.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV || 'development'
-    });
-});
-
 // Usar los enrutadores en el router principal
 // Todas estas rutas estarán prefijadas con /api
 router.use('/auth', authRoutes); // ej: /api/auth/login

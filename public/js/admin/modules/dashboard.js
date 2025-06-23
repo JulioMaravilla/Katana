@@ -130,7 +130,7 @@ function renderRecentItems(selector, result, renderFunction, emptyMessage) {
     if (Array.isArray(items) && items.length > 0) {
         listElement.innerHTML = items.map(renderFunction).join('');
     } else {
-        setListPlaceholder(listElement, result.success ? emptyMessage : 'Error al cargar datos.');
+        setListPlaceholder(selector, result.success ? emptyMessage : 'Error al cargar datos.');
     }
 }
 

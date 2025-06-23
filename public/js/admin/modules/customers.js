@@ -129,8 +129,13 @@ function renderCustomerRow(customer) {
         }
     } catch (e) { console.warn("Error formateando fecha:", e); }
     const orderCount = customer.orderCount !== undefined ? customer.orderCount : 0;
+    
+    // Aplicar sombreado si la cuenta está inactiva
+    const isInactive = customer.isActive === false;
+    const rowStyle = isInactive ? 'style="background-color: #edbcb7;"' : '';
+    
     return `
-        <tr data-customer-id="${customer._id}">
+        <tr data-customer-id="${customer._id}" ${rowStyle}>
             <td>#${customer._id.slice(-6).toUpperCase()}</td>
             <td>${customer.nombre || ''} ${customer.apellidos || ''}</td>
             <td>${customer.email || '-'}</td>
@@ -139,8 +144,6 @@ function renderCustomerRow(customer) {
             <td>${orderCount}</td>
             <td>
                 <button class="action-btn view-btn" title="Ver" data-id="${customer._id}"><i class="fas fa-eye"></i></button>
-                <button class="action-btn edit-btn" title="Editar" data-id="${customer._id}" disabled><i class="fas fa-edit"></i></button>
-                <button class="action-btn delete-btn" title="Eliminar" data-id="${customer._id}" disabled><i class="fas fa-trash"></i></button>
             </td>
         </tr>`;
 }

@@ -11,7 +11,8 @@ const SELECTORS = {
     MODAL: '#productModal',
     MODAL_TITLE: '#productModalTitle',
     MODAL_ACTIONS: '#productModalActions',
-    CLOSE_MODAL_BTN: '#closeProductModalBtn'
+    CLOSE_MODAL_BTN: '#closeProductModalBtn',
+    CANCEL_MODAL_BTN: '#cancelProductEditBtn'
 };
 
 /**
