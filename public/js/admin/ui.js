@@ -46,38 +46,124 @@ export function setupAdminSidebar() {
  * @param {function(string): void} loadSectionContent - Callback que se ejecuta para cargar el contenido de la sección seleccionada.
  */
 export function setupAdminNavigation(loadSectionContent) {
+    console.log("Configurando navegación del menú admin...");
+    
     const menuLinks = document.querySelectorAll('.admin-menu .menu-link');
+    const mobileMenuLinks = document.querySelectorAll('.admin-mobile-menu-link');
     const sections = document.querySelectorAll('.dashboard-section');
     const headerTitle = document.querySelector('.admin-main .header-title');
 
-    menuLinks.forEach(link => {
+    console.log(`Encontrados ${menuLinks.length} enlaces del menú:`, menuLinks);
+    console.log(`Encontrados ${mobileMenuLinks.length} enlaces del menú móvil:`, mobileMenuLinks);
+    console.log(`Encontradas ${sections.length} secciones:`, sections);
+
+    // Función para manejar la navegación
+    const handleNavigation = (link, targetSectionId, linkText) => {
+        console.log("Navegando a:", {
+            href: link.getAttribute('href'),
+            dataSection: targetSectionId,
+            linkText: linkText
+        });
+
+        if (!targetSectionId) {
+            console.warn("Enlace sin data-section:", link);
+            return;
+        }
+
+        console.log("Activando enlace:", targetSectionId);
+
+        // Actualizar enlaces activos en ambos menús
+        menuLinks.forEach(l => l.classList.remove('active'));
+        mobileMenuLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        // Actualizar secciones
+        sections.forEach(section => {
+            const wasActive = section.classList.contains('active');
+            const shouldBeActive = section.id === targetSectionId;
+            section.classList.toggle('active', shouldBeActive);
+            
+            if (wasActive !== shouldBeActive) {
+                console.log(`Sección ${section.id}: ${wasActive} -> ${shouldBeActive}`);
+            }
+        });
+
+        // Actualizar título
+        if (headerTitle) {
+            headerTitle.textContent = linkText;
+            console.log("Título actualizado:", linkText);
+        }
+
+        // Cargar contenido de la sección
+        if (typeof loadSectionContent === 'function') {
+            console.log("Llamando loadSectionContent con:", targetSectionId);
+            loadSectionContent(targetSectionId);
+        } else {
+            console.warn("loadSectionContent no es una función:", typeof loadSectionContent);
+        }
+
+        // Cerrar menú móvil si el enlace es del menú móvil
+        if (link.classList.contains('admin-mobile-menu-link')) {
+            closeMobileMenu();
+        }
+    };
+
+    // Configurar enlaces del menú lateral
+    menuLinks.forEach((link, index) => {
+        const targetSectionId = link.getAttribute('data-section');
+        const targetSpan = link.querySelector('span');
+        
+        console.log(`Enlace ${index + 1}:`, {
+            href: link.getAttribute('href'),
+            dataSection: targetSectionId,
+            spanText: targetSpan?.textContent,
+            element: link
+        });
+
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const targetSectionId = link.getAttribute('data-section');
-            const targetSpan = link.querySelector('span');
+            handleNavigation(link, targetSectionId, targetSpan?.textContent);
+        });
+    });
 
-            if (!targetSectionId || !targetSpan) return;
+    // Configurar enlaces del menú móvil
+    mobileMenuLinks.forEach((link, index) => {
+        const targetSectionId = link.getAttribute('data-section');
+        const linkText = link.textContent.trim();
+        
+        console.log(`Enlace móvil ${index + 1}:`, {
+            href: link.getAttribute('href'),
+            dataSection: targetSectionId,
+            linkText: linkText,
+            element: link
+        });
 
-            menuLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-
-            sections.forEach(section => {
-                section.classList.toggle('active', section.id === targetSectionId);
-            });
-
-            if (headerTitle) {
-                headerTitle.textContent = targetSpan.textContent;
-            }
-
-            if (typeof loadSectionContent === 'function') {
-                loadSectionContent(targetSectionId);
-            }
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleNavigation(link, targetSectionId, linkText);
         });
     });
     
     const logoutButton = document.getElementById('adminLogoutButton');
     if (logoutButton) {
         logoutButton.addEventListener('click', adminLogout);
+    }
+}
+
+/**
+ * Función para cerrar el menú móvil
+ */
+function closeMobileMenu() {
+    const mobileMenuDrawer = document.getElementById('adminMobileMenuDrawer');
+    const mobileMenuIcon = document.getElementById('adminMobileMenuIcon');
+    
+    if (mobileMenuDrawer) {
+        mobileMenuDrawer.classList.remove('open');
+    }
+    
+    if (mobileMenuIcon) {
+        mobileMenuIcon.classList.remove('fa-times');
+        mobileMenuIcon.classList.add('fa-bars');
     }
 }
 

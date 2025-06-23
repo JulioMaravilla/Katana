@@ -426,6 +426,48 @@
 /* Eliminar sidebar deslizable en móvil */
 /* Ajustar footer para botones alineados horizontalmente en móvil */
 @media (max-width: 768px) {
+  .main-content, .content-area {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  .orders-list, .menu-items {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  #addressListContainer {
+    grid-template-columns: 1fr !important;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  .address-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-bottom: 1.2rem;
+  }
+  .btn-add-new, .filter-btn, .logout-btn, .home-btn {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  body, html {
+    overflow-x: hidden !important;
+  }
   .dashboard-body {
     flex-direction: column;
   }
@@ -524,7 +566,7 @@
   .logout-btn {
     width: 90%;
     max-width: 340px;
-    background: #000;
+    background: #e53935;
     color: #fff;
     border: 2px solid #e53935;
     border-radius: 12px;
@@ -670,6 +712,26 @@
     font-size: 28px;
     color: #fff;
   }
+  #menuContent .menu-items {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding: 0 0.5rem !important;
+    margin: 0 !important;
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  #menuContent .menu-item-card {
+    min-width: 0;
+    width: calc(100vw - 1rem);
+    max-width: 100vw;
+    box-sizing: border-box;
+    font-size: 1rem;
+    padding: 0.5rem 0.5rem 1.2rem 0.5rem;
+    margin: 0.5rem auto !important;
+    border-radius: 12px;
+  }
 }
 @media (min-width: 769px) {
   .sidebar {
@@ -736,4 +798,63 @@
   #sidebarToggle {
     display: none !important;
   }
+}
+
+input.confirmar-pedido-btn {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: linear-gradient(135deg, #BB002B 0%, #800020 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 1.15rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    padding: 1rem 0 !important;
+    box-shadow: 0 4px 12px rgba(187, 0, 43, 0.08) !important;
+    margin: 1.5rem 0 0 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+input.confirmar-pedido-btn:hover {
+    background: linear-gradient(135deg, #800020 0%, #BB002B 100%) !important;
+}
+
+.confirm-order-btn {
+    width: 100%;
+    padding: 1rem 0;
+    background: linear-gradient(135deg, #BB002B 0%, #800020 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(187, 0, 43, 0.08);
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    margin: 1.5rem 0 0 0;
+}
+.confirm-order-btn i {
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+.confirm-order-btn:hover {
+    background: linear-gradient(135deg, #800020 0%, #BB002B 100%);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(187, 0, 43, 0.13);
+}
+@media (max-width: 600px) {
+    .confirm-order-btn {
+        font-size: 1rem;
+        padding: 0.9rem 0;
+        min-height: 54px;
+        border-radius: 12px;
+    }
 }

@@ -37,8 +37,15 @@ export function loadAdminSectionContent(sectionId) {
     const initializer = sectionInitializers[sectionId];
 
     if (initializer && typeof initializer === 'function') {
-        initializer();
+        console.log(`Ejecutando inicializador para: ${sectionId}`);
+        try {
+            initializer();
+            console.log(`Inicializador ejecutado exitosamente para: ${sectionId}`);
+        } catch (error) {
+            console.error(`Error al ejecutar inicializador para ${sectionId}:`, error);
+        }
     } else {
         console.warn(`No hay un módulo de carga específico definido para la sección: ${sectionId}`);
+        console.log('Inicializadores disponibles:', Object.keys(sectionInitializers));
     }
 }

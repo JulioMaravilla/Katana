@@ -377,35 +377,6 @@
     font-size: 1.2rem;
 }
 
-/* Estilos responsivos */
-@media (max-width: 900px) {
-    #orderDetailsModal .modal-content {
-        max-width: 98vw;
-        padding: 1rem;
-    }
-    .order-details-modal-body {
-        gap: 1rem;
-    }
-    .order-details-modal-body .info-section {
-        padding: 1rem;
-    }
-}
-
-@media (max-width: 600px) {
-    #orderDetailsModal .modal-content {
-        max-width: 100vw;
-        margin: 0;
-        border-radius: 0;
-        padding: 0.5rem;
-    }
-    .order-details-modal-body {
-        gap: 0.5rem;
-    }
-    .order-details-modal-body .info-section {
-        padding: 0.5rem;
-    }
-}
-
 /* Animaciones */
 @keyframes fadeIn {
     from {
@@ -432,3 +403,66 @@
 #modal-order-items .order-item-detail:nth-child(3) { animation-delay: 0.3s; }
 #modal-order-items .order-item-detail:nth-child(4) { animation-delay: 0.4s; }
 #modal-order-items .order-item-detail:nth-child(5) { animation-delay: 0.5s; }
+
+#pedidosContent .orders-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+#pedidosContent .search-order {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+#pedidosContent .search-order input {
+  width: 90%;
+  max-width: 320px;
+  border-radius: 10px;
+  border: none;
+  padding: 0.7em 1.2em;
+  font-size: 1.1em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  background: #fff;
+  margin: 0 auto;
+}
+#pedidosContent .filter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+  align-items: center;
+}
+#pedidosContent .filter-btn {
+  width: 90%;
+  max-width: 340px;
+  font-size: 1.15em;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 0.7em 0;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  transition: background 0.2s, color 0.2s;
+}
+#pedidosContent .filter-btn[data-filter="all"] {
+  background: #111;
+  color: #fff;
+}
+#pedidosContent .filter-btn[data-filter="pending"],
+#pedidosContent .filter-btn[data-filter="processing"],
+#pedidosContent .filter-btn[data-filter="delivered"],
+#pedidosContent .filter-btn[data-filter="cancelled"] {
+  background: #c00;
+  color: #fff;
+}
+#pedidosContent .filter-btn.active {
+  outline: 2px solid #BB002B;
+  outline-offset: 2px;
+}
+#pedidosContent .orders-list {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}

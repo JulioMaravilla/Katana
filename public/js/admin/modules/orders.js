@@ -21,13 +21,25 @@ export function initializeOrders() {
     
     const filtroFecha = document.getElementById('filtroFechaPedidos');
     if (filtroFecha) {
+        console.log("Configurando filtro de fecha para pedidos");
         filtroFecha.addEventListener('change', () => loadAdminOrders(filtroFecha.value));
+    } else {
+        console.warn("No se encontró el filtro de fecha para pedidos");
     }
     
+    console.log("Configurando acciones de lote para pedidos");
     setupBatchOrderActions();
+    
+    console.log("Configurando botones de exportación");
     setupExportButtons();
+    
+    console.log("Configurando listeners del modal de pedidos manuales");
     setupManualOrderModalListeners(); // <-- FIX: Añadida la inicialización del modal
+    
+    console.log("Cargando pedidos iniciales");
     loadAdminOrders();
+    
+    console.log("Módulo de Pedidos completamente inicializado");
 }
 
 // --- Lógica de Pedidos Manuales ---

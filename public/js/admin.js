@@ -343,4 +343,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configurar para el formulario de agregar imagen de carrusel
     setupCustomFileInput('carouselImageFile', 'carouselImageUploadBtn', 'carouselImageFileName');
 
+    // --- SOLO listeners para menú móvil aquí ---
+    document.querySelectorAll('.admin-mobile-menu-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const sectionId = link.getAttribute('data-section');
+            if (sectionId) {
+                // Cerrar el menú móvil
+                const mobileMenuDrawer = document.getElementById('adminMobileMenuDrawer');
+                const mobileMenuIcon = document.getElementById('adminMobileMenuIcon');
+                if (mobileMenuDrawer) {
+                    mobileMenuDrawer.classList.remove('open');
+                }
+                if (mobileMenuIcon) {
+                    mobileMenuIcon.classList.remove('fa-times');
+                    mobileMenuIcon.classList.add('fa-bars');
+                }
+                
+                // Activar la sección
+                document.querySelectorAll('.dashboard-section').forEach(section => {
+                    section.classList.toggle('active', section.id === sectionId);
+                });
+                const headerTitle = document.querySelector('.admin-main .header-title');
+                if (headerTitle) {
+                    headerTitle.textContent = link.textContent.trim();
+                }
+                loadAdminSectionContent(sectionId);
+            }
+        });
+    });
 });

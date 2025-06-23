@@ -314,9 +314,12 @@ function setupCategoryButtons() {
 
     // Listener para las categorías principales con imagen
     imageCategoriesContainer.addEventListener('click', (event) => {
-        event.preventDefault(); // Evita que el enlace recargue la página
+        // Solo prevenir el comportamiento por defecto si el target es un enlace
         const clickedItem = event.target.closest('.image-category-item');
         if (!clickedItem) return;
+        if (clickedItem.tagName === 'A') {
+            event.preventDefault();
+        }
 
         const category = clickedItem.dataset.category;
         updateActiveButtons(clickedItem);
@@ -335,13 +338,15 @@ function setupCategoryButtons() {
             subcategoriesContainer.style.display = 'none';
             displayMenuItems(category);
         }
-    });
+    }, { passive: false });
 
     // Listener para los botones de subcategoría
     subcategoriesContainer.addEventListener('click', (event) => {
         const clickedButton = event.target.closest('.category-btn');
         if (!clickedButton) return;
-        
+        if (clickedButton.tagName === 'A') {
+            event.preventDefault();
+        }
         const category = clickedButton.dataset.category;
         updateActiveButtons(clickedButton, false); // false indica que no es una categoría principal
         displayMenuItems(category);
