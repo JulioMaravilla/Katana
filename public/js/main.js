@@ -930,14 +930,13 @@ function setupNavbarAuth() {
     navButtonsContainer.querySelectorAll('.login-btn, .nav-user-menu, .logout-btn-nav').forEach(el => el.remove()); navLinksUl.querySelectorAll('.auth-mobile').forEach(el => el.remove()); body.classList.remove('logged-in');
     if (token && userInfo.nombre) {
         body.classList.add('logged-in');
-        // Eliminar la creación del botón de cerrar sesión en .nav-buttons (solo dejar en menú móvil)
-        // const userMenuDesktop = document.createElement('div');
-        // userMenuDesktop.className = 'nav-user-menu';
-        // userMenuDesktop.innerHTML = `<a href="/dashboard" class="nav-user-link" title="Mi Dashboard"><i class="fas fa-user-circle"></i> ${userInfo.nombre.split(' ')[0]}</a><button class="logout-btn-nav" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>`;
-        // if (cartBtnExisting) navButtonsContainer.insertBefore(userMenuDesktop, cartBtnExisting); else navButtonsContainer.appendChild(userMenuDesktop);
-        // userMenuDesktop.querySelector('.logout-btn-nav').addEventListener('click', logoutUser);
+        // Restaurar el enlace al dashboard con el nombre del usuario en la navbar (escritorio)
+        const userMenuDesktop = document.createElement('div');
+        userMenuDesktop.className = 'nav-user-menu';
+        userMenuDesktop.innerHTML = `<a href="/dashboard" class="nav-user-link" title="Mi Dashboard"><i class="fas fa-user-circle"></i> ${userInfo.nombre.split(' ')[0]}</a>`;
+        if (cartBtnExisting) navButtonsContainer.insertBefore(userMenuDesktop, cartBtnExisting); else navButtonsContainer.appendChild(userMenuDesktop);
 
-        // --- NUEVO: Botón de cerrar sesión dentro del menú móvil ---
+        // Volver a poner el botón de cerrar sesión en el menú móvil
         if (window.innerWidth <= 768) {
             let logoutMobileLi = navLinksUl.querySelector('.logout-mobile');
             if (!logoutMobileLi) {
