@@ -929,9 +929,28 @@ function setupNavbarAuth() {
     if (!navButtonsContainer || !navLinksUl) return; const cartBtnExisting = document.getElementById('cartBtn');
     navButtonsContainer.querySelectorAll('.login-btn, .nav-user-menu, .logout-btn-nav').forEach(el => el.remove()); navLinksUl.querySelectorAll('.auth-mobile').forEach(el => el.remove()); body.classList.remove('logged-in');
     if (token && userInfo.nombre) {
-        body.classList.add('logged-in'); const userMenuDesktop = document.createElement('div'); userMenuDesktop.className = 'nav-user-menu'; userMenuDesktop.innerHTML = `<a href="/dashboard" class="nav-user-link" title="Mi Dashboard"><i class="fas fa-user-circle"></i> ${userInfo.nombre.split(' ')[0]}</a><button class="logout-btn-nav" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>`;
-        if (cartBtnExisting) navButtonsContainer.insertBefore(userMenuDesktop, cartBtnExisting); else navButtonsContainer.appendChild(userMenuDesktop);
-        userMenuDesktop.querySelector('.logout-btn-nav').addEventListener('click', logoutUser);
+        body.classList.add('logged-in');
+        // Eliminar la creación del botón de cerrar sesión en .nav-buttons (solo dejar en menú móvil)
+        // const userMenuDesktop = document.createElement('div');
+        // userMenuDesktop.className = 'nav-user-menu';
+        // userMenuDesktop.innerHTML = `<a href="/dashboard" class="nav-user-link" title="Mi Dashboard"><i class="fas fa-user-circle"></i> ${userInfo.nombre.split(' ')[0]}</a><button class="logout-btn-nav" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>`;
+        // if (cartBtnExisting) navButtonsContainer.insertBefore(userMenuDesktop, cartBtnExisting); else navButtonsContainer.appendChild(userMenuDesktop);
+        // userMenuDesktop.querySelector('.logout-btn-nav').addEventListener('click', logoutUser);
+
+        // --- NUEVO: Botón de cerrar sesión dentro del menú móvil ---
+        if (window.innerWidth <= 768) {
+            let logoutMobileLi = navLinksUl.querySelector('.logout-mobile');
+            if (!logoutMobileLi) {
+                logoutMobileLi = document.createElement('li');
+                logoutMobileLi.className = 'logout-mobile mobile-only';
+                logoutMobileLi.innerHTML = `<button class="logout-btn-nav" style="width:100%;text-align:left;padding:0.7em 1em;font-size:1em;background:none;border:none;color:#bb002b;"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>`;
+                navLinksUl.appendChild(logoutMobileLi);
+                logoutMobileLi.querySelector('.logout-btn-nav').addEventListener('click', logoutUser);
+            }
+        } else {
+            const logoutMobileLi = navLinksUl.querySelector('.logout-mobile');
+            if (logoutMobileLi) logoutMobileLi.remove();
+        }
     } else {
         const loginBtnDesktopNew = document.createElement('a'); loginBtnDesktopNew.href = '/login'; loginBtnDesktopNew.className = 'login-btn'; loginBtnDesktopNew.innerHTML = '<i class="fas fa-user"></i>Iniciar Sesión';
         if (cartBtnExisting) navButtonsContainer.insertBefore(loginBtnDesktopNew, cartBtnExisting); else navButtonsContainer.appendChild(loginBtnDesktopNew);

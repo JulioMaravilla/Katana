@@ -319,6 +319,15 @@ function renderAdminOrderCard(order) {
                 <div class="order-info-row"><i class="fas fa-phone"></i> <strong>Teléfono:</strong> ${order.deliveryDetails?.telefono || '-'}</div>
                 <div class="order-info-row"><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> ${order.deliveryDetails?.direccion || '-'} (${order.deliveryDetails?.zona || 'N/A'})</div>
                 <div class="order-info-row"><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> ${orderDateFormatted}</div>
+                <div class="order-products-list" style="margin: 0.5rem 0 0.2rem 0; padding: 0.3rem 0; border-top: 1px solid #f0f0f0;">
+                  ${(order.items || []).map(prod => `
+                    <div class="order-product-item" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                      <img src="${prod.image || '/public/images/placeholder.png'}" alt="${prod.name || 'Producto'}" style="width:32px;height:32px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+                      <span style="font-weight:500;font-size:0.98em;">${prod.name || 'Producto'}</span>
+                      <span style="margin-left:auto;font-size:0.97em;color:#888;">x${prod.quantity || 1}</span>
+                    </div>
+                  `).join('')}
+                </div>
                 <div class="order-info-row" style="font-weight: bold; color: var(--admin-accent, #3498DB); margin-top: 0.5rem; border-top: 1px dashed #eee; padding-top: 0.5rem;">
                     <i class="fas fa-dollar-sign"></i> <strong>Total General:</strong> $${(parseFloat(order.totalAmount) || 0).toFixed(2)}
                 </div>

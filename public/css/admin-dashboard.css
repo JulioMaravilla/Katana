@@ -3316,3 +3316,339 @@ body {
     }
 }
 
+/* Oculta el texto del sidebar cuando está colapsado */
+.admin-sidebar.collapsed .sidebar-text {
+    display: none !important;
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA EL BOTÓN SIDEBAR --- */
+.admin-sidebar .sidebar-toggle {
+    background: none !important;
+    border: none !important;
+    color: white !important;
+    font-size: 20px !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    transition: var(--admin-transition) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1001 !important;
+}
+
+.admin-sidebar .sidebar-toggle:hover {
+    color: var(--admin-accent) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+}
+
+.admin-sidebar .sidebar-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Asegurar que el botón siempre sea visible */
+@media (max-width: 1024px) {
+    .admin-sidebar .sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar .sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-sidebar .sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* --- REGLA FINAL PARA GARANTIZAR FUNCIONAMIENTO DEL SIDEBAR --- */
+.admin-sidebar .sidebar-header .sidebar-toggle {
+    background: none !important;
+    border: none !important;
+    color: white !important;
+    font-size: 20px !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    transition: all 0.3s ease !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1001 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    margin: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.admin-sidebar .sidebar-header .sidebar-toggle:hover {
+    color: var(--admin-accent) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+    transform: none !important;
+}
+
+.admin-sidebar .sidebar-header .sidebar-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+.admin-sidebar .sidebar-header .sidebar-toggle:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Asegurar que el botón siempre sea visible en todas las resoluciones */
+@media (max-width: 1024px) {
+    .admin-sidebar .sidebar-header .sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar .sidebar-header .sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-sidebar .sidebar-header .sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* --- MEJORAS VISUALES SECCIÓN REPORTES --- */
+
+/* Botones de exportar (PDF, CSV, Word, etc.) */
+.reports-section .admin-btn,
+.reports-section .btn-primary,
+.reports-section .btn-success,
+.reports-section .btn-warning {
+    background: var(--admin-accent);
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.08);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    transition: all 0.2s;
+}
+.reports-section .admin-btn i,
+.reports-section .btn-primary i,
+.reports-section .btn-success i,
+.reports-section .btn-warning i {
+    font-size: 1.1em;
+    margin-right: 0.3em;
+}
+.reports-section .admin-btn:hover,
+.reports-section .btn-primary:hover,
+.reports-section .btn-success:hover,
+.reports-section .btn-warning:hover {
+    background: #2980b9;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(52,152,219,0.15);
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* Selectores (select) modernos */
+.reports-section select,
+.reports-section .admin-select {
+    padding: 10px 38px 10px 16px;
+    border-radius: 6px;
+    border: 1.5px solid #d0d7e2;
+    background: #fff url('data:image/svg+xml;utf8,<svg fill="%23349edb" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7.293 7.293a1 1 0 011.414 0L10 8.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z"/></svg>') no-repeat right 12px center/18px 18px;
+    font-size: 1.05rem;
+    color: #222;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.06);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.reports-section select:focus,
+.reports-section .admin-select:focus {
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(52,152,219,0.15);
+    outline: none;
+}
+
+/* Métricas tipo card */
+.reports-section .metrics-grid .metric-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    border: 1.5px solid #e3eaf3;
+    transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+    padding: 22px 18px;
+    margin-bottom: 0.5rem;
+}
+.reports-section .metrics-grid .metric-card:hover {
+    box-shadow: 0 6px 24px rgba(52,152,219,0.18);
+    border-color: var(--admin-accent);
+    transform: translateY(-3px) scale(1.03);
+}
+.reports-section .metrics-grid .metric-icon {
+    background: var(--admin-accent);
+    color: #fff;
+    border-radius: 10px;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-right: 1rem;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.10);
+}
+
+/* Responsive para reportes */
+@media (max-width: 600px) {
+    .reports-section .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .reports-section .admin-btn,
+    .reports-section .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    .reports-section select,
+    .reports-section .admin-select {
+        width: 100%;
+    }
+}
+
+/* --- BOTONES DE EXPORTAR POR DEFECTO EN REPORTES --- */
+.reports-section .btn-pdf {
+    background: #e53935;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(229,57,53,0.08);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    transition: all 0.2s;
+}
+.reports-section .btn-pdf i {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f1c1'; /* fa-file-pdf */
+    color: #fff;
+    font-size: 1.2em;
+    margin-right: 0.3em;
+}
+.reports-section .btn-pdf:hover {
+    background: #b71c1c;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(229,57,53,0.15);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.reports-section .btn-csv {
+    background: #43a047;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(67,160,71,0.08);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    transition: all 0.2s;
+}
+.reports-section .btn-csv i {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f6dd'; /* fa-file-csv */
+    color: #fff;
+    font-size: 1.2em;
+    margin-right: 0.3em;
+}
+.reports-section .btn-csv:hover {
+    background: #1b5e20;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(67,160,71,0.15);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.reports-section .btn-word {
+    background: #1976d2;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    transition: all 0.2s;
+}
+.reports-section .btn-word i {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    content: '\f1c2'; /* fa-file-word */
+    color: #fff;
+    font-size: 1.2em;
+    margin-right: 0.3em;
+}
+.reports-section .btn-word:hover {
+    background: #0d47a1;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(25,118,210,0.15);
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* Mejorar selectores de filtros en reportes */
+.reports-section select,
+.reports-section .admin-select {
+    padding: 10px 38px 10px 16px;
+    border-radius: 6px;
+    border: 1.5px solid #d0d7e2;
+    background: #fff url('data:image/svg+xml;utf8,<svg fill="%23349edb" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7.293 7.293a1 1 0 011.414 0L10 8.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z"/></svg>') no-repeat right 12px center/18px 18px;
+    font-size: 1.05rem;
+    color: #222;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.06);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: border 0.2s, box-shadow 0.2s;
+    margin-bottom: 0.5em;
+}
+.reports-section select:focus,
+.reports-section .admin-select:focus {
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(52,152,219,0.15);
+    outline: none;
+}
+

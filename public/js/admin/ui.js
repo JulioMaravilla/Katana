@@ -11,14 +11,27 @@ import { adminLogout } from './auth.js';
  * Configura la funcionalidad de la barra lateral (sidebar) para que sea colapsable.
  */
 export function setupAdminSidebar() {
+    console.log("Configurando funcionalidad de sidebar...");
+    
     const sidebar = document.querySelector('.admin-sidebar');
     const main = document.querySelector('.admin-main');
     const toggleBtn = document.querySelector('.sidebar-toggle');
     const logoutBtn = document.getElementById('adminLogoutButton');
     const logoutText = logoutBtn?.querySelector('.logout-text');
 
+    console.log("Elementos encontrados:", {
+        sidebar: !!sidebar,
+        main: !!main,
+        toggleBtn: !!toggleBtn,
+        logoutBtn: !!logoutBtn
+    });
+
     if (!sidebar || !main || !toggleBtn) {
-        console.error("Elementos de la sidebar no encontrados.");
+        console.error("Elementos de la sidebar no encontrados:", {
+            sidebar: !!sidebar,
+            main: !!main,
+            toggleBtn: !!toggleBtn
+        });
         return;
     }
 
@@ -30,14 +43,28 @@ export function setupAdminSidebar() {
         if (icon) icon.style.marginRight = isCollapsed ? '0' : '8px';
     };
 
-    toggleBtn.addEventListener('click', () => {
+    // Remover listeners previos para evitar duplicados
+    const newToggleBtn = toggleBtn.cloneNode(true);
+    toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+
+    newToggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log("Botón de sidebar clickeado");
+        
         const isCollapsed = sidebar.classList.toggle('collapsed');
         main.classList.toggle('expanded');
         updateLogoutButtonVisibility(isCollapsed);
+        
+        console.log("Sidebar estado:", isCollapsed ? 'colapsado' : 'expandido');
     });
     
     // Estado inicial
-    updateLogoutButtonVisibility(sidebar.classList.contains('collapsed'));
+    const isInitiallyCollapsed = sidebar.classList.contains('collapsed');
+    updateLogoutButtonVisibility(isInitiallyCollapsed);
+    
+    console.log("Sidebar configurado correctamente. Estado inicial:", isInitiallyCollapsed ? 'colapsado' : 'expandido');
 }
 
 
