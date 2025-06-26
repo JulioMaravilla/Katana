@@ -6,8 +6,8 @@ import { showAdminNotification } from '../ui.js';
 const SELECTORS = {
     ADD_FORM: '#addProductForm',
     EDIT_FORM: '#productEditForm',
-    TABLE_BODY: '#productsContent .products-table-container tbody',
-    TABLE_CONTAINER: '#productsContent .products-table-container',
+    TABLE_BODY: '#viewProductsContent .products-table-container tbody',
+    TABLE_CONTAINER: '#viewProductsContent .products-table-container',
     MODAL: '#productModal',
     MODAL_TITLE: '#productModalTitle',
     MODAL_ACTIONS: '#productModalActions',
@@ -15,18 +15,53 @@ const SELECTORS = {
     CANCEL_MODAL_BTN: '#cancelProductEditBtn'
 };
 
+// --- SECCION "AGREGAR PRODUCTO" ---
+export function initializeAddProductSection() {
+    console.log("Módulo 'Agregar Producto' inicializado.");
+    const addProductForm = document.querySelector(SELECTORS.ADD_FORM);
+
+    populateCategorySelector(); // Cargar categorías activas al iniciar
+    
+    // Nos aseguramos de que el listener solo se añada una vez
+    if (addProductForm && !addProductForm.dataset.listenerAttached) {
+        addProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = addProductForm.querySelector('button[type="submit"]');
+            const formData = new FormData(addProductForm);
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const result = await makeAdminApiCall('/products', 'POST', formData);
+
+            if (result.success) {
+                showAdminNotification('¡Producto guardado!', 'success');
+                addProductForm.reset();
+                // Opcional: podrías redirigir al usuario a la lista de productos
+                // window.location.hash = '#ver-productos';
+            } else {
+                showAdminNotification(result.message || 'Error al guardar el producto.', 'error');
+            }
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-save"></i> Guardar Producto';
+        });
+        addProductForm.dataset.listenerAttached = 'true';
+    }
+}
+
 /**
  * Abre el modal y lo configura para ver o editar un producto.
  * @param {string} mode - 'view' o 'edit'.
  * @param {object | null} product - El objeto del producto (solo para 'view' y 'edit').
  */
-function openProductModal(mode, product = null) {
+async function openProductModal(mode, product = null) {
     const modal = document.querySelector(SELECTORS.MODAL);
     const titleEl = document.querySelector(SELECTORS.MODAL_TITLE);
     const actionsEl = document.querySelector(SELECTORS.MODAL_ACTIONS);
     const form = document.querySelector(SELECTORS.EDIT_FORM);
     // Nuevo selector para el grupo de cambio de imagen
     const changeImageGroup = document.getElementById('changeImageGroup'); 
+    
 
     if (!modal || !titleEl || !actionsEl || !form || !changeImageGroup) return;
 
@@ -45,6 +80,8 @@ function openProductModal(mode, product = null) {
         titleEl.textContent = 'Editar Producto';
     }
 
+    await populateCategorySelectorForEdit(product ? product.category : null);
+
     // Poblar formulario si hay datos de producto
     if (product) {
         form.productId.value = product._id;
@@ -58,6 +95,38 @@ function openProductModal(mode, product = null) {
     }
 
     modal.style.display = 'flex';
+}
+
+/**
+ * Carga las categorías en el selector del modal de edición.
+ */
+async function populateCategorySelectorForEdit(currentCategoryName) {
+    const categorySelect = document.getElementById('editProductCategory');
+    if (!categorySelect) return;
+
+    // Limpiar opciones, guardando el placeholder
+    const placeholder = categorySelect.querySelector('option[value=""]');
+    categorySelect.innerHTML = '';
+    if (placeholder) categorySelect.appendChild(placeholder);
+
+    try {
+        const result = await makeAdminApiCall('/admin/categories', 'GET');
+        if (result.success && Array.isArray(result.data)) {
+            result.data.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.name;
+                option.textContent = cat.name;
+                categorySelect.appendChild(option);
+            });
+
+            // Seleccionar la categoría actual del producto
+            if (currentCategoryName) {
+                categorySelect.value = currentCategoryName;
+            }
+        }
+    } catch (error) {
+        console.error("Error al poblar categorías en modal de edición:", error);
+    }
 }
 
 /**
@@ -156,7 +225,7 @@ async function loadProductsTable() {
                 <td>${p.name || '-'}</td>
                 <td>$${(p.price || 0).toFixed(2)}</td>
                 <td>${p.category || '-'}</td>
-                <td>${p.stock ?? '-'}</td>
+                <td class="text-center" style="font-weight: 600;">${p.timesFavorited || 0}</td>
                 <td><span class="status-badge ${p.isActive ? 'success' : 'danger'}">${p.isActive ? 'Activo' : 'Inactivo'}</span></td>
                 <td>
                     <button class="action-btn view-btn" title="Ver" data-id="${p._id}"><i class="fas fa-eye"></i></button>
@@ -191,60 +260,89 @@ async function handleDeleteProduct(productId) {
 /**
  * Inicializa la sección de gestión de productos.
  */
-export function initializeProducts() {
-    console.log("Módulo de Productos inicializado.");
+export function initializeViewProductsSection() {
+    console.log("Módulo de 'Ver Pructos' inicializado.");
     
-    // Listeners para los formularios
-    const addProductForm = document.querySelector(SELECTORS.ADD_FORM);
     const editProductForm = document.querySelector(SELECTORS.EDIT_FORM);
     
-    addProductForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitButton = addProductForm.querySelector('button[type="submit"]');
-        const formData = new FormData(addProductForm);
-        
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-        const result = await makeAdminApiCall('/products', 'POST', formData);
-
-        if (result.success) {
-            showAdminNotification('¡Producto guardado!', 'success');
-            addProductForm.reset();
-            loadProductsTable();
-        } else {
-            showAdminNotification(result.message || 'Error al guardar el producto.', 'error');
-        }
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-save"></i> Guardar Producto';
-    });
-
-    editProductForm?.addEventListener('submit', handleProductEditSubmit);
+    if (editProductForm && !editProductForm.dataset.listenerAttached) {
+        editProductForm.addEventListener('submit', handleProductEditSubmit);
+        editProductForm.dataset.listenerAttached = 'true';
+    }
 
     // Listener para los botones de acción en la tabla
     const tableContainer = document.querySelector(SELECTORS.TABLE_CONTAINER);
-    tableContainer?.addEventListener('click', (e) => {
-        const button = e.target.closest('.action-btn');
-        if (!button) return;
+    if (tableContainer && !tableContainer.dataset.listenerAttached) {
+        tableContainer.addEventListener('click', (e) => {
+            const button = e.target.closest('.action-btn');
+            if (!button) return;
 
-        const productId = button.dataset.id;
-        if (!productId) return;
+            const productId = button.dataset.id;
+            if (!productId) return;
 
-        if (button.classList.contains('edit-btn')) {
-            handleEditProduct(productId);
-        } else if (button.classList.contains('delete-btn')) {
-            handleDeleteProduct(productId);
-        } else if (button.classList.contains('view-btn')) {
-            handleViewProduct(productId);
-        }
-    });
+            if (button.classList.contains('edit-btn')) {
+                handleEditProduct(productId);
+            } else if (button.classList.contains('delete-btn')) {
+                handleDeleteProduct(productId);
+            } else if (button.classList.contains('view-btn')) {
+                handleViewProduct(productId);
+            }
+        });
+        tableContainer.dataset.listenerAttached = 'true';
+    }
 
     // Listener para cerrar el modal
     const closeModalBtn = document.querySelector(SELECTORS.CLOSE_MODAL_BTN);
-    closeModalBtn?.addEventListener('click', () => {
-        const modal = document.querySelector(SELECTORS.MODAL);
-        if (modal) modal.style.display = 'none';
-    });
+    if (closeModalBtn && !closeModalBtn.dataset.listenerAttached) {
+        closeModalBtn.addEventListener('click', () => {
+            const modal = document.querySelector(SELECTORS.MODAL);
+            if (modal) modal.style.display = 'none';
+        });
+        closeModalBtn.dataset.listenerAttached = 'true';
+    }
     
     loadProductsTable();
+}
+
+/**
+ * Carga las categorías activas y las inserta en el <select> del formulario de productos.
+ */
+async function populateCategorySelector() {
+    const categorySelect = document.getElementById('productCategory');
+    if (!categorySelect) return;
+
+    try {
+        const result = await makeAdminApiCall('/admin/categories', 'GET');
+        if (result.success && Array.isArray(result.data)) {
+            const activeCategories = result.data.filter(cat => cat.isActive);
+
+            // Guardar la opción "Seleccione" y limpiar el resto
+            const placeholder = categorySelect.querySelector('option[value=""]');
+            categorySelect.innerHTML = '';
+            if (placeholder) {
+                categorySelect.appendChild(placeholder);
+            }
+
+            if (activeCategories.length === 0) {
+                categorySelect.disabled = true;
+                placeholder.textContent = 'No hay categorías activas';
+            } else {
+                categorySelect.disabled = false;
+                activeCategories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.name;
+                    option.textContent = cat.name;
+                    categorySelect.appendChild(option);
+                });
+            }
+        } else {
+            throw new Error('No se pudieron cargar las categorías.');
+        }
+    } catch (error) {
+        console.error("Error al poblar categorías:", error);
+        showAdminNotification('No se pudieron cargar las categorías para el formulario.', 'error');
+        const placeholder = categorySelect.querySelector('option[value=""]');
+        categorySelect.disabled = true;
+        if(placeholder) placeholder.textContent = 'Error al cargar categorías';
+    }
 }

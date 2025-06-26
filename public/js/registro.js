@@ -70,8 +70,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Registro exitoso');
-                window.location.href = '/login';
+                Swal.fire({
+                    title: 'Registro exitoso',
+                    text: 'Tu cuenta ha sido creada exitosamente',
+                    icon: 'success',
+                    confirmButtonText: 'Iniciar sesión',
+                    confirmButtonColor: '#ca0b0b',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login'; // Redirige al usuario a la página de inicio de sesión
+                    }
+                });
             } else {
                 alert(data.message || 'Error en el registro');
             }

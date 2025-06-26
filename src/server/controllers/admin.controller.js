@@ -10,6 +10,7 @@ const User = require('../models/user.model');
 const Order = require('../models/order.model');
 const CarouselImage = require('../models/carouselImage.model');
 const Product = require('../models/product.model');
+const Category = require('../models/category.model');
 const { notificarNuevoPedido } = require('../services/email.service');
 
 
@@ -48,10 +49,20 @@ const getAllUsers = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
     try {
-        const { source, status, page = 1, limit = 1000, sort = '-createdAt' } = req.query;
+        // CORRECCIÓN: Leemos startDate y endDate en lugar de 'fecha'
+        const { source, status, page = 1, limit = 1000, sort = '-createdAt', startDate, endDate } = req.query;
         let query = {};
+
         if (source) query.source = source;
         if (status && status !== 'all') query.status = status;
+
+        // Si se proporcionan fechas de inicio y fin, las usamos para filtrar.
+        if (startDate && endDate) {
+            query.createdAt = {
+                $gte: new Date(startDate),
+                $lt: new Date(endDate) // Usamos 'less than' el día siguiente para incluir todo el día de fin.
+            };
+        }
 
         const options = {
             sort: sort,
@@ -408,6 +419,238 @@ const getManualOrders = async (req, res) => {
     }
 };
 
+/**
+ * Obtiene un reporte de los productos más agregados a Favoritos por los usuarios.
+ */
+const getFavoritesReport = async (req, res) => {
+    try {
+        // 1. Obtener todos los usuarios y sus listas de favoritos.
+        const users = await User.find({ favorites: { $exists: true, $not: { $size: 0 } } }).select('favorites');
+
+        // 2. Contar la frecuencia de cada producto favorito.
+        const favoritesCount = new Map();
+        users.forEach(user => {
+            user.favorites.forEach(productId => {
+                const productIdStr = productId.toString();
+                favoritesCount.set(productIdStr, (favoritesCount.get(productIdStr) || 0) + 1);
+            });
+        });
+
+        if (favoritesCount.size === 0) {
+            return res.json({ success: true, data: [] });
+        }
+
+        // 3. Obtener los detalles de los productos que están en la lista de favoritos.
+        const productIds = Array.from(favoritesCount.keys());
+        const products = await Product.find({ _id: { $in: productIds } });
+
+        // 4. Combinar los datos y formatear la respuesta.
+        const reportData = products.map(product => ({
+            productId: product._id,
+            name: product.name,
+            category: product.category,
+            imageUrl: product.imageUrl,
+            timesFavorited: favoritesCount.get(product._id.toString()) || 0
+        }));
+
+        // 5. Ordenar por los más favoritados.
+        reportData.sort((a, b) => b.timesFavorited - a.timesFavorited);
+
+        res.json({ success: true, data: reportData });
+
+    } catch (error) {
+        console.error("Error en getFavoritesReport:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor al generar el reporte.' });
+    }
+}
+
+// --- INICIO DE LA NUEVA FUNCIÓN PARA EL PANEL DE ESTADO SEMANAL ---
+const getWeeklyStatusMetrics = async (req, res) => {
+    try {
+        // Definir el rango de la semana actual (Domingo a Sábado)
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const diffToSunday = today.getDate() - dayOfWeek;
+
+        const startDate = new Date(today.setDate(diffToSunday));
+        startDate.setHours(0, 0, 0, 0);
+
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 7);
+
+        // 1. Contar pedidos por estado usando una consulta de agregación
+        const statusCounts = await Order.aggregate([
+            { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]);
+
+        const metrics = {
+            pending: 0,
+            processing: 0,
+            shipped: 0, // 'shipped' se interpretará como 'Para Reparto'
+            totalToCollect: 0
+        };
+
+        statusCounts.forEach(status => {
+            if (metrics.hasOwnProperty(status._id)) {
+                metrics[status._id] = status.count;
+            }
+        });
+
+        // 2. Calcular el total a cobrar de los pedidos pendientes
+        const pendingOrders = await Order.find({
+            createdAt: { $gte: startDate, $lt: endDate },
+            status: 'pending'
+        });
+
+        metrics.totalToCollect = pendingOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+        res.json({ success: true, data: metrics });
+
+    } catch (error) {
+        console.error("Error en getWeeklyStatusMetrics:", error);
+        res.status(500).json({ success: false, message: 'Error al calcular el estado semanal.' });
+    }
+};
+
+const getWeeklyActivity = async (req, res) => {
+    try {
+        // 1. Definir el rango de la semana (sin cambios)
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const diffToSunday = today.getDate() - dayOfWeek;
+        const startDate = new Date(today.setDate(diffToSunday));
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 7);
+
+        const weeklyOrders = await Order.find({
+            createdAt: { $gte: startDate, $lt: endDate },
+            status: { $nin: ['cancelled'] }
+        }).populate('userId', 'nombre');
+
+        // --- INICIO DE LA LÓGICA COMPLETA ---
+
+        // 2. Calcular todas las métricas en un solo lugar
+        const weeklyOrdersCount = weeklyOrders.length;
+        const weeklyRevenue = weeklyOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+        // Top Clientes (Incluye todos los tipos)
+        const customerSpending = new Map();
+        weeklyOrders.forEach(order => {
+            let customerId, customerName;
+            if (order.userId) {
+                customerId = order.userId._id.toString();
+                customerName = order.userId.nombre || 'Cliente Registrado';
+            } else {
+                customerName = `${order.deliveryDetails.nombre} ${order.isGuestOrder ? '(Invitado)' : '(Manual)'}`;
+                customerId = `${customerName}_${order.deliveryDetails.telefono}`;
+            }
+            const currentSpending = customerSpending.get(customerId) || { name: customerName, total: 0 };
+            customerSpending.set(customerId, { ...currentSpending, total: currentSpending.total + order.totalAmount });
+        });
+        const topCustomers = Array.from(customerSpending.values()).sort((a, b) => b.total - a.total).slice(0, 5);
+
+        // Top Productos
+        const productStats = new Map();
+        weeklyOrders.forEach(order => { 
+            order.items.forEach(item => { 
+                const stats = productStats.get(item.name) || { name: item.name, quantity: 0, revenue: 0 }; 
+                productStats.set(item.name, { ...stats, quantity: stats.quantity + item.quantity, revenue: stats.revenue + (item.quantity * item.price) });
+            }); 
+        });
+        const topProducts = Array.from(productStats.values()).sort((a, b) => b.quantity - a.quantity).slice(0, 5);
+        const topProduct = topProducts.length > 0 ? topProducts[0].name : 'N/A';
+
+        // Origen de Pedidos (La parte que faltaba)
+        const orderSource = { registered: 0, guest: 0, manual: 0 };
+        weeklyOrders.forEach(order => {
+            if (order.source === 'web_user') orderSource.registered++;
+            else if (order.source === 'web_guest') orderSource.guest++;
+            else if (order.source === 'admin_manual') orderSource.manual++;
+        });
+
+        // Crecimiento Semanal
+        const weeklyCustomerIds = [...new Set(weeklyOrders.map(o => o.userId?._id.toString()).filter(id => id))];
+        let newCustomers = 0;
+        if (weeklyCustomerIds.length > 0) {
+            const firstOrders = await Order.aggregate([ { $sort: { createdAt: 1 } }, { $group: { _id: "$userId", firstOrderDate: { $first: "$createdAt" } } }, { $match: { _id: { $in: weeklyCustomerIds.map(id => new mongoose.Types.ObjectId(id)) } } } ]);
+            firstOrders.forEach(order => { if (order.firstOrderDate >= startDate) newCustomers++; });
+        }
+
+        // 3. Enviar la respuesta unificada completa
+        res.json({
+            success: true,
+            data: {
+                weeklyOrdersCount,
+                weeklyRevenue,
+                topProduct,
+                topCustomers,
+                topProducts,
+                growth: { newCustomers, recurringCustomers: weeklyCustomerIds.length - newCustomers },
+                orderSource
+            }
+        });
+
+        // --- FIN DE LA LÓGICA COMPLETA ---
+
+    } catch (error) {
+        console.error("Error en getWeeklyActivity:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+};
+
+const createCategory = async (req, res) => {
+    try {
+        const { name, description } = req.body;
+        if (!name) {
+            return res.status(400).json({ success: false, message: 'El nombre de la categoría es requerido.' });
+        }
+        const existingCategory = await Category.findOne({ name });
+        if (existingCategory) {
+            return res.status(400).json({ success: false, message: 'Ya existe una categoría con ese nombre.' });
+        }
+        const newCategory = new Category({ name, description });
+        await newCategory.save();
+        res.status(201).json({ success: true, message: 'Categoría creada con éxito.', data: newCategory });
+    } catch (error) {
+        console.error("Error en createCategory:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+};
+
+const getCategories = async (req, res) => {
+    try {
+        const categories = await Category.find().sort({ createdAt: -1 });
+        res.json({ success: true, data: categories });
+    } catch (error) {
+        console.error("Error en getCategories:", error);
+        res.status(500).json({ success: false, message: 'Error al obtener las categorías.' });
+    }
+};
+
+const updateCategoryStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isActive } = req.body;
+
+        if (typeof isActive !== 'boolean') {
+            return res.status(400).json({ success: false, message: 'El estado "isActive" debe ser un valor booleano.' });
+        }
+
+        const category = await Category.findByIdAndUpdate(id, { isActive }, { new: true });
+
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Categoría no encontrada.' });
+        }
+
+        res.json({ success: true, message: `El estado de la categoría "${category.name}" ha sido actualizado.`, data: category });
+    } catch (error) {
+        console.error("Error en updateCategoryStatus:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+};
+
 module.exports = {
     loginAdmin,
     getAllUsers,
@@ -421,12 +664,16 @@ module.exports = {
     createManualOrder,
     uploadCarouselImage,
     deleteCarouselImage,
-    // Controladores de reportes
     getReportMetrics,
     getSalesChartData,
     getCategoryChartData,
     getCustomerReport,
     getProductReport,
-    // Obtener pedidos manuales
-    getManualOrders
+    getManualOrders,
+    getFavoritesReport,
+    getWeeklyStatusMetrics,
+    getWeeklyActivity,
+    createCategory,
+    getCategories,
+    updateCategoryStatus
 };

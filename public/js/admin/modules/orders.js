@@ -12,35 +12,77 @@ let allAdminOrders = []; // Caché local de todos los pedidos cargados
 let adminSelectedOrderIds = new Set();
 let adminAvailableProducts = []; // Caché para productos en el modal
 let adminManualOrderProductRowCount = 0;
+let currentWeekStartDate = null;
+
+
+// --- NUEVA FUNCIÓN DE AYUDA: Obtener el rango de la semana (Domingo a Sábado) ---
+function getWeekRange(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // 0=Domingo, 1=Lunes, ...
+    const diffToSunday = d.getDate() - day;
+    
+    const startDate = new Date(d.setDate(diffToSunday));
+    startDate.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 7); // Apunta al inicio del siguiente Domingo
+    
+    return { start: startDate, end: endDate };
+}
+
+// --- NUEVA FUNCIÓN DE AYUDA: Formatear el rango para mostrarlo ---
+function formatWeekRangeForDisplay(startDate) {
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6); // Sábado de esa semana
+
+    const startDay = startDate.getDate();
+    const startMonth = startDate.toLocaleString('es-ES', { month: 'short' });
+    const endDay = endDate.getDate();
+    const endMonth = endDate.toLocaleString('es-ES', { month: 'short' });
+    const year = startDate.getFullYear();
+
+    return `Semana: ${startDay} ${startMonth} - ${endDay} ${endMonth}, ${year}`;
+}
 
 /**
- * Inicializa la sección de pedidos, configurando los listeners de eventos.
+ * CORREGIDO: Inicializa la sección de pedidos con el nuevo navegador de semanas.
  */
 export function initializeOrders() {
-    console.log("Módulo de Pedidos inicializado.");
-    
-    const filtroFecha = document.getElementById('filtroFechaPedidos');
-    if (filtroFecha) {
-        console.log("Configurando filtro de fecha para pedidos");
-        filtroFecha.addEventListener('change', () => loadAdminOrders(filtroFecha.value));
-    } else {
-        console.warn("No se encontró el filtro de fecha para pedidos");
+    console.log("Módulo de Pedidos inicializado con navegador de semanas.");
+
+    // --- Lógica para el nuevo navegador de semanas ---
+    const prevWeekBtn = document.getElementById('prevWeekBtn');
+    const nextWeekBtn = document.getElementById('nextWeekBtn');
+
+    if (prevWeekBtn && !prevWeekBtn.dataset.listener) {
+        prevWeekBtn.addEventListener('click', () => {
+            currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
+            const { start, end } = getWeekRange(currentWeekStartDate);
+            loadAdminOrders(start, end);
+        });
+        prevWeekBtn.dataset.listener = 'true';
+    }
+
+    if (nextWeekBtn && !nextWeekBtn.dataset.listener) {
+        nextWeekBtn.addEventListener('click', () => {
+            currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
+            const { start, end } = getWeekRange(currentWeekStartDate);
+            loadAdminOrders(start, end);
+        });
+        nextWeekBtn.dataset.listener = 'true';
     }
     
-    console.log("Configurando acciones de lote para pedidos");
+    // --- Lógica existente que se mantiene ---
     setupBatchOrderActions();
-    
-    console.log("Configurando botones de exportación");
     setupExportButtons();
+    setupManualOrderModalListeners();
     
-    console.log("Configurando listeners del modal de pedidos manuales");
-    setupManualOrderModalListeners(); // <-- FIX: Añadida la inicialización del modal
-    
-    console.log("Cargando pedidos iniciales");
-    loadAdminOrders();
-    
-    console.log("Módulo de Pedidos completamente inicializado");
+    // --- Carga inicial con la semana actual ---
+    currentWeekStartDate = new Date();
+    const { start, end } = getWeekRange(currentWeekStartDate);
+    loadAdminOrders(start, end);
 }
+
 
 // --- Lógica de Pedidos Manuales ---
 
@@ -248,16 +290,25 @@ async function handleAdminRegisterOrderSubmit(event) {
 
 // --- Carga y Visualización de Pedidos Existentes ---
 // (Esta sección permanece igual, no se necesita modificar)
-
-export async function loadAdminOrders(fecha = null) {
+/**
+ * CORREGIDO: Ahora acepta un rango de fechas.
+ */
+export async function loadAdminOrders(startDate, endDate) {
     const ordersContainer = document.getElementById('adminOrdersList');
-    if (!ordersContainer) return;
+    const weekDisplay = document.getElementById('weekRangeDisplay');
+    
+    if (!ordersContainer || !weekDisplay) return;
+
     ordersContainer.innerHTML = '<p style="text-align: center; width: 100%; padding: 2rem 0;">Cargando pedidos... <i class="fas fa-spinner fa-spin"></i></p>';
+    weekDisplay.textContent = formatWeekRangeForDisplay(startDate);
+
     try {
-        let url = '/admin/orders';
-        if (fecha) {
-            url += `?fecha=${fecha}`;
-        }
+        // Formatear fechas para la URL (YYYY-MM-DD)
+        const startDateString = startDate.toISOString().split('T')[0];
+        const endDateString = endDate.toISOString().split('T')[0];
+        
+        let url = `/admin/orders?startDate=${startDateString}&endDate=${endDateString}`;
+        
         const result = await makeAdminApiCall(url, 'GET');
         if (result.success && Array.isArray(result.data)) {
             allAdminOrders = result.data;
@@ -287,61 +338,73 @@ function displayAdminOrders() {
 }
 
 function renderAdminOrderCard(order) {
-    // ... (sin cambios)
     const orderDate = new Date(order.createdAt || Date.now());
-    const orderDateFormatted = orderDate.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const orderDateFormatted = orderDate.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
     const orderDateForFilter = orderDate.toISOString().split('T')[0]; 
-    const customerName = order.deliveryDetails?.nombre || (order.isGuestOrder ? 'Invitado' : 'Usuario Registrado');
+    
     const { statusClass, statusText } = getOrderStatusInfo(order.status);
     const orderDataString = JSON.stringify(order).replace(/'/g, "&apos;");
-    const subtotalProductos = (parseFloat(order.totalAmount) || 0) - (parseFloat(order.shippingCost) || 0);
     const isActionable = order.status !== 'delivered' && order.status !== 'cancelled';
     
+    // Calcular subtotal (Total - Envío)
+    const totalAmount = parseFloat(order.totalAmount) || 0;
+    const shippingCost = parseFloat(order.shippingCost) || 0;
+
+    // Generar la lista de productos
+    const productsHtml = (order.items || []).map(prod => `
+        <div class="product-item">
+            <span class="name">• ${prod.quantity}x ${prod.name || 'Producto'}</span>
+            <span class="price">($${(prod.price || 0).toFixed(2)} c/u)</span>
+        </div>
+    `).join('');
+
     return `
-        <div class="order-card-visual status-border-${order.status}" 
+        <div class="order-card-minimal"
              data-order-db-id="${order._id}" 
              data-order-status="${order.status}" 
              data-order-date="${orderDateForFilter}"
              data-order-data='${orderDataString}'> 
-            <div class="order-card-header">
-                <div style="display: flex; align-items: center;">
+            
+            <div class="minimal-header">
+                <div class="order-id">
                     <input type="checkbox"
                            class="order-select-checkbox"
                            data-order-id="${order._id}"
                            ${!isActionable ? 'disabled' : ''}
-                           title="${isActionable ? 'Seleccionar pedido' : 'Pedido no accionable'}"
-                           style="margin-right: 10px; width: 18px; height: 18px; accent-color: var(--admin-primary, #BB002B);">
-                    <div class="order-id"><i class="fas fa-receipt"></i> #${order.orderId || order._id.slice(-6)}</div>
+                           title="${isActionable ? 'Seleccionar pedido' : 'Pedido no accionable'}">
+                    <span>#${order.orderId || order._id.slice(-6)}</span>
                 </div>
-            </div>
-            <div class="order-card-body">
-                <div class="order-info-row"><i class="fas fa-user"></i> <strong>Cliente:</strong> ${customerName}</div>
-                <div class="order-info-row"><i class="fas fa-phone"></i> <strong>Teléfono:</strong> ${order.deliveryDetails?.telefono || '-'}</div>
-                <div class="order-info-row"><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> ${order.deliveryDetails?.direccion || '-'} (${order.deliveryDetails?.zona || 'N/A'})</div>
-                <div class="order-info-row"><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> ${orderDateFormatted}</div>
-                <div class="order-products-list" style="margin: 0.5rem 0 0.2rem 0; padding: 0.3rem 0; border-top: 1px solid #f0f0f0;">
-                  ${(order.items || []).map(prod => `
-                    <div class="order-product-item" style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-                      <img src="${prod.image || '/public/images/placeholder.png'}" alt="${prod.name || 'Producto'}" style="width:32px;height:32px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
-                      <span style="font-weight:500;font-size:0.98em;">${prod.name || 'Producto'}</span>
-                      <span style="margin-left:auto;font-size:0.97em;color:#888;">x${prod.quantity || 1}</span>
-                    </div>
-                  `).join('')}
-                </div>
-                <div class="order-info-row" style="font-weight: bold; color: var(--admin-accent, #3498DB); margin-top: 0.5rem; border-top: 1px dashed #eee; padding-top: 0.5rem;">
-                    <i class="fas fa-dollar-sign"></i> <strong>Total General:</strong> $${(parseFloat(order.totalAmount) || 0).toFixed(2)}
-                </div>
-            </div>
-            <div class="order-card-actions">
-                 <div class="custom-status-select ${statusClass}" data-order-id="${order._id}">
+                
+                <div class="custom-status-select ${statusClass}" data-order-id="${order._id}">
                     <button type="button" class="custom-select-btn ${statusClass}">${statusText}</button>
                     <ul class="custom-select-options">
                         <li class="custom-select-option status-pendiente" data-value="pending">Pendiente</li>
                         <li class="custom-select-option status-procesando" data-value="processing">En preparación</li>
-                        <li class="custom-select-option status-camino" data-value="shipped">En camino</li>
+                        <li class="custom-select-option status-camino" data-value="shipped">En Camino</li>
                         <li class="custom-select-option status-entregado" data-value="delivered">Entregado</li>
                         <li class="custom-select-option status-cancelado" data-value="cancelled">Cancelado</li>
                     </ul>
+                </div>
+            </div>
+
+            <div class="minimal-body">
+                <div class="customer-details">
+                    <p><i class="fas fa-user"></i> <strong>Cliente:</strong> ${order.deliveryDetails?.nombre || '-'}</p>
+                    <p><i class="fas fa-phone"></i> <strong>Teléfono:</strong> ${order.deliveryDetails?.telefono || '-'}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> ${order.deliveryDetails?.direccion || '-'}</p>
+                </div>
+                <div class="product-list">
+                    <strong>Producto(s):</strong>
+                    ${productsHtml}
+                </div>
+            </div>
+
+            <div class="minimal-footer">
+                <div class="shipping-cost">
+                    Envío: <strong>$${shippingCost.toFixed(2)}</strong>
+                </div>
+                <div class="grand-total">
+                    Total: <strong>$${totalAmount.toFixed(2)}</strong>
                 </div>
             </div>
         </div>
@@ -354,7 +417,9 @@ async function handleStatusChange(orderId, newStatus, btn) {
         const result = await makeAdminApiCall(`/admin/orders/${orderId}/status`, 'PATCH', { status: newStatus });
         if (result.success) {
             showAdminNotification(`Pedido actualizado a ${newStatus}.`, 'success');
-            loadAdminOrders(document.getElementById('filtroFechaPedidos')?.value);
+
+            const { start, end } = getWeekRange(currentWeekStartDate);
+            loadAdminOrders(start, end); // Recargar pedidos para reflejar el cambio
         } else {
             showAdminNotification(`Error al actualizar: ${result.message}`, 'error');
         }
@@ -440,7 +505,7 @@ function setupCustomStatusFilterLogic() {
  */
 function filterAdminOrders() {
     const selectedStatus = window._adminStatusFilterValue || 'all';
-    const orderCards = document.querySelectorAll('#adminOrdersList .order-card-visual');
+    const orderCards = document.querySelectorAll('#adminOrdersList .order-card-minimal');
     let visibleCount = 0;
 
     orderCards.forEach(card => {
@@ -478,11 +543,16 @@ function setupBatchOrderActions() {
     container.dataset.batchListenersAttached = 'true';
 
     container.addEventListener('click', (event) => {
-        const target = event.target;
-        if (target.id === 'markSelectedAsDeliveredBtn') handleMarkSelectedAsDelivered();
-        else if (target.id === 'selectAllVisibleBtn') selectAllVisibleOrders();
-        else if (target.id === 'deselectAllBtn') deselectAllOrders();
-        else if (target.classList.contains('order-select-checkbox')) updateBatchActionButtonsState();
+        const button = event.target.closest('.admin-btn');
+        const checkbox = event.target.closest('.order-select-checkbox');
+
+        if (button) {
+            if (button.id === 'markSelectedAsDeliveredBtn') handleMarkSelectedAsDelivered();
+            else if (button.id === 'selectAllVisibleBtn') selectAllVisibleOrders();
+            else if (button.id === 'deselectAllBtn') deselectAllOrders();
+        } else if (checkbox) {
+            updateBatchActionButtonsState();
+        }
     });
 }
 
@@ -490,7 +560,7 @@ function setupBatchOrderActions() {
  * Actualiza la visibilidad y el estado de los botones de acción en lote.
  */
 function updateBatchActionButtonsState() {
-    const selectedCheckboxes = document.querySelectorAll('#adminOrdersList .order-select-checkbox:checked:not(:disabled)');
+    const selectedCheckboxes = document.querySelectorAll('#adminOrdersList .order-card-minimal .order-select-checkbox:checked:not(:disabled)');
     const batchActionsContainer = document.querySelector('.batch-actions');
     const markBtn = document.getElementById('markSelectedAsDeliveredBtn');
     const deselectBtn = document.getElementById('deselectAllBtn');
@@ -517,7 +587,7 @@ function updateBatchActionButtonsState() {
  * Selecciona todos los checkboxes de pedidos visibles y no deshabilitados.
  */
 function selectAllVisibleOrders() {
-    document.querySelectorAll('#adminOrdersList .order-card-visual').forEach(card => {
+    document.querySelectorAll('#adminOrdersList .order-card-minimal').forEach(card => {
         if (card.style.display !== 'none') {
             const checkbox = card.querySelector('.order-select-checkbox:not(:disabled)');
             if (checkbox) checkbox.checked = true;
@@ -530,7 +600,7 @@ function selectAllVisibleOrders() {
  * Deselecciona todos los checkboxes de pedidos.
  */
 function deselectAllOrders() {
-    document.querySelectorAll('#adminOrdersList .order-select-checkbox:checked').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#adminOrdersList .order-card-minimal .order-select-checkbox:checked').forEach(cb => cb.checked = false);
     updateBatchActionButtonsState();
 }
 
@@ -557,7 +627,8 @@ async function handleMarkSelectedAsDelivered() {
     
     btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-double"></i> Marcar Seleccionados como Entregados';
     
-    loadAdminOrders(document.getElementById('filtroFechaPedidos')?.value);
+    const { start, end } = getWeekRange(currentWeekStartDate);
+    loadAdminOrders(start, end); // Recargar pedidos para reflejar el cambio
 }
 
 // --- Lógica de Exportación ---
@@ -567,7 +638,7 @@ async function handleMarkSelectedAsDelivered() {
  */
 function setupExportButtons() {
     const exportPdfBtn = document.getElementById('exportAdminOrdersPdfBtn');
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
     const exportWordBtn = document.getElementById('exportWordBtn');
     
     if (exportPdfBtn && exportPdfBtn.dataset.listenerAttached !== 'true') {
@@ -575,9 +646,9 @@ function setupExportButtons() {
         exportPdfBtn.dataset.listenerAttached = 'true';
     }
 
-    if (exportCsvBtn && exportCsvBtn.dataset.listenerAttached !== 'true') {
-        exportCsvBtn.addEventListener('click', exportOrdersToCSV);
-        exportCsvBtn.dataset.listenerAttached = 'true';
+    if (exportExcelBtn && exportExcelBtn.dataset.listenerAttached !== 'true') {
+        exportExcelBtn.addEventListener('click', exportOrdersToExcel);
+        exportExcelBtn.dataset.listenerAttached = 'true';
     }
 
     if (exportWordBtn && exportWordBtn.dataset.listenerAttached !== 'true') {
@@ -587,247 +658,355 @@ function setupExportButtons() {
 }
 
 /**
- * Exporta los pedidos visibles a un documento PDF.
+ * FINAL: Exporta los pedidos activos de la semana actual a un PDF con un diseño 
+ * de 6 tarjetas por página (2x3) y un nombre de archivo dinámico.
  */
 async function exportOrdersToPDF() {
+    if (!window.jspdf || !window.QRious) {
+        return showAdminNotification('Librerías para PDF o QR no están cargadas.', 'error');
+    }
+
     const { jsPDF } = window.jspdf;
-    if (!jsPDF || typeof jsPDF.API.autoTable !== 'function') {
-        return showAdminNotification('Librerías para PDF no están cargadas.', 'error');
-    }
 
-    const orderCards = document.querySelectorAll('#adminOrdersList .order-card-visual');
-    const visibleOrders = Array.from(orderCards)
-        .filter(card => card.style.display !== 'none')
-        .map(card => JSON.parse(card.dataset.orderData.replace(/&apos;/g, "'")));
+    const allOrderCards = document.querySelectorAll('#adminOrdersList .order-card-minimal');
     
-    if (visibleOrders.length === 0) {
-        return showAdminNotification('No hay pedidos visibles para exportar.', 'info');
+    const ordersToExport = Array.from(allOrderCards)
+        .map(card => JSON.parse(card.dataset.orderData.replace(/'/g, "'")))
+        .filter(order => {
+            const status = order.status.toLowerCase();
+            return status !== 'delivered' && status !== 'cancelled';
+        });
+
+    if (ordersToExport.length === 0) {
+        return showAdminNotification('No hay pedidos activos para exportar en la vista actual.', 'info');
     }
 
-    const doc = new jsPDF();
-    let yPos = 20;
+    showAdminNotification(`Generando PDF para ${ordersToExport.length} pedidos...`, 'info');
 
-    doc.setFontSize(18);
-    doc.text('Reporte de Pedidos - Katana Sushi', 105, yPos, { align: 'center' });
-    yPos += 10;
-    doc.setFontSize(10);
-    doc.text(`Fecha de generación: ${new Date().toLocaleString('es-ES')}`, 105, yPos, { align: 'center' });
-    yPos += 15;
-
-    visibleOrders.forEach((order, index) => {
-        if (yPos > 260) {
-            doc.addPage();
-            yPos = 20;
-        }
-
-        const orderId = order.orderId || order._id;
-        const customerName = order.deliveryDetails?.nombre || 'N/A';
-        const orderDate = new Date(order.createdAt).toLocaleDateString('es-ES');
-        
-        doc.setFont(undefined, 'bold');
-        doc.text(`Pedido #${orderId}`, 14, yPos);
-        yPos += 7;
-        doc.setFont(undefined, 'normal');
-        doc.text(`Cliente: ${customerName}`, 14, yPos);
-        doc.text(`Fecha: ${orderDate}`, 100, yPos);
-        doc.text(`Estado: ${order.status || 'N/A'}`, 150, yPos);
-        yPos += 7;
-        doc.text(`Dirección: ${order.deliveryDetails?.direccion || 'N/A'} (${order.deliveryDetails?.zona || 'N/A'})`, 14, yPos);
-        yPos += 7;
-        doc.text(`Teléfono: ${order.deliveryDetails?.telefono || 'N/A'}`, 14, yPos);
-        yPos += 10;
-
-        const head = [['Cant.', 'Producto', 'Precio Unit.', 'Subtotal']];
-        const body = order.items.map(item => [
-            item.quantity,
-            item.name,
-            `$${(parseFloat(item.price) || 0).toFixed(2)}`,
-            `$${((parseFloat(item.price) || 0) * (item.quantity || 0)).toFixed(2)}`
-        ]);
-        
-        doc.autoTable({
-            startY: yPos,
-            head: head,
-            body: body,
-            theme: 'grid',
-            headStyles: { fillColor: [202, 11, 11] },
-            styles: { fontSize: 9, cellPadding: 1.5 },
-            columnStyles: {
-                0: { cellWidth: 15 }, 1: { cellWidth: 'auto' },
-                2: { cellWidth: 30, halign: 'right' }, 3: { cellWidth: 30, halign: 'right' }
-            }
-        });
-        
-        yPos = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'bold');
-        doc.text(`Total: $${(parseFloat(order.totalAmount) || 0).toFixed(2)}`, 196, yPos, { align: 'right' });
-        yPos += 15;
-
-        if (index < visibleOrders.length - 1) {
-            doc.setDrawColor(200, 200, 200);
-            doc.line(14, yPos - 7, 196, yPos - 7);
-        }
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'letter'
     });
 
-    doc.save(`pedidos_katana_${new Date().toISOString().slice(0,10)}.pdf`);
-    showAdminNotification('PDF de pedidos generado.', 'success');
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // --- INICIO DE LA CORRECCIÓN: PARÁMETROS PARA 2x3 ---
+    const margin = 10;
+    const verticalGap = 4; // Espacio vertical entre tarjetas
+    const horizontalGap = 5; // Espacio horizontal
+    const cardHeight = 80; // Altura que permite 3 filas
+    const cardWidth = (pageWidth - (margin * 2) - horizontalGap) / 2; // Ancho para 2 tarjetas
+
+    let y = margin;
+    let x = margin;
+    let isLeftColumn = true;
+    // --- FIN DE LA CORRECCIÓN ---
+
+    const logoUrl = '/images/LOGO-SIN-FONDO.png';
+
+    for (const order of ordersToExport) {
+        if (y + cardHeight > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
+            x = margin;
+            isLeftColumn = true;
+        }
+
+        // El código para dibujar la tarjeta (bordes, logo, texto, etc.) es el mismo.
+        // Solo hemos cambiado las dimensiones y la lógica de posicionamiento.
+        doc.setDrawColor(180);
+        doc.roundedRect(x, y, cardWidth, cardHeight, 3, 3);
+        doc.setDrawColor(220);
+        doc.line(x, y + 15, x + cardWidth, y + 15);
+        try { doc.addImage(logoUrl, 'PNG', x + 3, y + 2.5, 10, 10); } catch (e) { console.error("No se pudo añadir el logo al PDF:", e); }
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(44, 62, 80);
+        doc.text(`#${order.orderId || order._id.slice(-6)}`, x + cardWidth - 3, y + 9, { align: 'right' });
+        let currentY = y + 21;
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(80);
+        const textMaxWidth = cardWidth - 6;
+        doc.text(`Cliente: ${order.deliveryDetails?.nombre || 'N/A'}`, x + 3, currentY);
+        currentY += 5;
+        doc.text(`Teléfono: ${order.deliveryDetails?.telefono || 'N/A'}`, x + 3, currentY);
+        currentY += 5;
+        const referenceLines = doc.splitTextToSize(`Ref: ${order.deliveryDetails?.referencia || 'Ninguna.'}`, textMaxWidth);
+        doc.text(referenceLines, x + 3, currentY);
+        currentY += (referenceLines.length * 3.5) + 2;
+        doc.setFont(undefined, 'bold');
+        doc.text('Producto(s):', x + 3, currentY);
+        currentY += 4;
+        doc.setFont(undefined, 'normal');
+        const productSummary = order.items.map(item => `${item.quantity}x ${item.name}`).join(', ');
+        let productLines = doc.splitTextToSize(productSummary, textMaxWidth);
+        const maxProductLines = 2;
+        if (productLines.length > maxProductLines) {
+            productLines = productLines.slice(0, maxProductLines);
+            productLines[maxProductLines - 1] = productLines[maxProductLines - 1].slice(0, -3) + '...';
+        }
+        doc.text(productLines, x + 3, currentY);
+        const footerY = y + cardHeight - 12;
+        doc.line(x, footerY, x + cardWidth, footerY);
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(202, 11, 11);
+        doc.text(`$${(parseFloat(order.totalAmount) || 0).toFixed(2)}`, x + 5, footerY + 7);
+        const qrSize = 22;
+        const qrX = x + cardWidth - qrSize - 3;
+        const qrY = footerY - 9;
+        const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(order.deliveryDetails?.direccion || 'Usulutan, El Salvador')}`;
+        try {
+            const qr = new window.QRious({ value: googleMapsUrl, size: 128 });
+            doc.addImage(qr.toDataURL(), 'PNG', qrX, qrY, qrSize, qrSize);
+        } catch (qrError) { console.error("Error al generar QR:", qrError); }
+        
+        // Lógica para alternar entre 2 columnas
+        if (isLeftColumn) {
+            x += cardWidth + horizontalGap;
+            isLeftColumn = false;
+        } else {
+            x = margin;
+            y += cardHeight + verticalGap;
+            isLeftColumn = true;
+        }
+    }
+
+    const { start: weekStart, end: weekEnd } = getWeekRange(currentWeekStartDate);
+    weekEnd.setDate(weekEnd.getDate() - 1);
+    const formatDate = (date) => `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+    const fileName = `Fichas_Pedidos_KatanaSushi_Semana_${formatDate(weekStart)}_a_${formatDate(weekEnd)}.pdf`;
+    
+    doc.save(fileName);
+
+    showAdminNotification('PDF con fichas de pedido generado.', 'success');
 }
 
 /**
- * Exporta los pedidos visibles a un documento de Word.
+ * Exporta los pedidos activos de la semana actual a un documento de Word (.docx)
+ * con un formato de reporte detallado.
  */
 async function exportOrdersToWord() {
-    if (!window.docx || !window.QRious) {
-        return showAdminNotification('Librerías para Word (docx, qrious) no están cargadas.', 'error');
+    // 1. Verificar si la librería docx está disponible
+    if (!window.docx) {
+        return showAdminNotification('La librería para generar Word no está cargada.', 'error');
     }
 
-    const { Document, Packer, Paragraph, TextRun, ImageRun, AlignmentType, HeadingLevel } = window.docx;
-    
-    const orderCards = document.querySelectorAll('#adminOrdersList .order-card-visual');
-    const visibleOrders = Array.from(orderCards)
-        .filter(card => card.style.display !== 'none')
-        .map(card => JSON.parse(card.dataset.orderData.replace(/&apos;/g, "'")));
+    const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle, HeadingLevel } = window.docx;
 
-    if (visibleOrders.length === 0) {
-        return showAdminNotification('No hay pedidos visibles para exportar.', 'info');
+    // 2. Filtrar los pedidos (misma lógica que PDF y Excel)
+    const ordersToExport = allAdminOrders.filter(order => {
+        const status = order.status.toLowerCase();
+        return status !== 'delivered' && status !== 'cancelled';
+    });
+
+    if (ordersToExport.length === 0) {
+        return showAdminNotification('No hay pedidos activos para exportar en la vista actual.', 'info');
     }
 
-    const children = [new Paragraph({ text: 'Reporte de Pedidos - Katana Sushi', heading: HeadingLevel.TITLE })];
+    showAdminNotification('Generando documento de Word...', 'info');
 
-    for (const pedido of visibleOrders) {
-        children.push(new Paragraph({ text: `Pedido #${pedido.orderId || pedido._id}`, heading: HeadingLevel.HEADING_2 }));
-        
-        const qrData = pedido.deliveryDetails?.direccion || '';
-        if (qrData) {
-            try {
-                const qr = new window.QRious({ value: qrData, size: 128 });
-                const dataUrl = qr.toDataURL();
-                const base64Data = dataUrl.split(',')[1];
-                const binaryString = atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length).map((_, i) => binaryString.charCodeAt(i));
-                
-                children.push(new Paragraph({
-                    children: [new ImageRun({ data: bytes, transformation: { width: 100, height: 100 }})],
-                    alignment: AlignmentType.CENTER
-                }));
-            } catch (qrError) {
-                console.error("Error generando QR para pedido (Word):", pedido, qrError);
-                children.push(new Paragraph({ text: `[Error al generar QR para la dirección]` }));
-            }
+    // 3. Crear el contenido del documento
+    const docChildren = [];
+
+    docChildren.push(new Paragraph({ text: "Respaldo de Pedidos Semanales - Katana Sushi", heading: HeadingLevel.TITLE }));
+
+    ordersToExport.forEach((order, index) => {
+        const totalAmount = parseFloat(order.totalAmount) || 0;
+        const shippingCost = parseFloat(order.shippingCost) || 0;
+        const subtotal = totalAmount - shippingCost;
+
+        // Añadir detalles del pedido
+        docChildren.push(new Paragraph({ text: `Pedido #${order.orderId || order._id.slice(-6)}`, heading: HeadingLevel.HEADING_2 }));
+        docChildren.push(
+            new Paragraph({
+                children: [
+                    new TextRun({ text: "Cliente: ", bold: true }),
+                    new TextRun(order.deliveryDetails?.nombre || 'N/A'),
+                ]
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: "Teléfono: ", bold: true }),
+                    new TextRun(order.deliveryDetails?.telefono || 'N/A'),
+                ]
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: "Dirección: ", bold: true }),
+                    new TextRun(order.deliveryDetails?.direccion || 'N/A'),
+                ]
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: "Estado: ", bold: true }),
+                    new TextRun({ text: order.status || 'N/A', color: "CC0000" }),
+                ]
+            }),
+            new Paragraph({ text: "Productos:", bold: true, spacing: { before: 200 } })
+        );
+
+        // Crear tabla de productos
+        const tableRows = [
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: "Cant.", bold: true })], width: { size: 10, type: WidthType.PERCENTAGE } }),
+                    new TableCell({ children: [new Paragraph({ text: "Producto", bold: true })], width: { size: 50, type: WidthType.PERCENTAGE } }),
+                    new TableCell({ children: [new Paragraph({ text: "Precio Unit.", bold: true })], width: { size: 20, type: WidthType.PERCENTAGE } }),
+                    new TableCell({ children: [new Paragraph({ text: "Subtotal", bold: true })], width: { size: 20, type: WidthType.PERCENTAGE } }),
+                ],
+                tableHeader: true,
+            })
+        ];
+
+        (order.items || []).forEach(item => {
+            const itemPrice = parseFloat(item.price) || 0;
+            const itemQuantity = parseInt(item.quantity) || 1;
+            tableRows.push(
+                new TableRow({
+                    children: [
+                        new TableCell({ children: [new Paragraph(String(itemQuantity))] }),
+                        new TableCell({ children: [new Paragraph(item.name || '')] }),
+                        new TableCell({ children: [new Paragraph(`$${itemPrice.toFixed(2)}`)] }),
+                        new TableCell({ children: [new Paragraph(`$${(itemPrice * itemQuantity).toFixed(2)}`)] }),
+                    ]
+                })
+            );
+        });
+
+        const productTable = new Table({ rows: tableRows, width: { size: 100, type: WidthType.PERCENTAGE } });
+        docChildren.push(productTable);
+
+        // Resumen de costos
+        docChildren.push(
+            new Paragraph({ text: `Subtotal Productos: $${subtotal.toFixed(2)}`, alignment: AlignmentType.RIGHT }),
+            new Paragraph({ text: `Costo de Envío: $${shippingCost.toFixed(2)}`, alignment: AlignmentType.RIGHT }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: `Total del Pedido: $${totalAmount.toFixed(2)}`, bold: true, size: 24 }),
+                ],
+                alignment: AlignmentType.RIGHT
+            })
+        );
+
+        // Separador para el siguiente pedido
+        if (index < ordersToExport.length - 1) {
+            docChildren.push(new Paragraph({ text: "", border: { bottom: { color: "auto", space: 1, value: "single", size: 6 } }, spacing: { after: 400, before: 400 } }));
         }
-        
-        children.push(new Paragraph({ text: `Cliente: ${pedido.deliveryDetails?.nombre}`}));
-        children.push(new Paragraph({ text: `Total: $${(pedido.totalAmount || 0).toFixed(2)}` }));
-    }
+    });
 
+    // 4. Crear y descargar el documento
     const doc = new Document({
-        sections: [{ children }],
+        sections: [{ children: docChildren }],
         styles: {
             paragraphStyles: [
-                { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 28, bold: true, color: "C2185B" } },
+                { id: "Title", name: "Title", run: { size: 40, bold: true, color: "C00000" } },
+                { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", run: { size: 28, bold: true, color: "4F81BD" }, paragraph: { spacing: { before: 240, after: 120 } } },
             ]
         }
     });
 
-    const blob = await Packer.toBlob(doc);
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `pedidos_katana_sushi_${new Date().toISOString().slice(0,10)}.docx`;
-    link.click();
-    URL.revokeObjectURL(link.href);
-    showAdminNotification('Documento Word generado.', 'success');
-}
+    const { start: weekStart, end: weekEnd } = getWeekRange(currentWeekStartDate);
+    weekEnd.setDate(weekEnd.getDate() - 1);
+    const formatDate = function(date) {
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).toString().padStart(2, '0');
+        const y = date.getFullYear();
+        return d + '-' + m + '-' + y;
+    };
+    const fileName = `Respaldo_Word_Semana_${formatDate(weekStart)}_a_${formatDate(weekEnd)}.docx`;
 
-/**
- * Exporta los pedidos visibles a un archivo CSV.
- */
-async function exportOrdersToCSV() {
-    const orderCards = document.querySelectorAll('#adminOrdersList .order-card-visual');
-    const visibleOrders = Array.from(orderCards)
-        .filter(card => card.style.display !== 'none')
-        .map(card => JSON.parse(card.dataset.orderData.replace(/&apos;/g, "'")));
-    
-    if (visibleOrders.length === 0) {
-        return showAdminNotification('No hay pedidos visibles para exportar.', 'info');
-    }
-
-    // Preparar los datos para CSV
-    const csvData = [];
-    
-    // Encabezados
-    csvData.push([
-        'ID Pedido',
-        'Cliente',
-        'Teléfono',
-        'Dirección',
-        'Zona',
-        'Fecha',
-        'Estado',
-        'Origen',
-        'Total Productos',
-        'Costo Envío',
-        'Total General',
-        'Productos'
-    ]);
-
-    // Datos de cada pedido
-    visibleOrders.forEach(order => {
-        const orderId = order.orderId || order._id.slice(-6);
-        const customerName = order.deliveryDetails?.nombre || 'N/A';
-        const phone = order.deliveryDetails?.telefono || 'N/A';
-        const address = order.deliveryDetails?.direccion || 'N/A';
-        const zone = order.deliveryDetails?.zona || 'N/A';
-        const orderDate = new Date(order.createdAt).toLocaleDateString('es-ES');
-        const status = order.status || 'N/A';
-        const source = order.source || 'N/A';
-        const totalItems = order.items?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
-        const shippingCost = order.shippingCost || 0;
-        const totalAmount = order.totalAmount || 0;
-        
-        // Lista de productos como texto
-        const productsList = order.items?.map(item => 
-            `${item.quantity}x ${item.name} ($${(item.price || 0).toFixed(2)})`
-        ).join('; ') || 'N/A';
-
-        csvData.push([
-            orderId,
-            customerName,
-            phone,
-            address,
-            zone,
-            orderDate,
-            status,
-            source,
-            totalItems,
-            `$${shippingCost.toFixed(2)}`,
-            `$${totalAmount.toFixed(2)}`,
-            productsList
-        ]);
+    Packer.toBlob(doc).then(blob => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
     });
 
-    // Convertir a formato CSV
-    const csvContent = csvData.map(row => 
-        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
-    ).join('\n');
-
-    // Crear y descargar el archivo
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `pedidos_katana_${new Date().toISOString().slice(0,10)}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    showAdminNotification('Archivo CSV de pedidos generado exitosamente.', 'success');
+    showAdminNotification('Documento Word generado exitosamente.', 'success');
 }
 
+
+/**
+ * FINAL: Exporta los pedidos activos de la semana actual a un archivo XLSX (Excel)
+ * con estilos y el nombre de archivo formateado correctamente.
+ */
+function exportOrdersToExcel() {
+    // 1. Filtrar los pedidos (esto ya funciona bien)
+    const ordersToExport = allAdminOrders.filter(order => {
+        const status = order.status.toLowerCase();
+        return status !== 'delivered' && status !== 'cancelled';
+    });
+
+    if (ordersToExport.length === 0) {
+        return showAdminNotification('No hay pedidos activos para exportar.', 'info');
+    }
+
+    // ... (El código para preparar los datos y estilos de la hoja de cálculo no cambia) ...
+    const dataForSheet = [];
+    ordersToExport.forEach(order => {
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                dataForSheet.push({
+                    "ID Pedido": order.orderId || order._id.slice(-6),
+                    "Fecha": new Date(order.createdAt).toLocaleDateString('es-ES'),
+                    "Cliente": order.deliveryDetails?.nombre || 'N/A',
+                    "Teléfono": order.deliveryDetails?.telefono || 'N/A',
+                    "Dirección": order.deliveryDetails?.direccion || 'N/A',
+                    "Referencia": order.deliveryDetails?.referencia || 'N/A',
+                    "Producto": item.name || 'Producto desconocido',
+                    "Cant.": item.quantity || 1,
+                    "Precio Unit.": parseFloat(item.price || 0),
+                    "Total Pedido": parseFloat(order.totalAmount || 0),
+                    "Estado": order.status
+                });
+            });
+        }
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
+    const headerStyle = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4F81BD" } } };
+    const currencyStyle = { numFmt: "$#,##0.00" };
+    const columnWidths = [ { wch: 10 }, { wch: 12 }, { wch: 25 }, { wch: 15 }, { wch: 40 }, { wch: 30 }, { wch: 30 }, { wch: 8 }, { wch: 15 }, { wch: 15 }, { wch: 12 } ];
+    worksheet['!cols'] = columnWidths;
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        const address = XLSX.utils.encode_cell({ r: 0, c: C });
+        if (worksheet[address]) worksheet[address].s = headerStyle;
+    }
+    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+        if (worksheet[XLSX.utils.encode_cell({ r: R, c: 8 })]) worksheet[XLSX.utils.encode_cell({ r: R, c: 8 })].s = currencyStyle;
+        if (worksheet[XLSX.utils.encode_cell({ r: R, c: 9 })]) worksheet[XLSX.utils.encode_cell({ r: R, c: 9 })].s = currencyStyle;
+    }
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Pedidos");
+
+
+    // --- INICIO DE LA CORRECCIÓN FINAL ---
+    const { start: weekStart, end: weekEnd } = getWeekRange(currentWeekStartDate);
+    weekEnd.setDate(weekEnd.getDate() - 1);
+
+    // Escribimos la función de la forma más tradicional y segura posible.
+    const formatDate = function(date) {
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear();
+        return d + '-' + m + '-' + y;
+    };
+
+    const fileName = "Respaldo_Pedidos_Semana_" + formatDate(weekStart) + "_a_" + formatDate(weekEnd) + ".xlsx";
+    // --- FIN DE LA CORRECCIÓN FINAL ---
+    
+    XLSX.writeFile(workbook, fileName);
+
+    showAdminNotification('Respaldo Excel generado exitosamente.', 'success');
+}
 
 // --- Utilidades del Módulo ---
 

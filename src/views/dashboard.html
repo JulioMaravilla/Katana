@@ -54,12 +54,6 @@
                 </a>
             </li>
             <li class="menu-item">
-                <a href="#promociones">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem; vertical-align: middle;"><path d="M20.59 13.41l-8-8A2 2 0 0 0 10.17 5H5a2 2 0 0 0-2 2v5.17a2 2 0 0 0 .59 1.41l8 8a2 2 0 0 0 2.83 0l6.17-6.17a2 2 0 0 0 0-2.83zM7.5 8A1.5 1.5 0 1 1 6 9.5A1.5 1.5 0 0 1 7.5 8z"></path></svg>
-                    <span>Promociones</span>
-                </a>
-            </li>
-            <li class="menu-item">
                 <a href="#carrito">
                     <svg width="20px" height="20px" viewBox="0 0 512 512" fill="currentColor" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" style="margin-right: 15px; vertical-align: middle;">
@@ -253,7 +247,7 @@
             <section id="checkoutContent" class="dashboard-section">
                 <div class="dashboard-header">
                     <div class="header-left">
-                        <h1><i class="fas fa-truck"></i> Proceso de Entrega</h1>
+                        <h1><i class="fas fa-truck"></i> Proceso de Reservas</h1>
                     </div>
                 </div>
                 <div class="checkout-container">
@@ -361,7 +355,7 @@
                         </div>
                     </form>
                     <div class="order-summary">
-                        <h2>Resumen del pedido</h2>
+                        <h2>Resumen de la Reserva</h2>
                         <div class="order-items">
                         </div>
                         <div class="order-total">
@@ -389,7 +383,7 @@
                     <div class="checkout-actions">
                         <button type="button" class="confirm-order-btn">
                             <i class="fas fa-check-circle"></i>
-                            Confirmar Pedido
+                            Confirmar Reserva
                         </button>
                         <button type="button" id="serfinsaPayBtn" class="cta-button"
                             style="width:100%;margin-top:1rem;background:#1e90ff;color:#fff;">
@@ -411,12 +405,15 @@
                             <i class="fas fa-search"></i>
                             <input type="text" placeholder="Buscar pedido por número o producto..." id="searchOrder">
                         </div>
-                        <div class="filter-buttons">
-                            <button class="filter-btn active" data-filter="all">Todos</button>
-                            <button class="filter-btn" data-filter="pending">Pendientes</button>
-                            <button class="filter-btn" data-filter="processing">En Proceso</button>
-                            <button class="filter-btn" data-filter="delivered">Entregados</button>
-                            <button class="filter-btn" data-filter="cancelled">Cancelados</button>
+                        <div class="filter-select-wrapper">
+                            <i class="fas fa-filter"></i>
+                            <select id="orderStatusFilter" class="order-status-select">
+                                <option value="all">Todos los estados</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="processing">En Proceso</option>
+                                <option value="delivered">Entregados</option>
+                                <option value="cancelled">Cancelados</option>
+                            </select>
                         </div>
                     </div>
                     <div class="orders-list">
@@ -451,10 +448,19 @@
                     </div>
                 </div>
             </section>
-            <section id="favoritosContent" class="dashboard-section" style="text-align: center; padding: 4rem 2rem;">
-                <i class="fas fa-tools fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
-                <h2 style="font-size: 1.5rem; color: #555;">Funcionalidad en Desarrollo</h2>
-                <p style="color: #777;">La sección para ver tus productos favoritos estará disponible próximamente.</p>
+
+            <!-- Mis Favoritos Section -->
+            <section id="favoritosContent" class="dashboard-section">
+
+                <div class="dashboard-header">
+                    <div class="header-left">
+                        <h1><i class="fas fa-heart" style="color: #e74c3c;"></i> Mis Favoritos</h1>
+                    </div>
+                </div>
+                <div class="favorites-container">
+                    <p class="loading-message">Cargando tus favoritos...</p>
+                </div>
+            
             </section>
 
             <section id="direccionesContent" class="dashboard-section">
@@ -471,12 +477,6 @@
                 <div id="addressListContainer" class="orders-list">
                     <p>Cargando direcciones...</p>
                 </div>
-            </section>
-
-            <section id="promocionesContent" class="dashboard-section" style="text-align: center; padding: 4rem 2rem;">
-                <i class="fas fa-tools fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
-                <h2 style="font-size: 1.5rem; color: #555;">Funcionalidad en Desarrollo</h2>
-                <p style="color: #777;">Pronto verás aquí las promociones exclusivas para ti.</p>
             </section>
         </div>
     </main>

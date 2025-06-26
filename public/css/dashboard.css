@@ -858,3 +858,84 @@ input.confirmar-pedido-btn:hover {
         border-radius: 12px;
     }
 }
+
+/* Estilos para las acciones de la tarjeta de menú (botones) */
+.menu-item-actions {
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  margin-top: auto; 
+}
+
+/* El botón de reservar pedido ahora ocupará el espacio restante */
+.add-to-cart-btn {
+  flex-grow: 1;
+  background-color: #BB002B;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease-in-out;
+}
+  
+.add-to-cart-btn:hover {
+  background-color: #b8294a;
+}
+
+.favorite-btn {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+  
+.favorite-btn:hover {
+  background-color: #e0e0e0;
+}
+  
+.favorite-btn.is-favorite {
+  color: #e74c3c;
+  background-color: #fddfe2;
+}
+  
+.favorite-btn.is-favorite:hover {
+  background-color: #fcc8cd;
+}
+
+/* ============================================= */
+/* ===  ESTILOS PARA LA SECCIÓN DE FAVORITOS   === */
+/* ============================================= */
+
+.favorites-container {
+  display: grid;
+  /* Usamos la misma cuadrícula que el menú para consistencia */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* Mensajes de carga o de vacío */
+.favorites-container .loading-message,
+.favorites-container .empty-favorites-message {
+  grid-column: 1 / -1; /* Ocupa todo el ancho de la cuadrícula */
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.favorites-container .empty-favorites-message i {
+  display: block;
+  font-size: 3rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}

@@ -66,12 +66,3 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         submitButton.textContent = 'Iniciar Sesión';
     }
 });
-
-// Social login handlers
-document.querySelector('.social-btn.google').addEventListener('click', () => {
-    window.location.href = '/api/auth/google';
-});
-
-document.querySelector('.social-btn.facebook').addEventListener('click', () => {
-    window.location.href = '/api/auth/facebook';
-});

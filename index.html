@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -99,37 +99,14 @@
         <h2><i class="material-icons">ramen_dining</i> Nuestro Menú</h2>
     
         <div class="image-categories-container">
-            <a href="#" class="image-category-item" data-category="Rolls">
+            <a href="#" class="image-category-item" data-category="Rolls" id="default-rolls-category">
                 <img src="public/images/categorias/rolls.avif" alt="Rolls">
                 <h4>Rolls</h4>
-            </a>
-            <a href="#" class="image-category-item" data-category="Nigiri">
-                <img src="public/images/categorias/nigiri.jpg" alt="Nigiri">
-                <h4>Nigiri</h4>
-            </a>
-            <a href="#" class="image-category-item" data-category="Sashimi">
-                <img src="public/images/categorias/sashimi.avif" alt="Sashimi">
-                <h4>Sashimi</h4>
-            </a>
-            <a href="#" class="image-category-item" data-category="Entradas">
-                <img src="public/images/categorias/ramenn.jpg" alt="Entradas">
-                <h4>Ramen</h4>
-            </a>
-            <a href="#" class="image-category-item" data-category="Bebidas">
-                <img src="public/images/categorias/bebidas.avif" alt="Bebidas">
-                <h4>Bebidas</h4>
-            </a>
-            <a href="#" class="image-category-item" data-category="Postres">
-                <img src="public/images/categorias/postres.png" alt="Postres">
-                <h4>Postres</h4>
             </a>
         </div>
         
         <div class="subcategories-container" id="rolls-subcategories">
             <div class="subcategories">
-                <button class="category-btn" data-category="Makis">Makis</button>
-                <button class="category-btn" data-category="Uramakis">Uramakis</button>
-                <button class="category-btn" data-category="Tempurizados">Tempurizados</button>
             </div>
         </div>
         <div class="menu-items">
@@ -201,7 +178,6 @@
             <div class="footer-col">
                 <h4>CONTACTO</h4>
                 <ul>
-                    <li><a href="#contacto">Formulario</a></li>
                     <li><a href="katana.sushi.shulton@gmail.com">katana.sushi.shulton@gmail.com</a></li>
                 </ul>
             </div>

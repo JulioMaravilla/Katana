@@ -7,22 +7,27 @@
 // Importa las funciones de inicialización de cada módulo de sección.
 import { initializeDashboardContent } from './modules/dashboard.js';
 import { initializeOrders, initializeManualOrdersSection } from './modules/orders.js';
-import { initializeProducts } from './modules/products.js';
+import { initializeViewProductsSection, initializeAddProductSection } from './modules/products.js';
 import { initializeCustomers } from './modules/customers.js';
 import { initializeSettings } from './modules/settings.js';
 import { initializePrizes } from './modules/prizes.js';
 import { initializeReports } from './modules/reports.js';
+import { initializeCategoriesSection } from './modules/categories.js';
 
 // Mapa para evitar un switch largo y hacerlo más escalable
 const sectionInitializers = {
     'dashboardContent': initializeDashboardContent,
     'ordersContent': initializeOrders,
     'customersContent': initializeCustomers,
-    'productsContent': initializeProducts,
+
+    'addProductsContent': initializeAddProductSection, 
+    'viewProductsContent': initializeViewProductsSection,
+    
     'premiosContent': initializePrizes,
     'reportsContent': initializeReports,
     'configuracionContent': initializeSettings,
-    'registrarPedidoContent': initializeManualOrdersSection
+    'registrarPedidoContent': initializeManualOrdersSection,
+    'categoriesContent': initializeCategoriesSection
 };
 
 /**

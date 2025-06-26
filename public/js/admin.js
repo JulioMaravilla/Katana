@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pdfPreviewVideo = document.getElementById('pdfPreviewVideo');
 
     // CSV Button elements
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const exportExcelBtn = document.getElementById('exportExcelBtn');
     const csvVideoPreviewContainer = document.getElementById('csvVideoPreviewContainer');
     const csvPreviewVideo = document.getElementById('csvPreviewVideo');
 
@@ -109,55 +109,81 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullScreenVideo = document.getElementById('fullScreenVideo');
     const closeVideoModalBtn = document.getElementById('closeVideoModalBtn');
 
-    // Helper function to handle video preview logic
-    const setupVideoPreview = (buttonElement, containerElement, previewVideoElement, videoSrc, toggleCheckboxElement, position = 'right') => {
-        if (buttonElement && containerElement && previewVideoElement && toggleCheckboxElement && videoModal && fullScreenVideo && closeVideoModalBtn) {
-            // Ensure the parent for absolute positioning
-            if (buttonElement.parentNode) {
-                buttonElement.parentNode.style.position = 'relative';
-                buttonElement.parentNode.style.display = 'inline-block'; // Ensure it doesn't break layout
+    // Helper function to handle video preview logic (AHORA CON LÓGICA DE POSICIONAMIENTO INTELIGENTE)
+    const setupVideoPreview = (buttonElement, containerElement, previewVideoElement, videoSrc, toggleCheckboxElement) => {
+        // Asegurarse de que todos los elementos necesarios existan
+        const videoModal = document.getElementById('videoModal');
+        const fullScreenVideo = document.getElementById('fullScreenVideo');
+        const closeVideoModalBtn = document.getElementById('closeVideoModalBtn');
+        
+        if (!buttonElement || !containerElement || !previewVideoElement || !toggleCheckboxElement || !videoModal || !fullScreenVideo || !closeVideoModalBtn) {
+            return;
+        }
 
-                // Apply positioning based on the parameter
-                if (position === 'left') {
-                    containerElement.style.left = 'auto'; // Reset left if previously set
+        if (buttonElement.parentNode) {
+            buttonElement.parentNode.style.position = 'relative';
+            buttonElement.parentNode.style.display = 'inline-block';
+        }
+
+        let hideTimeout; // Variable para controlar el temporizador de ocultación
+
+        // --- INICIO DE LA LÓGICA CORREGIDA ---
+
+        // 1. Mostrar el video cuando el cursor entra en el botón
+        buttonElement.addEventListener('mouseenter', () => {
+            if (toggleCheckboxElement.checked) {
+                clearTimeout(hideTimeout); // Cancela cualquier orden de ocultar pendiente
+
+                const buttonRect = buttonElement.getBoundingClientRect();
+                const videoWidth = 320;
+                const spaceOnRight = window.innerWidth - buttonRect.right;
+
+                if (spaceOnRight < videoWidth + 15) { // 15px de margen
+                    containerElement.style.left = 'auto';
                     containerElement.style.right = '100%';
-                    containerElement.style.marginLeft = '0'; // Reset margin-left
+                    containerElement.style.marginLeft = '0';
                     containerElement.style.marginRight = '10px';
-                } else { // default to 'right'
-                    containerElement.style.right = 'auto'; // Reset right if previously set
+                } else {
+                    containerElement.style.right = 'auto';
                     containerElement.style.left = '100%';
-                    containerElement.style.marginRight = '0'; // Reset margin-right
+                    containerElement.style.marginRight = '0';
                     containerElement.style.marginLeft = '10px';
                 }
+
+                containerElement.style.display = 'block';
+                if (previewVideoElement.paused || previewVideoElement.ended) {
+                    previewVideoElement.play().catch(e => console.warn('Video play was prevented:', e));
+                }
             }
+        });
 
-            buttonElement.addEventListener('mouseenter', () => {
-                if (toggleCheckboxElement.checked) {
-                    containerElement.style.display = 'block';
-                    if (previewVideoElement.paused || previewVideoElement.ended) {
-                        previewVideoElement.play().catch(error => {
-                            if (error.name !== 'AbortError') {
-                                console.warn('Video play was prevented:', error);
-                            }
-                        });
-                    }
-                }
-            });
+        // 2. Iniciar un temporizador para ocultar cuando el cursor sale del botón
+        buttonElement.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                containerElement.style.display = 'none';
+                previewVideoElement.pause();
+            }, 200); // Espera 200ms antes de ocultar
+        });
 
-            buttonElement.addEventListener('mouseleave', () => {
-                if (toggleCheckboxElement.checked) {
-                    containerElement.style.display = 'none';
-                    previewVideoElement.pause();
-                    previewVideoElement.currentTime = 0;
-                }
-            });
+        // 3. Mantener el video visible si el cursor entra en él
+        containerElement.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout); // Cancela la orden de ocultar
+        });
 
-            previewVideoElement.addEventListener('click', () => {
-                videoModal.style.display = 'flex';
-                fullScreenVideo.src = videoSrc;
-                fullScreenVideo.play();
-            });
-        }
+        // 4. Ocultar el video cuando el cursor sale de la ventana del video
+        containerElement.addEventListener('mouseleave', () => {
+            containerElement.style.display = 'none';
+            previewVideoElement.pause();
+        });
+
+        // 5. El clic en el video pequeño abre el modal grande (esta lógica ya existía y es correcta)
+        previewVideoElement.addEventListener('click', () => {
+            videoModal.style.display = 'flex';
+            fullScreenVideo.src = videoSrc;
+            fullScreenVideo.play();
+        });
+        
+        // --- FIN DE LA LÓGICA CORREGIDA ---
     };
 
     // Initial state and change listener for the main toggle (for export buttons)
@@ -281,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Setup for all buttons
     setupVideoPreview(exportAdminOrdersPdfBtn, pdfVideoPreviewContainer, pdfPreviewVideo, './images/pdf.mp4', toggleVideoPreview);
-    setupVideoPreview(exportCsvBtn, csvVideoPreviewContainer, csvPreviewVideo, './images/descarga.jpg', toggleVideoPreview);
+    setupVideoPreview(exportExcelBtn, csvVideoPreviewContainer, csvPreviewVideo, './images/descarga.jpg', toggleVideoPreview);
     setupVideoPreview(exportWordBtn, wordVideoPreviewContainer, wordPreviewVideo, './images/word.mp4', toggleVideoPreview, 'left');
     setupVideoPreview(exportOrdersBtn, exportVideoPreviewContainer, exportPreviewVideo, './images/Todos.mp4', toggleVideoPreview, 'left');
     setupVideoPreview(openRegisterOrderModalBtn, registerOrderVideoPreviewContainer, registerOrderPreviewVideo, './images/registro.mp4', toggleVideoPreview);

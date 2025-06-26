@@ -21,7 +21,25 @@ const userSchema = new mongoose.Schema({
     role: { type: String, default: 'cliente' },
     isActive: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },
-    addresses: [addressSchema]
+    addresses: [addressSchema],
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+});
+
+// Hook para encriptar la contraseña antes de guardar cualquier cambio en ella
+userSchema.pre('save', async function(next) {
+    // Solo encripta la contraseña si ha sido modificada (o es nueva)
+    if (!this.isModified('password')) {
+        return next();
+    }
+
+    try {
+        // Genera la "sal" y encripta la contraseña
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 const User = mongoose.model('User', userSchema);

@@ -253,8 +253,12 @@ function setupSectionSpecificListeners() {
     const ordersContainer = document.querySelector(SELECTORS.ORDERS_CONTENT);
     if (ordersContainer) {
         ordersContainer.addEventListener('click', handleOrderActions);
-        const filterButtons = ordersContainer.querySelectorAll(SELECTORS.ORDERS_FILTERS_BUTTONS);
-        filterButtons.forEach(button => button.addEventListener('click', handleOrderFilterClick));
+
+        const statusFilterSelect = document.getElementById('orderStatusFilter');
+        if (statusFilterSelect) {
+            statusFilterSelect.addEventListener('change', handleOrderStatusFilterChange);
+        }
+
         const searchInput = ordersContainer.querySelector(SELECTORS.ORDERS_SEARCH_INPUT);
         if (searchInput) searchInput.addEventListener('input', handleOrderSearch);
     }
@@ -351,6 +355,7 @@ function handleOrderActions(event) {
 function handleMenuActions(event) {
     const target = event.target;
     const addToCartBtn = target.closest(SELECTORS.MENU_ADD_TO_CART_BTN);
+    const favoriteBtn = target.closest('.favorite-btn');
     if (addToCartBtn) {
         try {
             const productInfoString = addToCartBtn.dataset.productInfo;
@@ -365,6 +370,32 @@ function handleMenuActions(event) {
             console.error("Error processing add to cart click:", error);
             showNotification("Error al agregar el producto al carrito.", "error");
         }
+    }
+
+    // NUEVO: Manejo de favoritos
+    if (favoriteBtn) {
+        const productId = favoriteBtn.dataset.productId;
+        handleToggleFavorite(productId, favoriteBtn);
+    }
+}
+
+// -- Función de Favoritos --
+async function handleToggleFavorite(productId, buttonElement) {
+    // Actualización visual inmediata para una mejor experiencia de usuario
+    buttonElement.classList.toggle('is-favorite');
+
+    const result = await makeApiCall('/api/users/profile/favorites', 'POST', { productId });
+
+    if (result.success) {
+        showNotification(result.message, 'success');
+        // Actualizar la lista de favoritos en el estado local
+        if (dashboardState.userProfile) {
+            dashboardState.userProfile.favorites = result.data;
+        }
+    } else {
+        showNotification(result.message || 'No se pudo actualizar favoritos.', 'error');
+        // Si falló, revertimos el cambio visual
+        buttonElement.classList.toggle('is-favorite');
     }
 }
 
@@ -502,8 +533,8 @@ async function loadSectionContent(sectionId) {
             initializeDireccionesSection();
             break;
         case 'favoritos':
-        case 'promociones':
-            break; 
+            await loadFavorites();
+            break;
 
         default: 
             console.log(`No specific content loading defined for section: ${sectionId}`);
@@ -518,6 +549,7 @@ async function fetchAndDisplayUserProfile() {
     if (profileData && profileData.success) {
         dashboardState.userProfile = profileData.data;
         updateProfileDOM(profileData.data);
+        await loadOrders(); // Cargar pedidos después de obtener el perfil
         console.log("User profile loaded and displayed.");
     } else {
         displayProfileError(profileData?.message || 'No se pudo cargar el perfil.');
@@ -544,6 +576,27 @@ function updateProfileDOM(userData) {
             } catch (e) { console.error("Error formatting date:", e); fechaNacimientoEl.textContent = 'Fecha inválida'; }
         } else fechaNacimientoEl.textContent = 'No disponible';
     }
+
+    // Actualizar Resumen de Actividad
+    const totalOrdersEl = document.getElementById('statUserTotalOrders');
+    const favoriteProductsEl = document.getElementById('statUserFavoriteProducts');
+    // const reviewsEl = document.getElementById('statUserReviews');
+
+    if (totalOrdersEl) {
+        // Usamos la longitud del array de pedidos que ya cargamos
+        totalOrdersEl.textContent = dashboardState.userOrders?.length || 0;
+    }
+
+    if (favoriteProductsEl) {
+        // Usamos la longitud del array de favoritos del perfil del usuario
+        favoriteProductsEl.textContent = userData.favorites?.length || 0;
+    }
+
+    /*
+    if (reviewsEl) {
+        reviewsEl.textContent = 0; // Dejar en 0 por ahora
+    }
+    */
 }
 function displayProfileError(message) {
     const selectors = [SELECTORS.USER_NAME_HEADER, SELECTORS.USER_NOMBRES, SELECTORS.USER_APELLIDOS, SELECTORS.USER_EMAIL, SELECTORS.USER_TELEFONO, SELECTORS.USER_FECHA_NACIMIENTO];
@@ -1167,11 +1220,20 @@ function toggleOrderDetails(orderCardElement) { // Recibe el elemento de la tarj
     icon.classList.toggle('rotate-180', !isExpanded);
 }
 
-function handleOrderFilterClick(event) {
-    const filterValue = event.target.dataset.filter;
-    document.querySelectorAll(SELECTORS.ORDERS_FILTERS_BUTTONS).forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    filterAndSearchOrders(filterValue, document.querySelector(SELECTORS.ORDERS_SEARCH_INPUT).value);
+// function handleOrderFilterClick(event) {
+//     const filterValue = event.target.dataset.filter;
+//     document.querySelectorAll(SELECTORS.ORDERS_FILTERS_BUTTONS).forEach(btn => btn.classList.remove('active'));
+//     event.target.classList.add('active');
+//     filterAndSearchOrders(filterValue, document.querySelector(SELECTORS.ORDERS_SEARCH_INPUT).value);
+// }
+
+/**
+ * Maneja el cambio de filtro de pedidos y búsqueda.
+ */
+function handleOrderStatusFilterChange(event) {
+    const filterValue = event.target.value;
+    const searchTerm = document.querySelector(SELECTORS.ORDERS_SEARCH_INPUT).value || '';
+    filterAndSearchOrders(filterValue, searchTerm);
 }
 
 function handleOrderSearch(event) {
@@ -1190,6 +1252,67 @@ function filterAndSearchOrders(statusFilter, searchTerm) {
     displayOrders(filteredOrders);
 }
 
+/**
+ * Carga la lista de productos favoritos del usuario.
+ */
+async function loadFavorites() {
+    console.log("Cargando productos favoritos...");
+    const favoritesContainer = document.querySelector('.favorites-container');
+    if (!favoritesContainer) return;
+
+    favoritesContainer.innerHTML = '<p class="loading-message">Cargando tus favoritos... <i class="fas fa-spinner fa-spin"></i></p>';
+
+    // Primero, nos aseguramos de tener el perfil del usuario actualizado.
+    if (!dashboardState.userProfile || !dashboardState.userProfile.favorites) {
+        await fetchAndDisplayUserProfile();
+    }
+
+    const favoriteIds = dashboardState.userProfile?.favorites || [];
+
+    if (favoriteIds.length === 0) {
+        displayFavorites([]); // Llama a la función de display con un array vacío
+        return;
+    }
+
+    // Si ya tenemos todos los productos en caché, los usamos.
+    if (dashboardState.dashboardProducts && dashboardState.dashboardProducts.length > 0) {
+        const favoriteProducts = dashboardState.dashboardProducts.filter(p => favoriteIds.includes(p._id));
+        displayFavorites(favoriteProducts);
+    } else {
+        // Si no, hacemos una llamada para obtener todos los productos y luego filtramos.
+        const result = await makeApiCall(API_ENDPOINTS.PRODUCTS, 'GET');
+        if (result.success && Array.isArray(result.data)) {
+            dashboardState.dashboardProducts = result.data; // Guardamos en caché
+            const favoriteProducts = result.data.filter(p => favoriteIds.includes(p._id));
+            displayFavorites(favoriteProducts);
+        } else {
+            favoritesContainer.innerHTML = '<p class="empty-favorites-message">Error al cargar los productos.</p>';
+        }
+    }
+}
+
+/**
+ * Muestra los productos favoritos en el contenedor.
+ * @param {Array} favoriteProducts - La lista de productos a mostrar.
+ */
+function displayFavorites(favoriteProducts) {
+    const favoritesContainer = document.querySelector('.favorites-container');
+    if (!favoritesContainer) return;
+
+    if (favoriteProducts.length === 0) {
+        favoritesContainer.innerHTML = `
+            <div class="empty-favorites-message">
+                <i class="far fa-heart"></i>
+                <p>Aún no tienes productos favoritos.</p>
+                <span>Marca un corazón <i class="fas fa-heart" style="color: #e74c3c;"></i> en los productos del menú para guardarlos aquí.</span>
+            </div>
+        `;
+        return;
+    }
+
+    // Reutilizamos la misma función que renderiza las tarjetas del menú.
+    favoritesContainer.innerHTML = favoriteProducts.map(item => renderMenuItemCard(item)).join('');
+}
 
 // Menu Module (Dashboard Version)
 async function loadDashboardMenu() {
@@ -1228,7 +1351,27 @@ function renderMenuItemCard(item) {
     const productImage = item.imageUrl || item.image || '/public/images/placeholder.png';
     const productDescription = item.description || 'Descripción no disponible.';
     const productInfo = JSON.stringify({ id: productId, name: productName, price: productPrice, image: productImage, description: item.description });
-    return `<div class="menu-item-card bg-white shadow rounded-lg overflow-hidden flex flex-col"><img src="${productImage}" alt="${productName}" class="menu-item-image w-full h-48 object-cover" onerror="this.onerror=null; this.src='/public/images/placeholder.png';"><div class="menu-item-content p-4 flex flex-col flex-grow"><div class="menu-item-header flex justify-between items-start mb-2"><h3 class="menu-item-name font-semibold text-lg flex-grow mr-2">${productName}</h3><span class="menu-item-price font-bold text-lg text-green-600 whitespace-nowrap">$${productPrice.toFixed(2)}</span></div><p class="menu-item-description text-sm text-gray-600 mb-4 flex-grow">${productDescription}</p><button class="add-to-cart-btn mt-auto w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-150 flex items-center justify-center" data-product-info='${productInfo.replace(/'/g, "&apos;")}'> <i class="fas fa-cart-plus mr-2"></i>Reservar pedido</button></div></div>`;
+    const isFavorite = dashboardState.userProfile?.favorites?.includes(productId);
+
+    return `
+    <div class="menu-item-card bg-white shadow rounded-lg overflow-hidden flex flex-col">
+        <img src="${productImage}" alt="${productName}" class="menu-item-image w-full h-48 object-cover" onerror="this.onerror=null; this.src='/public/images/placeholder.png';">
+        <div class="menu-item-content p-4 flex flex-col flex-grow">
+            <div class="menu-item-header flex justify-between items-start mb-2">
+                <h3 class="menu-item-name font-semibold text-lg flex-grow mr-2">${productName}</h3>
+                <span class="menu-item-price font-bold text-lg text-green-600 whitespace-nowrap">$${productPrice.toFixed(2)}</span>
+            </div>
+            <p class="menu-item-description text-sm text-gray-600 mb-4 flex-grow">${productDescription}</p>
+            <div class="menu-item-actions flex items-center gap-4 mt-auto">
+                <button class="add-to-cart-btn flex-grow bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-150 flex items-center justify-center" data-product-info='${productInfo.replace(/'/g, "&apos;")}'> 
+                    <i class="fas fa-cart-plus mr-2"></i>Reservar pedido
+                </button>
+                <button class="favorite-btn p-2 rounded-full transition duration-150 ${isFavorite ? 'is-favorite' : ''}" data-product-id="${productId}" title="Añadir a favoritos">
+                    <i class="fas fa-heart"></i>
+                </button>
+            </div>
+        </div>
+    </div>`;
 }
 
 // --- 9. API Utility Functions ---

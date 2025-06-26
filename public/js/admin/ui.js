@@ -69,105 +69,92 @@ export function setupAdminSidebar() {
 
 
 /**
- * Configura la navegación principal del menú lateral.
- * @param {function(string): void} loadSectionContent - Callback que se ejecuta para cargar el contenido de la sección seleccionada.
+ * Configura la navegación principal del menú lateral y el menú móvil.
+ * @param {function(string): void} loadSectionContent - Callback para cargar el contenido de la sección.
  */
 export function setupAdminNavigation(loadSectionContent) {
-    console.log("Configurando navegación del menú admin...");
+    console.log("Configurando navegación del menú admin (versión corregida)...");
     
     const menuLinks = document.querySelectorAll('.admin-menu .menu-link');
     const mobileMenuLinks = document.querySelectorAll('.admin-mobile-menu-link');
     const sections = document.querySelectorAll('.dashboard-section');
     const headerTitle = document.querySelector('.admin-main .header-title');
 
-    console.log(`Encontrados ${menuLinks.length} enlaces del menú:`, menuLinks);
-    console.log(`Encontrados ${mobileMenuLinks.length} enlaces del menú móvil:`, mobileMenuLinks);
-    console.log(`Encontradas ${sections.length} secciones:`, sections);
-
-    // Función para manejar la navegación
-    const handleNavigation = (link, targetSectionId, linkText) => {
-        console.log("Navegando a:", {
-            href: link.getAttribute('href'),
-            dataSection: targetSectionId,
-            linkText: linkText
-        });
+    // --- FUNCIÓN CENTRAL PARA MANEJAR LA NAVEGACIÓN ---
+    const handleNavigation = (clickedLink) => {
+        const targetSectionId = clickedLink.getAttribute('data-section');
+        const linkText = (clickedLink.querySelector('span') || clickedLink).textContent.trim();
 
         if (!targetSectionId) {
-            console.warn("Enlace sin data-section:", link);
+            console.warn("Enlace sin data-section:", clickedLink);
             return;
         }
 
-        console.log("Activando enlace:", targetSectionId);
-
-        // Actualizar enlaces activos en ambos menús
-        menuLinks.forEach(l => l.classList.remove('active'));
-        mobileMenuLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-
-        // Actualizar secciones
-        sections.forEach(section => {
-            const wasActive = section.classList.contains('active');
-            const shouldBeActive = section.id === targetSectionId;
-            section.classList.toggle('active', shouldBeActive);
-            
-            if (wasActive !== shouldBeActive) {
-                console.log(`Sección ${section.id}: ${wasActive} -> ${shouldBeActive}`);
-            }
+        // Desactivar todos los items del menú principal y submenús
+        document.querySelectorAll('.admin-menu .menu-item, .admin-menu .submenu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelectorAll('.admin-menu .menu-link').forEach(link => {
+            link.classList.remove('active');
         });
 
-        // Actualizar título
+        // Activar el enlace clickeado y su contenedor
+        clickedLink.classList.add('active');
+        const parentLi = clickedLink.closest('li');
+        if (parentLi) parentLi.classList.add('active');
+        
+        // Si es un sub-item, mantener el menú padre activo también
+        const parentMenuItem = clickedLink.closest('.has-submenu');
+        if (parentMenuItem) {
+            parentMenuItem.classList.add('active');
+        }
+
+        // Mostrar la sección correspondiente
+        sections.forEach(section => {
+            section.classList.toggle('active', section.id === targetSectionId);
+        });
+
+        // Actualizar el título del header
         if (headerTitle) {
             headerTitle.textContent = linkText;
-            console.log("Título actualizado:", linkText);
         }
 
-        // Cargar contenido de la sección
-        if (typeof loadSectionContent === 'function') {
-            console.log("Llamando loadSectionContent con:", targetSectionId);
-            loadSectionContent(targetSectionId);
-        } else {
-            console.warn("loadSectionContent no es una función:", typeof loadSectionContent);
-        }
+        // Cargar el contenido de la sección
+        loadSectionContent(targetSectionId);
 
-        // Cerrar menú móvil si el enlace es del menú móvil
-        if (link.classList.contains('admin-mobile-menu-link')) {
+        // Si es un enlace móvil, cerrar el menú
+        if (clickedLink.classList.contains('admin-mobile-menu-link')) {
             closeMobileMenu();
         }
     };
 
-    // Configurar enlaces del menú lateral
-    menuLinks.forEach((link, index) => {
-        const targetSectionId = link.getAttribute('data-section');
-        const targetSpan = link.querySelector('span');
-        
-        console.log(`Enlace ${index + 1}:`, {
-            href: link.getAttribute('href'),
-            dataSection: targetSectionId,
-            spanText: targetSpan?.textContent,
-            element: link
-        });
+    // --- CONFIGURACIÓN DE LISTENERS PARA MENÚ DE ESCRITORIO ---
+    menuLinks.forEach(link => {
+        const parentLi = link.parentElement;
 
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            handleNavigation(link, targetSectionId, targetSpan?.textContent);
+            
+            if (parentLi.classList.contains('has-submenu')) {
+                parentLi.classList.toggle('active');
+            } else {
+                handleNavigation(link);
+            }
         });
     });
 
-    // Configurar enlaces del menú móvil
-    mobileMenuLinks.forEach((link, index) => {
-        const targetSectionId = link.getAttribute('data-section');
-        const linkText = link.textContent.trim();
-        
-        console.log(`Enlace móvil ${index + 1}:`, {
-            href: link.getAttribute('href'),
-            dataSection: targetSectionId,
-            linkText: linkText,
-            element: link
-        });
+    // --- CONFIGURACIÓN DE LISTENERS PARA MENÚ MÓVIL ---
+    mobileMenuLinks.forEach(link => {
+        const parentLi = link.parentElement;
 
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            handleNavigation(link, targetSectionId, linkText);
+            
+            if (parentLi.classList.contains('has-submenu')) {
+                parentLi.classList.toggle('active');
+            } else {
+                handleNavigation(link);
+            }
         });
     });
     

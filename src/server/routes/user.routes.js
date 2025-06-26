@@ -8,7 +8,8 @@ const {
     addAddress,
     updateAddress,
     deleteAddress,
-    deactivateAccount
+    deactivateAccount,
+    toggleFavorite
 } = require('../controllers/user.controller');
 const {
     auth
@@ -19,6 +20,9 @@ router.get('/profile', auth, getUserProfile);
 router.put('/profile', auth, updateUserProfile);
 router.post('/profile/change-password', auth, changePassword);
 router.post('/deactivate', auth, deactivateAccount);
+
+// --- RUTAS PARA FAVORITOS ---
+router.post('/profile/favorites', auth, toggleFavorite);
 
 // --- RUTAS PARA DIRECCIONES DE ENVÍO ---
 router.get('/profile/addresses', auth, getAddresses);

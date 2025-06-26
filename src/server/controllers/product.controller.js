@@ -1,20 +1,36 @@
 const mongoose = require('mongoose');
 const Product = require('../models/product.model');
+const User = require('../models/user.model');
+const Category = require('../models/category.model');
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find({
-            isActive: true
-        }).sort({
-            category: 1,
-            name: 1
+        // 1. Obtener todos los productos activos
+        const products = await Product.find({ isActive: true }).lean().sort({ category: 1, name: 1 });
+
+        // 2. Obtener las listas de favoritos de todos los usuarios
+        const usersWithFavorites = await User.find({ favorites: { $exists: true, $ne: [] } }).select('favorites');
+
+        // 3. Contar la frecuencia de cada producto en las listas de favoritos
+        const favoritesCount = new Map();
+        usersWithFavorites.forEach(user => {
+            user.favorites.forEach(productId => {
+                const productIdStr = productId.toString();
+                favoritesCount.set(productIdStr, (favoritesCount.get(productIdStr) || 0) + 1);
+            });
         });
-        res.json(products);
+
+        // 4. Añadir el conteo a cada producto
+        const productsWithFavorites = products.map(product => ({
+            ...product,
+            timesFavorited: favoritesCount.get(product._id.toString()) || 0
+        }));
+
+        res.json(productsWithFavorites);
+
     } catch (error) {
-        console.error("Error en getAllProducts:", error);
-        res.status(500).json({
-            message: 'Error al obtener productos'
-        });
+        console.error("Error en getAllProducts con favoritos:", error);
+        res.status(500).json({ message: 'Error al obtener productos' });
     }
 };
 
@@ -132,10 +148,22 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+const getActiveCategories = async (req, res) => {
+    try {
+        // Busca solo las categorías que están marcadas como activas
+        const categories = await Category.find({ isActive: true }).sort({ name: 1 });
+        res.json({ success: true, data: categories });
+    } catch (error) {
+        console.error("Error en getActiveCategories:", error);
+        res.status(500).json({ success: false, message: 'Error al obtener las categorías.' });
+    }
+};
+
 module.exports = {
     getAllProducts,
     getProductById,
     updateProduct,
     createProduct,
-    deleteProduct
+    deleteProduct,
+    getActiveCategories
 };

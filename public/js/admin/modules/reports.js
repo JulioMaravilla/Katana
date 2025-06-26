@@ -69,12 +69,24 @@ function setupReportTypeSwitcher() {
 
     select.addEventListener('change', (e) => {
         const selectedReport = e.target.value;
+
+        // Ocultar todos los paneles de reporte
         document.querySelectorAll('.reports-section > div[id$="ReportContent"]').forEach(div => {
             div.style.display = 'none';
         });
+
+        // Mostrar el panel seleccionado
         const activePanel = document.getElementById(`${selectedReport}ReportContent`);
         if (activePanel) {
             activePanel.style.display = 'block';
+        }
+
+        // Si se selecciona "favoritos" y la tabla está vacía, cargar los datos.
+        if (selectedReport === 'favoritos') {
+            const favoritesTableBody = document.querySelector('#favoritesReportTable tbody');
+            if (favoritesTableBody && favoritesTableBody.children.length <= 1) { // <=1 para contar el placeholder
+                loadFavoritesReport();
+            }
         }
     });
     select.dataset.listenerAttached = 'true';
@@ -300,6 +312,82 @@ function renderCategoryChart(chartData) {
             maintainAspectRatio: false
         }
     });
+}
+
+/**
+ * Carga los datos del reporte de favoritos desde la API.
+ */
+async function loadFavoritesReport() {
+    showAdminNotification('Cargando reporte de favoritos...', 'info', 2000);
+
+    const result = await makeAdminApiCall('/admin/reports/favorites', 'GET');
+
+    if (result.success && Array.isArray(result.data)) {
+        renderFavoritesMetrics(result.data);
+        renderFavoritesTable(result.data);
+    } else {
+        showAdminNotification('Error al cargar el reporte de favoritos.', 'error');
+        document.querySelector('#favoritesReportTable tbody').innerHTML = '<tr><td colspan="4">Error al cargar datos.</td></tr>';
+        document.querySelector('#favoritesMetricsGrid').innerHTML = '<div class="metric-card"><h3>Error</h3><div class="metric-value">-</div></div>';
+    }
+}
+
+/**
+ * Renderiza las tarjetas de métricas para el reporte de favoritos.
+ * @param {Array} reportData - Los datos del reporte.
+ */
+function renderFavoritesMetrics(reportData) {
+    const metricsGrid = document.getElementById('favoritesMetricsGrid');
+    if (!metricsGrid) return;
+
+    const totalFavorites = reportData.reduce((sum, item) => sum + item.timesFavorited, 0);
+    const mostPopularProduct = reportData.length > 0 ? reportData[0].name : 'N/A';
+    // (La métrica de "Favorito Sorpresa" es más compleja y la dejaremos para una futura mejora)
+
+    metricsGrid.innerHTML = `
+        <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-heart"></i></div>
+            <div class="metric-info">
+                <h3>Producto Más Popular</h3>
+                <div class="metric-value"><span class="math-inline">${mostPopularProduct}</div\>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-star"></i></div>
+            <div class="metric-info">
+                <h3>Total de Favoritos</h3>
+                <div class="metric-value">${totalFavorites}</div>
+            </div>
+        </div>
+        `;
+}
+
+/**
+ * Renderiza la tabla detallada del reporte de favoritos.
+ * @param {Array} reportData - Los datos del reporte.
+ */
+function renderFavoritesTable(reportData) {
+    const tableBody = document.querySelector('#favoritesReportTable tbody');
+    if (!tableBody) return;
+
+    if (reportData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4">Aún no hay productos marcados como favoritos.</td></tr>';
+        return;
+    }
+
+    tableBody.innerHTML = reportData.map((item, index) => `
+        <tr>
+            <td><strong>#<span class="math-inline">${index + 1}</strong\></td\>
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="${item.imageUrl || '/images/placeholder.png'}" alt="${item.name}" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
+                    <span>${item.name}</span>
+                </div>
+            </td>
+            <td>${item.category}</td>
+            <td class="text-center" style="font-weight: 600; font-size: 1.1rem;">${item.timesFavorited}</td>
+        </tr>
+    `).join('');
 }
 
 // ===== LÓGICA PARA EL REPORTE DE PEDIDOS =====

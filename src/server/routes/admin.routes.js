@@ -16,12 +16,17 @@ const {
     getManualOrders, // Obtener pedidos manuales
     uploadCarouselImage, // Subir imagen del carrusel
     deleteCarouselImage, // Eliminar imagen del carrusel
-    // Controladores de reportes
     getReportMetrics,
     getSalesChartData,
     getCategoryChartData,
     getCustomerReport,
-    getProductReport
+    getProductReport,
+    getFavoritesReport,
+    getWeeklyStatusMetrics,
+    getWeeklyActivity,
+    createCategory,
+    getCategories,
+    updateCategoryStatus
 } = require('../controllers/admin.controller');
 
 // Middlewares
@@ -59,5 +64,14 @@ router.get('/reports/sales-chart', adminAuth, getSalesChartData);
 router.get('/reports/category-chart', adminAuth, getCategoryChartData);
 router.get('/reports/customers', adminAuth, getCustomerReport);
 router.get('/reports/products', adminAuth, getProductReport);
+router.get('/reports/favorites', adminAuth, getFavoritesReport);
+
+router.get('/reports/weekly-status', adminAuth, getWeeklyStatusMetrics);
+router.get('/reports/weekly-activity', adminAuth, getWeeklyActivity);
+
+// Categories
+router.get('/categories', adminAuth, getCategories);
+router.post('/categories', adminAuth, createCategory);
+router.patch('/categories/:id/status', adminAuth, updateCategoryStatus);
 
 module.exports = router;

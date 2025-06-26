@@ -5,7 +5,8 @@ const {
     getProductById,
     updateProduct,  
     createProduct,
-    deleteProduct
+    deleteProduct,
+    getActiveCategories
 } = require('../controllers/product.controller');
 const {
     adminAuth
@@ -26,5 +27,8 @@ router.put('/:id', adminAuth, productUpload.single('productImage'), updateProduc
 // Rutas de admin para gestionar productos
 router.post('/', adminAuth, productUpload.single('productImage'), createProduct);
 router.delete('/:id', adminAuth, deleteProduct);
+
+// Ruta para obtener categorías activas
+router.get('/categories/active', getActiveCategories);
 
 module.exports = router;

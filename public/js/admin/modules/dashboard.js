@@ -28,90 +28,150 @@ const SELECTORS = {
 export function initializeDashboardContent() {
     console.log("Módulo de Dashboard principal inicializado.");
     loadDashboardStats();
-    loadRecentActivity();
+    loadWeeklyStatusPanel(); 
+    loadWeeklyActivityPanel();
 }
 
 /**
- * Carga las estadísticas principales del dashboard (tarjetas de resumen).
+ * CORREGIDO: Carga las estadísticas semanales desde la nueva ruta de la API.
  */
 async function loadDashboardStats() {
-    console.log("Cargando estadísticas del dashboard...");
-    // Resetear los valores a 'cargando'
-    document.querySelector(SELECTORS.STAT_TOTAL_ORDERS).textContent = '...';
-    document.querySelector(SELECTORS.STAT_TOTAL_CUSTOMERS).textContent = '...';
-    document.querySelector(SELECTORS.STAT_MONTHLY_REVENUE).textContent = '$...';
-    document.querySelector(SELECTORS.STAT_ACTIVE_PRODUCTS).textContent = '...';
-    
+    console.log("Cargando estadísticas unificadas del dashboard...");
+
+    // Seleccionamos los nuevos elementos del DOM
+    const ordersEl = document.getElementById('statWeeklyOrders');
+    const revenueEl = document.getElementById('statWeeklyRevenue');
+    const topProductEl = document.getElementById('statTopProduct');
+    const newCustomersEl = document.getElementById('statNewCustomersValue');
+    const recurringCustomersEl = document.getElementById('statRecurringCustomersValue');
+
     try {
-        // Se pueden hacer las llamadas en paralelo para mayor eficiencia
-        const [ordersResult, customersResult, productsResult] = await Promise.all([
-            makeAdminApiCall('/admin/orders', 'GET'),
-            makeAdminApiCall('/admin/users', 'GET'),
-            makeAdminApiCall('/products', 'GET', null, false)
-        ]);
+        // Hacemos una única llamada a la API unificada
+        const result = await makeAdminApiCall('/admin/reports/weekly-activity', 'GET');
 
-        // Procesar pedidos y ingresos
-        if (ordersResult.success && Array.isArray(ordersResult.data)) {
-            document.querySelector(SELECTORS.STAT_TOTAL_ORDERS).textContent = ordersResult.data.length;
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
-            const monthlyRevenue = ordersResult.data.reduce((sum, order) => {
-                const orderDate = new Date(order.createdAt);
-                if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear && order.status !== 'cancelled') {
-                    return sum + (order.totalAmount || 0);
-                }
-                return sum;
-            }, 0);
-            document.querySelector(SELECTORS.STAT_MONTHLY_REVENUE).textContent = `$${monthlyRevenue.toFixed(2)}`;
+        if (result.success && result.data) {
+            const metrics = result.data;
+
+            // Actualizamos las 4 tarjetas principales
+            if (ordersEl) ordersEl.textContent = metrics.weeklyOrdersCount || 0;
+            if (revenueEl) revenueEl.textContent = `$${(metrics.weeklyRevenue || 0).toFixed(2)}`;
+            if (topProductEl) topProductEl.textContent = metrics.topProduct || 'N/A';
+            if (newCustomersEl) newCustomersEl.textContent = metrics.growth.newCustomers || 0;
+            if (recurringCustomersEl) recurringCustomersEl.textContent = metrics.growth.recurringCustomers || 0;
+        } else {
+            showAdminNotification('No se pudieron cargar las métricas.', 'error');
         }
-
-        // Procesar clientes
-        if (customersResult.success && Array.isArray(customersResult.data)) {
-            document.querySelector(SELECTORS.STAT_TOTAL_CUSTOMERS).textContent = customersResult.data.length;
-        }
-
-        // Procesar productos
-        const products = productsResult.success ? (productsResult.data || productsResult) : [];
-        if (Array.isArray(products)) {
-            document.querySelector(SELECTORS.STAT_ACTIVE_PRODUCTS).textContent = products.filter(p => p.isActive).length;
-        }
-
     } catch (error) {
         console.error("Error cargando estadísticas del dashboard:", error);
-        // Podrías poner un mensaje de error en las tarjetas si falla la carga
+        showAdminNotification('Error de red al cargar las métricas.', 'error');
+    }
+}
+
+// --- INICIO DE LA NUEVA FUNCIÓN ---
+/**
+ * Carga y muestra las métricas del panel de estado semanal.
+ */
+async function loadWeeklyStatusPanel() {
+    const result = await makeAdminApiCall('/admin/reports/weekly-status', 'GET');
+
+    if (result.success && result.data) {
+        const metrics = result.data;
+        document.getElementById('statusPendingCount').textContent = metrics.pending || 0;
+        document.getElementById('statusProcessingCount').textContent = metrics.processing || 0;
+        document.getElementById('statusShippedCount').textContent = metrics.shipped || 0;
+        document.getElementById('totalToCollectValue').textContent = `$${(metrics.totalToCollect || 0).toFixed(2)}`;
+    } else {
+        console.error("No se pudieron cargar las métricas de estado semanal.");
     }
 }
 
 /**
- * Carga las listas de actividad reciente (pedidos, clientes, productos).
+ * CORREGIDO: Carga y muestra los datos del panel de Resumen Operativo Semanal,
+ * con un manejo de errores robusto.
  */
-async function loadRecentActivity() {
-    console.log("Cargando actividad reciente...");
-    const { RECENT_ORDERS_LIST, RECENT_CUSTOMERS_LIST, RECENT_PRODUCTS_LIST } = SELECTORS;
+async function loadWeeklyActivityPanel() {
+    console.log("Cargando resumen operativo semanal...");
 
-    setListPlaceholder(RECENT_ORDERS_LIST, 'Cargando pedidos...');
-    setListPlaceholder(RECENT_CUSTOMERS_LIST, 'Cargando clientes...');
-    setListPlaceholder(RECENT_PRODUCTS_LIST, 'Cargando productos...');
+    const topCustomersList = document.getElementById('topCustomersList');
+    const topProductsList = document.getElementById('topProductsList');
+    const orderSourceList = document.getElementById('orderSourceList');
+
+    // Placeholders de carga
+    if (topCustomersList) topCustomersList.innerHTML = '<li class="loading-placeholder">Cargando...</li>';
+    if (topProductsList) topProductsList.innerHTML = '<li class="loading-placeholder">Cargando...</li>';
+    if (orderSourceList) orderSourceList.innerHTML = '<li class="loading-placeholder">Cargando...</li>';
 
     try {
-        const [ordersResult, customersResult, productsResult] = await Promise.all([
-            makeAdminApiCall(`/admin/orders?limit=${RECENT_ACTIVITY_LIMIT}&sort=-createdAt`, 'GET'),
-            makeAdminApiCall(`/admin/users?limit=${RECENT_ACTIVITY_LIMIT}&sort=-createdAt`, 'GET'),
-            makeAdminApiCall(`/products?limit=${RECENT_ACTIVITY_LIMIT}&sort=-createdAt`, 'GET', null, false)
-        ]);
-        
-        // Renderizar pedidos recientes
-        renderRecentItems(RECENT_ORDERS_LIST, ordersResult, renderRecentOrder, 'No hay pedidos recientes.');
-        // Renderizar clientes recientes
-        renderRecentItems(RECENT_CUSTOMERS_LIST, customersResult, renderRecentCustomer, 'No hay clientes recientes.');
-        // Renderizar productos recientes
-        renderRecentItems(RECENT_PRODUCTS_LIST, productsResult, renderRecentProduct, 'No hay productos recientes.');
+        const result = await makeAdminApiCall('/admin/reports/weekly-activity', 'GET');
+
+        if (result.success && result.data) {
+            // Desestructuramos los datos que vienen de la API
+            const { 
+                topCustomers = [], 
+                topProducts = [], 
+                orderSource = { registered: 0, guest: 0, manual: 0 } 
+            } = result.data;
+
+            // Renderizar Top Clientes
+            if (topCustomersList) {
+                if (topCustomers.length > 0) {
+                    topCustomersList.innerHTML = topCustomers.map((customer, index) => `
+                        <li>
+                            <span class="item-info">
+                                <span class="item-id"><strong>#${index + 1}</strong> ${customer.name}</span>
+                                <span class="item-details">Total gastado: $${(customer.total || 0).toFixed(2)}</span>
+                            </span>
+                        </li>
+                    `).join('');
+                } else {
+                    topCustomersList.innerHTML = '<li class="empty-placeholder">No hay ventas esta semana.</li>';
+                }
+            }
+
+            // Renderizar Top Productos
+            if (topProductsList) {
+                if (topProducts.length > 0) {
+                    topProductsList.innerHTML = topProducts.map((product, index) => `
+                        <li>
+                            <span class="item-info">
+                                <span class="item-id"><strong>#${index + 1}</strong> ${product.name}</span>
+                                <span class="item-details">${product.quantity} vendidos - Ingresos: $${(product.revenue || 0).toFixed(2)}</span>
+                            </span>
+                        </li>
+                    `).join('');
+                } else {
+                    topProductsList.innerHTML = '<li class="empty-placeholder">No hay productos vendidos.</li>';
+                }
+            }
+            
+            // Renderizar Origen de Pedidos
+            if (orderSourceList) {
+                orderSourceList.innerHTML = `
+                    <li class="source-item">
+                        <i class="fas fa-user-check registered"></i>
+                        <span class="item-info"><span class="item-id">${orderSource.registered} Registrados</span></span>
+                    </li>
+                    <li class="source-item">
+                        <i class="fas fa-user-clock guest"></i>
+                        <span class="item-info"><span class="item-id">${orderSource.guest} Invitados</span></span>
+                    </li>
+                    <li class="source-item">
+                        <i class="fas fa-edit manual"></i>
+                        <span class="item-info"><span class="item-id">${orderSource.manual} Manuales</span></span>
+                    </li>
+                `;
+            }
+
+        } else {
+            throw new Error(result.message || 'No se pudieron cargar los datos de actividad.');
+        }
 
     } catch (error) {
-        console.error("Error general al cargar actividad reciente:", error);
-        setListPlaceholder(RECENT_ORDERS_LIST, 'Error de carga.');
-        setListPlaceholder(RECENT_CUSTOMERS_LIST, 'Error de carga.');
-        setListPlaceholder(RECENT_PRODUCTS_LIST, 'Error de carga.');
+        console.error("Error al cargar actividad semanal:", error);
+        const errorMessage = '<li class="empty-placeholder" style="color: red;">Error al cargar.</li>';
+        if (topCustomersList) topCustomersList.innerHTML = errorMessage;
+        if (topProductsList) topProductsList.innerHTML = errorMessage;
+        if (orderSourceList) orderSourceList.innerHTML = errorMessage;
     }
 }
 

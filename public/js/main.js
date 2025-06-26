@@ -308,67 +308,103 @@ function displayMenuItems(category) {
     `).join('');
 }
 
-function setupCategoryButtons() {
-    const imageCategoriesContainer = document.querySelector('.image-categories-container');
-    const subcategoriesContainer = document.getElementById('rolls-subcategories');
+/**
+ * Carga las categorías desde la API y configura los listeners de los botones.
+ */
+async function setupCategoryButtons() {
+    const mainCategoriesContainer = document.querySelector('.image-categories-container');
+    const subcategoriesContainer = document.querySelector('#rolls-subcategories .subcategories');
 
-    // Listener para las categorías principales con imagen
-    imageCategoriesContainer.addEventListener('click', (event) => {
-        // Solo prevenir el comportamiento por defecto si el target es un enlace
+    if (!mainCategoriesContainer || !subcategoriesContainer) return;
+
+    try {
+        const result = await fetch('/api/products/categories/active');
+        const responseData = await result.json();
+
+        if (!responseData.success) throw new Error('No se pudieron cargar las categorías.');
+
+        const categories = responseData.data;
+
+        // Renderizar las categorías dinámicas
+        categories.forEach(cat => {
+            const isSubcategory = ['Makis', 'Uramakis', 'Tempurizados'].includes(cat.name);
+
+            if (isSubcategory) {
+                const button = document.createElement('button');
+                button.className = 'category-btn';
+                button.dataset.category = cat.name;
+                button.textContent = cat.name;
+                subcategoriesContainer.appendChild(button);
+            } else {
+                const mainCategoryItem = document.createElement('a');
+                mainCategoryItem.href = '#';
+                mainCategoryItem.className = 'image-category-item';
+                mainCategoryItem.dataset.category = cat.name;
+                const imageName = cat.name.toLowerCase().replace(/ /g, '-');
+                const imageUrl = `public/images/categorias/${imageName}.avif`; // Puedes cambiar la extensión si usas otro formato
+
+                mainCategoryItem.innerHTML = `
+                    <img src="${imageUrl}" alt="${cat.name}" onerror="this.onerror=null; this.src='public/images/categorias/default.png';">
+                    <h4>${cat.name}</h4>
+                `;
+                mainCategoriesContainer.appendChild(mainCategoryItem);
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al cargar categorías dinámicas:", error);
+        // Puedes mostrar un mensaje de error si lo deseas
+    }
+
+    // Configurar listeners para todos los botones (estáticos y dinámicos)
+    mainCategoriesContainer.addEventListener('click', (event) => {
         const clickedItem = event.target.closest('.image-category-item');
         if (!clickedItem) return;
-        if (clickedItem.tagName === 'A') {
-            event.preventDefault();
-        }
+        event.preventDefault();
 
         const category = clickedItem.dataset.category;
-        updateActiveButtons(clickedItem);
+        updateActiveButtons(clickedItem, true);
 
-        // Si se hace clic en "Rolls", muestra las subcategorías y el primer tipo de roll
+        const rollsSubcategories = document.getElementById('rolls-subcategories');
         if (category === 'Rolls') {
-            subcategoriesContainer.style.display = 'block';
+            rollsSubcategories.style.display = 'block';
             const firstSubCategoryBtn = subcategoriesContainer.querySelector('.category-btn');
             if (firstSubCategoryBtn) {
-                // Activa el primer botón de subcategoría y muestra sus items
                 updateActiveButtons(firstSubCategoryBtn, false);
                 displayMenuItems(firstSubCategoryBtn.dataset.category);
+            } else {
+                // Si no hay subcategorías, podemos decidir qué mostrar.
+                // Por ahora, no mostramos nada hasta que se seleccione una.
+                document.querySelector('.menu-items').innerHTML = '<p style="text-align:center; width:100%;">Selecciona un tipo de roll.</p>';
             }
         } else {
-            // Si se hace clic en otra categoría principal, oculta las subcategorías
-            subcategoriesContainer.style.display = 'none';
+            rollsSubcategories.style.display = 'none';
             displayMenuItems(category);
         }
-    }, { passive: false });
+    });
 
-    // Listener para los botones de subcategoría
     subcategoriesContainer.addEventListener('click', (event) => {
         const clickedButton = event.target.closest('.category-btn');
         if (!clickedButton) return;
-        if (clickedButton.tagName === 'A') {
-            event.preventDefault();
-        }
         const category = clickedButton.dataset.category;
-        updateActiveButtons(clickedButton, false); // false indica que no es una categoría principal
+        updateActiveButtons(clickedButton, false);
         displayMenuItems(category);
     });
 
-    // --- Carga Inicial de la Página ---
-    // Activa la categoría "Rolls" y la subcategoría "Makis" por defecto
-    const initialRollsItem = document.querySelector('.image-category-item[data-category="Rolls"]');
-    if (initialRollsItem) {
-        initialRollsItem.classList.add('active-category');
-    }
-    
-    subcategoriesContainer.style.display = 'block'; // Muestra subcategorías al cargar
-    
-    const initialMakisButton = document.querySelector('.subcategories .category-btn[data-category="Makis"]');
-    if (initialMakisButton) {
-        initialMakisButton.classList.add('active');
-    }
-    
-    // Muestra los Makis al cargar la página
-    if (allProducts.length > 0) {
-        displayMenuItems('Makis');
+    // Carga Inicial
+    const initialRollsItem = document.getElementById('default-rolls-category');
+    if (initialRollsItem) initialRollsItem.classList.add('active-category');
+
+    const rollsSubcategories = document.getElementById('rolls-subcategories');
+    rollsSubcategories.style.display = 'block';
+
+    const firstSubCategoryButton = subcategoriesContainer.querySelector('.category-btn');
+    if (firstSubCategoryButton) {
+        firstSubCategoryButton.classList.add('active');
+        displayMenuItems(firstSubCategoryButton.dataset.category);
+    } else {
+         // Si no hay subcategorías, pero sí productos "Rolls", podemos mostrarlos
+         displayMenuItems('Makis'); // O la subcategoría por defecto que prefieras
     }
 }
 
@@ -831,95 +867,37 @@ function toggleMenu(e) {
 
 function openMenu() {
     if (isMenuOpen) return;
-    
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuIcon = document.querySelector('.menu-toggle .menu-icon');
+
     const navLinks = document.querySelector('.nav-links');
     const mobileOverlay = document.querySelector('.mobile-menu-overlay');
     const body = document.body;
-    
-    if (!menuToggle || !menuIcon || !navLinks || !mobileOverlay) return;
-    
+
+    if (!navLinks || !mobileOverlay) return;
+
     // Cerrar carrito si está abierto
     if (document.querySelector('.cart-sidebar')?.classList.contains('active')) {
         closeCart();
     }
-    
+
     isMenuOpen = true;
-    
-    // Activar overlay
-    mobileOverlay.classList.add('active');
-    
-    // Activar menú
-    menuToggle.classList.add('active');
     body.classList.add('menu-open');
-    
-    // Mostrar menú con animación
-    navLinks.style.display = 'flex';
-    navLinks.style.right = '-100%';
-    
-    // Forzar reflow
-    navLinks.offsetHeight;
-    
-    navLinks.classList.add('active');
-    
-    // Cambiar ícono
-    menuIcon.classList.remove('fa-bars');
-    menuIcon.classList.add('fa-times');
-    
-    // Animar elementos del menú
-    const navItems = navLinks.querySelectorAll('li');
-    navItems.forEach((item, index) => {
-        item.style.transitionDelay = `${index * 0.05}s`;
-        item.classList.add('visible');
-    });
-    
-    // Prevenir scroll del body
-    body.style.overflow = 'hidden';
+    mobileOverlay.classList.add('active');
+    navLinks.classList.add('active'); // <-- Solo añadimos la clase
 }
 
 function closeMenu() {
     if (!isMenuOpen) return;
-    
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuIcon = document.querySelector('.menu-toggle .menu-icon');
+
     const navLinks = document.querySelector('.nav-links');
     const mobileOverlay = document.querySelector('.mobile-menu-overlay');
     const body = document.body;
-    
-    if (!menuToggle || !menuIcon || !navLinks || !mobileOverlay) return;
-    
+
+    if (!navLinks || !mobileOverlay) return;
+
     isMenuOpen = false;
-    
-    // Desactivar menú
-    menuToggle.classList.remove('active');
-    menuIcon.classList.remove('fa-times');
-    menuIcon.classList.add('fa-bars');
-    
-    // Remover clase del body
     body.classList.remove('menu-open');
-    body.style.overflow = '';
-    
-    // Desactivar overlay
     mobileOverlay.classList.remove('active');
-    
-    // Cerrar menú con animación
-    navLinks.classList.remove('active');
-    
-    // Remover animaciones de elementos
-    const navItems = navLinks.querySelectorAll('li');
-    navItems.forEach(item => {
-        item.classList.remove('visible');
-        item.style.transitionDelay = '';
-    });
-    
-    // Ocultar menú después de la animación
-    setTimeout(() => {
-        if (!isMenuOpen) {
-            navLinks.style.display = 'none';
-            navLinks.style.right = '-100%';
-        }
-    }, 400);
+    navLinks.classList.remove('active'); // <-- Solo quitamos la clase
 }
 
 // --- Autenticación en Navbar (sin cambios) ---

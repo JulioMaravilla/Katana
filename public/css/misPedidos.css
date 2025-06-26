@@ -466,3 +466,52 @@
   border-radius: 0;
   padding: 0;
 }
+
+/* --- Estilos para el nuevo filtro de selección de pedidos --- */
+
+.filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.filter-select-wrapper i {
+    position: absolute;
+    left: 15px;
+    color: #888;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.order-status-select {
+    appearance: none; /* Elimina la apariencia nativa del select */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease-in-out;
+}
+
+.order-status-select:hover {
+    border-color: #ccc;
+}
+
+.order-status-select:focus {
+    outline: none;
+    border-color: var(--primary-color, #ca0b0b);
+    box-shadow: 0 0 0 3px rgba(202, 11, 11, 0.1);
+}

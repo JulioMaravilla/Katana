@@ -162,6 +162,50 @@ const deactivateAccount = async (req, res) => {
     }
 };
 
+const toggleFavorite = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        if (!productId) {
+            return res.status(400).json({ success: false, message: 'Se requiere el ID del producto.' });
+        }
+
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+        }
+
+        // Comprueba si el producto ya está en favoritos
+        const isFavorite = user.favorites.includes(productId);
+        let updatedUser;
+
+        if (isFavorite) {
+            // Si ya es favorito, lo quita
+            updatedUser = await User.findByIdAndUpdate(
+                req.userId,
+                { $pull: { favorites: productId } },
+                { new: true }
+            ).select('favorites');
+        } else {
+            // Si no es favorito, lo añade
+            updatedUser = await User.findByIdAndUpdate(
+                req.userId,
+                { $addToSet: { favorites: productId } }, // $addToSet evita duplicados
+                { new: true }
+            ).select('favorites');
+        }
+
+        res.json({
+            success: true,
+            message: isFavorite ? 'Producto eliminado de favoritos.' : 'Producto añadido a favoritos.',
+            data: updatedUser.favorites
+        });
+
+    } catch (error) {
+        console.error("Error en toggleFavorite:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+};
+
 module.exports = {
     getUserProfile,
     updateUserProfile,
@@ -170,5 +214,6 @@ module.exports = {
     addAddress,
     updateAddress,
     deleteAddress,
-    deactivateAccount
+    deactivateAccount,
+    toggleFavorite
 };
