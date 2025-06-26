@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER || 'kataba.sushi.shulton@gmail.com',
+    user: process.env.EMAIL_USER || 'katana.sushi.shulton@gmail.com',
     pass: process.env.EMAIL_PASS || 'txzq uxsv vgju idcc'
   }
 });
@@ -26,8 +26,8 @@ function notificarNuevoPedido(pedido) {
   const logoUrl = 'https://raw.githubusercontent.com/USER/REPO/main/public/images/LOGO-SIN-FONDO.png'; // <-- ¡IMPORTANTE! Reemplaza con una URL pública a tu logo.
 
   const mailOptions = {
-      from: '"Katana Sushi Notificaciones" <kataba.sushi.shulton@gmail.com>',
-      to: 'kataba.sushi.shulton@gmail.com', // Correo del admin
+      from: '"Katana Sushi Notificaciones" <katana.sushi.shulton@gmail.com>',
+      to: 'katana.sushi.shulton@gmail.com', // Correo del admin
       subject: `🍣 ¡Nuevo Pedido! - #${pedido.orderId}`,
       html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 20px auto; border: 1px solid #ddd; border-radius: 8px;">
