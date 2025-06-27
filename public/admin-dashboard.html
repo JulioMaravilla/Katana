@@ -1045,6 +1045,29 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="editCategoryModal" class="admin-modal" style="display: none;">
+                    <div class="admin-modal-content">
+                        <button class="close-modal-btn" id="closeEditCategoryModalBtn">&times;</button>
+                        <h2 id="editCategoryModalTitle">Editar Categoría</h2>
+                        <form id="editCategoryForm">
+                            <input type="hidden" id="editCategoryId" name="categoryId">
+                            <div class="form-group">
+                                <label for="editCategoryName" class="form-label">Nombre de la Categoría</label>
+                                <input type="text" id="editCategoryName" name="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editCategoryDescription" class="form-label">Descripción (Opcional)</label>
+                                <textarea id="editCategoryDescription" name="description" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </section>
 
             <section id="configuracionContent" class="dashboard-section">

@@ -9,6 +9,20 @@ export function initializeCategoriesSection() {
     setupCategoryFormListener();
     setupCategoryListListener();
     loadCategories();
+
+    // --- INICIO DEL CÓDIGO A AÑADIR ---
+    const editForm = document.getElementById('editCategoryForm');
+    const closeEditModalBtn = document.getElementById('closeEditCategoryModalBtn');
+
+    if (editForm && !editForm.dataset.listener) {
+        editForm.addEventListener('submit', handleUpdateCategorySubmit);
+        editForm.dataset.listener = 'true';
+    }
+    if (closeEditModalBtn) {
+        closeEditModalBtn.addEventListener('click', () => {
+            document.getElementById('editCategoryModal').style.display = 'none';
+        });
+    }
 }
 
 /**
@@ -110,10 +124,13 @@ function renderCategoriesList(categories) {
                             </span>
                         </td>
                         <td class="text-center">
+                            <button class="action-btn edit-category-btn" data-id="${cat._id}" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
                             <button class="action-btn toggle-status-btn" data-id="${cat._id}" data-active="${cat.isActive}" title="${cat.isActive ? 'Desactivar' : 'Activar'}">
                                 <i class="fas ${cat.isActive ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
                             </button>
-                            </td>
+                        </td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -133,31 +150,100 @@ function setupCategoryListListener() {
 }
 
 /**
- * Maneja los clics en los botones de acción de la tabla.
+ * CORREGIDO: Maneja los clics en los botones de acción de la tabla,
+ * como "Editar" o "Activar/Desactivar".
  * @param {Event} event
  */
 async function handleCategoryActionClick(event) {
-    const button = event.target.closest('.toggle-status-btn');
-    if (!button) return;
+    // Usamos .closest() para encontrar el botón, sin importar si se hizo clic
+    // en el ícono <i> o en el botón <button> directamente.
+    const toggleBtn = event.target.closest('.toggle-status-btn');
+    const editBtn = event.target.closest('.edit-category-btn');
 
-    const categoryId = button.dataset.id;
-    const currentStatus = button.dataset.active === 'true';
+    if (toggleBtn) {
+        const categoryId = toggleBtn.dataset.id;
+        const currentStatus = toggleBtn.dataset.active === 'true';
+        const newStatus = !currentStatus;
 
-    // Cambiamos el estado al opuesto
-    const newStatus = !currentStatus;
+        toggleBtn.disabled = true;
+        toggleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-    button.disabled = true;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        const result = await makeAdminApiCall(`/admin/categories/${categoryId}/status`, 'PATCH', { isActive: newStatus });
 
-    const result = await makeAdminApiCall(`/admin/categories/${categoryId}/status`, 'PATCH', { isActive: newStatus });
+        if (result.success) {
+            showAdminNotification('Estado de la categoría actualizado.', 'success');
+            loadCategories(); // Recargar la lista
+        } else {
+            showAdminNotification(result.message || 'No se pudo actualizar el estado.', 'error');
+            toggleBtn.disabled = false;
+            toggleBtn.innerHTML = `<i class="fas ${currentStatus ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>`;
+        }
+        return; // Detenemos la ejecución para no procesar ambos botones
+    }
+
+    if (editBtn) {
+        const categoryId = editBtn.dataset.id;
+        openEditCategoryModal(categoryId);
+        return; // Detenemos la ejecución
+    }
+}
+
+/**
+ * Abre el modal de edición y lo rellena con los datos de la categoría.
+ * @param {string} categoryId - El ID de la categoría a editar.
+ */
+async function openEditCategoryModal(categoryId) {
+    const modal = document.getElementById('editCategoryModal');
+    const form = document.getElementById('editCategoryForm');
+
+    // Pide los datos más recientes de la categoría por si han cambiado
+    const result = await makeAdminApiCall(`/admin/categories`, 'GET');
+    const category = result.data.find(c => c._id === categoryId);
+
+    if (!category) {
+        showAdminNotification('No se encontró la categoría para editar.', 'error');
+        return;
+    }
+
+    form.categoryId.value = category._id;
+    form.name.value = category.name;
+    form.description.value = category.description || '';
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Maneja el envío del formulario de edición de categoría.
+ */
+async function handleUpdateCategorySubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const categoryId = form.categoryId.value;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const updatedData = {
+        name: form.name.value.trim(),
+        description: form.description.value.trim()
+    };
+
+    if (!updatedData.name) {
+        showAdminNotification('El nombre es requerido.', 'error');
+        return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+    const result = await makeAdminApiCall(`/admin/categories/${categoryId}`, 'PATCH', updatedData);
 
     if (result.success) {
-        showAdminNotification('Estado de la categoría actualizado.', 'success');
-        loadCategories(); // Recargar la lista para reflejar el cambio
+        showAdminNotification('Categoría actualizada con éxito.', 'success');
+        document.getElementById('editCategoryModal').style.display = 'none';
+        loadCategories(); // Recargar la lista
     } else {
-        showAdminNotification(result.message || 'No se pudo actualizar el estado.', 'error');
-        // Restaurar el botón en caso de error
-        button.disabled = false;
-        button.innerHTML = `<i class="fas ${currentStatus ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>`;
+        showAdminNotification(result.message || 'No se pudo actualizar la categoría.', 'error');
     }
+
+    submitButton.disabled = false;
+    submitButton.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
 }

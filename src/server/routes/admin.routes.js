@@ -26,7 +26,8 @@ const {
     getWeeklyActivity,
     createCategory,
     getCategories,
-    updateCategoryStatus
+    updateCategoryStatus,
+    updateCategory
 } = require('../controllers/admin.controller');
 
 // Middlewares
@@ -73,5 +74,6 @@ router.get('/reports/weekly-activity', adminAuth, getWeeklyActivity);
 router.get('/categories', adminAuth, getCategories);
 router.post('/categories', adminAuth, createCategory);
 router.patch('/categories/:id/status', adminAuth, updateCategoryStatus);
+router.patch('/categories/:id', adminAuth, updateCategory);
 
 module.exports = router;

@@ -651,6 +651,41 @@ const updateCategoryStatus = async (req, res) => {
     }
 };
 
+/**
+ * Actualiza el nombre y/o la descripción de una categoría específica.
+ */
+const updateCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ success: false, message: 'El nombre de la categoría no puede estar vacío.' });
+        }
+
+        const categoryToUpdate = await Category.findById(id);
+        if (!categoryToUpdate) {
+            return res.status(404).json({ success: false, message: 'Categoría no encontrada.' });
+        }
+
+        // Verificar si el nuevo nombre ya existe en otra categoría
+        const existingCategory = await Category.findOne({ name, _id: { $ne: id } });
+        if (existingCategory) {
+            return res.status(400).json({ success: false, message: 'Ya existe otra categoría con ese nombre.' });
+        }
+
+        categoryToUpdate.name = name;
+        categoryToUpdate.description = description;
+
+        const updatedCategory = await categoryToUpdate.save();
+
+        res.json({ success: true, message: 'Categoría actualizada con éxito.', data: updatedCategory });
+    } catch (error) {
+        console.error("Error en updateCategory:", error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+    }
+};
+
 module.exports = {
     loginAdmin,
     getAllUsers,
@@ -675,5 +710,6 @@ module.exports = {
     getWeeklyActivity,
     createCategory,
     getCategories,
-    updateCategoryStatus
+    updateCategoryStatus,
+    updateCategory
 };
